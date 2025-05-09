@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Tableau de Bord - Gestion Parc</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="content">
+        <h1>📊 Tableau de Bord</h1>
+        <p>Nombre total d'employés : {{ total_employes }}</p>
+        <a href="http://localhost:8502" class="admin-link">Aller à l'Administration (Streamlit)</a>
+    </div>
+</body>
+</html>
+

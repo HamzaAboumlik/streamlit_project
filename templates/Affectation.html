@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Affectation{% endblock %}
+{% block content %}
+<h1>Affectation</h1>
+
+<!-- Search Bar -->
+<div class="search-container">
+    <form method="POST" action="{{ url_for('affectation') }}">
+        <input type="text" name="search" placeholder="Rechercher par article ou service..." value="{{ search_query }}">
+        <button type="submit" class="search-btn">🔍 Rechercher</button>
+    </form>
+</div>
+
+<!-- Add Affectation Form -->
+<h2>Nouvelle Affectation</h2>
+<form method="POST" action="{{ url_for('affectation') }}" class="form-container">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.id_article_affectation.label }} {{ form.id_article_affectation(class="input-field") }}
+    </div>
+    <div class="form-group">
+        {{ form.service_employe_article.label }} {{ form.service_employe_article(class="input-field") }}
+    </div>
+    <div class="form-group">
+        {{ form.date_affectation.label }} {{ form.date_affectation(class="input-field") }}
+    </div>
+    <div class="form-group">
+        {{ form.date_restitution_affectation.label }} {{ form.date_restitution_affectation(class="input-field") }}
+    </div>
+    <div class="form-group">
+        {{ form.affecter_au_article.label }} {{ form.affecter_au_article(class="input-field") }}
+    </div>
+    <div class="form-group">
+        {{ form.numero_affectation.label }} {{ form.numero_affectation(class="input-field") }}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="action-btn add-btn") }}
+    </div>
+</form>
+
+<!-- Affectation List Table -->
+<h2>Liste des Affectations</h2>
+<table class="styled-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Article</th>
+            <th>Service</th>
+            <th>Date Affectation</th>
+            <th>Date Restitution</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for affectation in affectations %}
+        <tr>
+            <td>{{ affectation.ID_Affectation }}</td>
+            <td>{{ affectation.Libelle_Article or 'N/A' }}</td>
+            <td>{{ affectation.Service_Employe_Article or 'N/A' }}</td>
+            <td>{{ affectation.Date_Affectation or 'N/A' }}</td>
+            <td>{{ affectation.Date_Restitution_Affectation or 'N/A' }}</td>
+            <td>
+                <form method="POST" action="{{ url_for('delete_affectation', id=affectation.ID_Affectation) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                    <button type="submit" class="action-btn delete-btn">Supprimer</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

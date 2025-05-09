@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Modifier Utilisateur{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('edit_utilisateur', id=user.ID_Employe) }}" class="form-container">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.code_employe.label }}
+        {{ form.code_employe(class="input-field", value=user.Code_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.badge_employe.label }}
+        {{ form.badge_employe(class="input-field", value=user.Badge_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.cin_employe.label }}
+        {{ form.cin_employe(class="input-field", value=user.CIN_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.nom_employe.label }}
+        {{ form.nom_employe(class="input-field", value=user.Nom_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.prenom_employe.label }}
+        {{ form.prenom_employe(class="input-field", value=user.Prenom_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.fonction_employe.label }}
+        {{ form.fonction_employe(class="input-field", value=user.Fonction_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.service_employe.label }}
+        {{ form.service_employe(class="input-field", value=user.Service_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.direction_employe.label }}
+        {{ form.direction_employe(class="input-field", value=user.Direction_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.affectation_employe.label }}
+        {{ form.affectation_employe(class="input-field", value=user.Affectation_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.statut_employe.label }}
+        {{ form.statut_employe(class="input-field", value=user.Statut_Employe) }}
+    </div>
+    <div class="form-group">
+        {{ form.date_sortie_employe.label }}
+        {{ form.date_sortie_employe(class="input-field", value=user.Date_Sortie_Employe) }}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="action-btn btn-cancel" onclick="closeEditModal()">Annuler</button>
+        {{ form.submit(class="action-btn btn-confirm", value="Enregistrer") }}
+    </div>
+</form>
+{% endblock %}

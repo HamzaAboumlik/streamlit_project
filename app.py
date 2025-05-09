@@ -1,106 +1,37 @@
 import streamlit as st
-import pyodbc
 import pandas as pd
+from utils.ui import render_navbar, apply_global_css
+from utils.database import get_connection, fetch_data
 
+st.set_page_config(page_title="Dashboard - Gestion Parc Informatique FedEx", layout="wide")
 
+apply_global_css()
 
-def get_connection():
-    return pyodbc.connect(
-        'DRIVER={ODBC Driver 17 for SQL Server};'
-        'SERVER=localhost\\TEST;'
-        'DATABASE=gestion_parc;'
-        'Trusted_Connection=yes;'
-    )
+if "current_page" not in st.session_state:
+    st.session_state.current_page = "Dashboard"
 
+render_navbar()
 
-def fetch_users(conn):
-    query = "SELECT * FROM utilisateur"
-    return pd.read_sql(query, conn)
-
-def add_user(conn, nom, prenom, adresse):
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO utilisateur (nom, prenom, adresse) VALUES (?, ?, ?)", (nom, prenom, adresse))
-    conn.commit()
-
-def delete_user(conn, user_id):
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM utilisateur WHERE id = ?", (user_id,))
-    conn.commit()
-
-def update_user(conn, user_id, nom, prenom, adresse):
-    cursor = conn.cursor()
-    cursor.execute("UPDATE utilisateur SET nom=?, prenom=?, adresse=? WHERE id=?", (nom, prenom, adresse, user_id))
-    conn.commit()
-
-
-menu = [" Afficher", " Ajouter"]
-choice = st.sidebar.radio("Navigation", menu)
+st.title("📊 Tableau de bord")
 
 conn = get_connection()
-users = fetch_users(conn)
+query_employes = "SELECT * FROM Employe"
+query_articles = "SELECT * FROM Article"
+query_affectations = "SELECT * FROM Affectation"
+employes = pd.read_sql(query_employes, conn)
+articles = pd.read_sql(query_articles, conn)
+affectations = pd.read_sql(query_affectations, conn)
+conn.close()
 
+col1, col2, col3 = st.columns(3)
+col1.metric("Employés", len(employes))
+col2.metric("Articles", len(articles))
+col3.metric("Affectations", len(affectations))
 
-if choice == " Afficher":
-    st.subheader(" Liste des utilisateurs")
+st.subheader("Répartition des articles par statut")
+if not articles.empty:
+    st.bar_chart(articles["Statut_Article"].value_counts())
 
-    search_term = st.text_input("🔍 Rechercher par nom ou prénom")
-    if search_term:
-        users = users[
-            users['nom'].str.contains(search_term, case=False) |
-            users['prenom'].str.contains(search_term, case=False)
-        ]
-
-    if users.empty:
-        st.info("Aucun utilisateur trouvé.")
-    else:
-        st.data_editor(
-            users,
-            column_config={
-                "id": st.column_config.NumberColumn("ID", width="small"),
-                "nom": st.column_config.TextColumn("Nom"),
-                "prenom": st.column_config.TextColumn("Prénom"),
-                "adresse": st.column_config.TextColumn("Adresse")
-            },
-            use_container_width=True,
-            hide_index=True,
-            disabled=True
-        )
-
-        st.markdown("---")
-        st.subheader(" Modifier ou  Supprimer un utilisateur")
-        selected_id = st.selectbox("Sélectionnez un ID", users['id'])
-
-        selected_user = users[users['id'] == selected_id].iloc[0]
-        col1, col2 = st.columns(2)
-        with col1:
-            nom = st.text_input("Nom", selected_user['nom'])
-            prenom = st.text_input("Prénom", selected_user['prenom'])
-        with col2:
-            adresse = st.text_input("Adresse", selected_user['adresse'])
-
-        if st.button("Mettre à jour"):
-            update_user(conn, selected_id, nom, prenom, adresse)
-            st.success(" Utilisateur mis à jour")
-            st.rerun()
-
-        if st.button("Supprimer", type="primary"):
-            delete_user(conn, selected_id)
-            st.success("️ Utilisateur supprimé")
-            st.rerun()
-
-
-elif choice == " Ajouter":
-    st.subheader(" Ajouter un nouvel utilisateur")
-    col1, col2 = st.columns(2)
-    with col1:
-        nom = st.text_input("Nom")
-        prenom = st.text_input("Prénom")
-    with col2:
-        adresse = st.text_input("Adresse")
-
-    if st.button("Ajouter"):
-        if nom and prenom and adresse:
-            add_user(conn, nom, prenom, adresse)
-            st.success("✅ Utilisateur ajouté")
-        else:
-            st.warning("⚠️ Veuillez remplir tous les champs.")
+st.subheader("Répartition des employés par service")
+if not employes.empty:
+    st.bar_chart(employes["Service_Employe"].value_counts())

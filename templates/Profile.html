@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Profil{% endblock %}
+{% block content %}
+<h1>Profil Utilisateur</h1>
+
+<form method="POST" action="{{ url_for('profile') }}" class="form-container">
+    <div class="form-group">
+        <label for="username">Nom d'utilisateur</label>
+        <input type="text" name="username" class="input-field" value="{{ username }}" required>
+    </div>
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" name="email" class="input-field" value="{{ email }}" required>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="action-btn edit-btn">Mettre à jour</button>
+    </div>
+</form>
+{% endblock %}

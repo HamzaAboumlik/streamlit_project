@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+{% block title %}Matériel{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Actions</h2>
+        <div class="search-box">
+            <input type="text" id="live-search" placeholder="Rechercher un article..." onkeyup="liveSearch()">
+        </div>
+        <select id="filter-articles" onchange="filterArticles()">
+            <option value="all">Tous</option>
+            <option value="AFFECTE">Affecté</option>
+            <option value="NON AFFECTE">Non Affecté</option>
+        </select>
+        <button class="action-btn" onclick="openAddModal()">Ajouter Article</button>
+        <button class="action-btn" onclick="quickAdd()">Ajout Rapide</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Matériel</h1>
+            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        </div>
+
+        <div class="card">
+            <table class="article-table" id="article-table">
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Libellé</th>
+                        <th>Référence</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr class="expandable" onclick="toggleDetails(this)">
+                        <td>
+                            {% if item.Image_Path %}
+                            <img src="{{ item.Image_Path }}" alt="Article Image" class="article-image">
+                            {% else %}
+                            <span>No Image</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.Libelle_Article or 'N/A' }}</td>
+                        <td>{{ item.Ref_Article or 'N/A' }}</td>
+                        <td>{{ item.Statut_Article or 'N/A' }}</td>
+                        <td>
+                            <a href="{{ url_for('edit_materiel', id=item.ID_Article) }}" class="action-btn edit-btn">Modifier</a>
+                            <form method="POST" action="{{ url_for('delete_materiel', id=item.ID_Article) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                <button type="submit" class="action-btn delete-btn">Supprimer</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr class="details">
+                        <td colspan="5">
+                            <strong>ID:</strong> {{ item.ID_Article }}<br>
+                            <strong>Type:</strong> {{ item.Type_Article or 'N/A' }}<br>
+                            <strong>Catégorie:</strong> {{ item.Categorie_Article or 'N/A' }}<br>
+                            <strong>Marque:</strong> {{ item.Marque_Article or 'N/A' }}<br>
+                            <strong>Description:</strong> {{ item.Description_Article or 'N/A' }}<br>
+                            <strong>Date Achat:</strong> {{ item.Date_Achat_Article or 'N/A' }}<br>
+                            <strong>Date Échéance:</strong> {{ item.Date_Echeance_Article or 'N/A' }}<br>
+                            <strong>État:</strong> {{ item.Etat_Article or 'N/A' }}<br>
+                            <strong>Location:</strong> {{ item.Location_Article or 'N/A' }}<br>
+                            <strong>Affecté à:</strong> {{ item.Affecter_au_Article or 'N/A' }}<br>
+                            <strong>Service:</strong> {{ item.Service_Employe_Article or 'N/A' }}<br>
+                            <strong>Agence:</strong> {{ item.Agence_Article or 'N/A' }}<br>
+                            <strong>Date Affectation:</strong> {{ item.Date_Affectation_Article or 'N/A' }}<br>
+                            <strong>Date Restitution:</strong> {{ item.Date_Restitution_Article or 'N/A' }}<br>
+                            <strong>Compte Comptable:</strong> {{ item.Compte_Comptable_Article or 'N/A' }}<br>
+                            <strong>Modifier:</strong> {{ item.modifier_o or 'N/A' }}<br>
+                            <strong>Acheté Par:</strong> {{ item.Achete_Par_Article or 'N/A' }}<br>
+                            <strong>Affecté à (Nom):</strong> {{ item.Affecte_A_Article or 'N/A' }}<br>
+                            <strong>Numéro Affectation:</strong> {{ item.Numero_Affectation or 'N/A' }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Add Article Modal -->
+<div class="modal" id="addModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Ajouter Article</h2>
+            <button class="modal-close" onclick="closeAddModal()">✖</button>
+        </div>
+        <form method="POST" action="{{ url_for('materiel') }}">
+            {{ form.hidden_tag() }}
+            <div class="modal-body">
+                <div>
+                    <label>{{ form.ref_article.label }}</label>
+                    {{ form.ref_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.libelle_article.label }}</label>
+                    {{ form.libelle_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.type_article.label }}</label>
+                    {{ form.type_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.categorie_article.label }}</label>
+                    {{ form.categorie_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.marque_article.label }}</label>
+                    {{ form.marque_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.description_article.label }}</label>
+                    {{ form.description_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.date_achat_article.label }}</label>
+                    {{ form.date_achat_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.date_echeance_article.label }}</label>
+                    {{ form.date_echeance_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.etat_article.label }}</label>
+                    {{ form.etat_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.statut_article.label }}</label>
+                    {{ form.statut_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.location_article.label }}</label>
+                    {{ form.location_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.affecter_au_article.label }}</label>
+                    {{ form.affecter_au_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.service_employe_article.label }}</label>
+                    {{ form.service_employe_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.agence_article.label }}</label>
+                    {{ form.agence_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.date_affectation_article.label }}</label>
+                    {{ form.date_affectation_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.date_restitution_article.label }}</label>
+                    {{ form.date_restitution_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.compte_comptable_article.label }}</label>
+                    {{ form.compte_comptable_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.modifier_o.label }}</label>
+                    {{ form.modifier_o(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.achete_par_article.label }}</label>
+                    {{ form.achete_par_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.affecte_a_article.label }}</label>
+                    {{ form.affecte_a_article(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.numero_affectation.label }}</label>
+                    {{ form.numero_affectation(class="input-field") }}
+                </div>
+                <div>
+                    <label>{{ form.image_path_article.label }}</label>
+                    {{ form.image_path_article(class="input-field") }}
+                </div>
+            </div>
+            <div class="modal-footer">
+                {{ form.submit(class="action-btn add-btn") }}
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Expandable table rows
+    function toggleDetails(row) {
+        const detailsRow = row.nextElementSibling;
+        detailsRow.style.display = detailsRow.style.display === 'table-row' ? 'none' : 'table-row';
+    }
+
+    // Modal control
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'block';
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+    }
+
+    // Theme toggle
+    function toggleTheme() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    }
+
+    // Load theme preference
+    window.onload = function() {
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    };
+
+    // Live search for articles
+    function liveSearch() {
+        const query = document.getElementById('live-search').value;
+        fetch(`/materiel/search?query=${query}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#article-table tbody');
+                tbody.innerHTML = '';
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr class="expandable" onclick="toggleDetails(this)">
+                            <td>
+                                ${item.Image_Path ? `<img src="${item.Image_Path}" alt="Article Image" class="article-image">` : '<span>No Image</span>'}
+                            </td>
+                            <td>${item.Libelle_Article || 'N/A'}</td>
+                            <td>${item.Ref_Article || 'N/A'}</td>
+                            <td>${item.Statut_Article || 'N/A'}</td>
+                            <td>
+                                <a href="/materiel/edit/${item.ID_Article}" class="action-btn edit-btn">Modifier</a>
+                                <form method="POST" action="/materiel/delete/${item.ID_Article}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                    <button type="submit" class="action-btn delete-btn">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr class="details">
+                            <td colspan="5">
+                                <strong>ID:</strong> ${item.ID_Article}<br>
+                                <strong>Type:</strong> ${item.Type_Article || 'N/A'}<br>
+                                <strong>Catégorie:</strong> ${item.Categorie_Article || 'N/A'}<br>
+                                <strong>Marque:</strong> ${item.Marque_Article || 'N/A'}<br>
+                                <strong>Description:</strong> ${item.Description_Article || 'N/A'}<br>
+                                <strong>Date Achat:</strong> ${item.Date_Achat_Article || 'N/A'}<br>
+                                <strong>Date Échéance:</strong> ${item.Date_Echeance_Article || 'N/A'}<br>
+                                <strong>État:</strong> ${item.Etat_Article || 'N/A'}<br>
+                                <strong>Location:</strong> ${item.Location_Article || 'N/A'}<br>
+                                <strong>Affecté à:</strong> ${item.Affecter_au_Article || 'N/A'}<br>
+                                <strong>Service:</strong> ${item.Service_Employe_Article || 'N/A'}<br>
+                                <strong>Agence:</strong> ${item.Agence_Article || 'N/A'}<br>
+                                <strong>Date Affectation:</strong> ${item.Date_Affectation_Article || 'N/A'}<br>
+                                <strong>Date Restitution:</strong> ${item.Date_Restitution_Article || 'N/A'}<br>
+                                <strong>Compte Comptable:</strong> ${item.Compte_Comptable_Article || 'N/A'}<br>
+                                <strong>Modifier:</strong> ${item.modifier_o || 'N/A'}<br>
+                                <strong>Acheté Par:</strong> ${item.Achete_Par_Article || 'N/A'}<br>
+                                <strong>Affecté à (Nom):</strong> ${item.Affecte_A_Article || 'N/A'}<br>
+                                <strong>Numéro Affectation:</strong> ${item.Numero_Affectation || 'N/A'}
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Filter articles
+    function filterArticles() {
+        const filter = document.getElementById('filter-articles').value;
+        fetch(`/materiel/filter?status=${filter}`)
+            .then(response => response.json())
+            .then(data => {
+                const tbody = document.querySelector('#article-table tbody');
+                tbody.innerHTML = '';
+                data.forEach(item => {
+                    tbody.innerHTML += `
+                        <tr class="expandable" onclick="toggleDetails(this)">
+                            <td>
+                                ${item.Image_Path ? `<img src="${item.Image_Path}" alt="Article Image" class="article-image">` : '<span>No Image</span>'}
+                            </td>
+                            <td>${item.Libelle_Article || 'N/A'}</td>
+                            <td>${item.Ref_Article || 'N/A'}</td>
+                            <td>${item.Statut_Article || 'N/A'}</td>
+                            <td>
+                                <a href="/materiel/edit/${item.ID_Article}" class="action-btn edit-btn">Modifier</a>
+                                <form method="POST" action="/materiel/delete/${item.ID_Article}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
+                                    <button type="submit" class="action-btn delete-btn">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                        <tr class="details">
+                            <td colspan="5">
+                                <strong>ID:</strong> ${item.ID_Article}<br>
+                                <strong>Type:</strong> ${item.Type_Article || 'N/A'}<br>
+                                <strong>Catégorie:</strong> ${item.Categorie_Article || 'N/A'}<br>
+                                <strong>Marque:</strong> ${item.Marque_Article || 'N/A'}<br>
+                                <strong>Description:</strong> ${item.Description_Article || 'N/A'}<br>
+                                <strong>Date Achat:</strong> ${item.Date_Achat_Article || 'N/A'}<br>
+                                <strong>Date Échéance:</strong> ${item.Date_Echeance_Article || 'N/A'}<br>
+                                <strong>État:</strong> ${item.Etat_Article || 'N/A'}<br>
+                                <strong>Location:</strong> ${item.Location_Article || 'N/A'}<br>
+                                <strong>Affecté à:</strong> ${item.Affecter_au_Article || 'N/A'}<br>
+                                <strong>Service:</strong> ${item.Service_Employe_Article || 'N/A'}<br>
+                                <strong>Agence:</strong> ${item.Agence_Article || 'N/A'}<br>
+                                <strong>Date Affectation:</strong> ${item.Date_Affectation_Article || 'N/A'}<br>
+                                <strong>Date Restitution:</strong> ${item.Date_Restitution_Article || 'N/A'}<br>
+                                <strong>Compte Comptable:</strong> ${item.Compte_Comptable_Article || 'N/A'}<br>
+                                <strong>Modifier:</strong> ${item.modifier_o || 'N/A'}<br>
+                                <strong>Acheté Par:</strong> ${item.Achete_Par_Article || 'N/A'}<br>
+                                <strong>Affecté à (Nom):</strong> ${item.Affecte_A_Article || 'N/A'}<br>
+                                <strong>Numéro Affectation:</strong> ${item.Numero_Affectation || 'N/A'}
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Quick Add
+    function quickAdd() {
+        fetch('/materiel/quick-add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                ref_article: 'QUICK-' + Math.floor(Math.random() * 1000),
+                libelle_article: 'Article Rapide',
+                type_article: 'Type',
+                statut_article: 'NON AFFECTE'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock %}
