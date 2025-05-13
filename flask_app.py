@@ -1,18 +1,22 @@
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
 import pyodbc
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, DateField, SelectField
-from wtforms.validators import DataRequired, Optional
 from datetime import datetime
+from flask import Flask, render_template, request, redirect, url_for, flash
+import pyodbc
+from datetime import datetime
+import logging
 
+logging.basicConfig(level=logging.DEBUG, filename='app.log', filemode='a',
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key_here'
+app.secret_key = 'votre_cle_secrete'
 
 
-# Database connection function
+# Configuration de la connexion à la base de données
 def get_db_connection():
     conn_str = (
-        "DRIVER={ODBC Driver 17 for SQL Server};"
+        "DRIVER={SQL Server};"
         "SERVER=localhost\\TEST;"
         "DATABASE=gestion_parc_informatique;"
         "Trusted_Connection=yes;"
@@ -20,652 +24,661 @@ def get_db_connection():
     return pyodbc.connect(conn_str)
 
 
-class UserForm(FlaskForm):
-    code_employe = StringField('Code Employé', validators=[DataRequired()])
-    badge_employe = StringField('Badge Employé', validators=[Optional()])
-    cin_employe = StringField('CIN Employé', validators=[DataRequired()])
-    nom_employe = StringField('Nom', validators=[DataRequired()])
-    prenom_employe = StringField('Prénom', validators=[DataRequired()])
-    fonction_employe = StringField('Fonction', validators=[Optional()])
-    service_employe = SelectField('Service', coerce=int, validators=[Optional()])
-    direction_employe = SelectField('Direction', coerce=int, validators=[Optional()])
-    affectation_employe = StringField('Affectation', validators=[Optional()])
-    statut_employe = SelectField('Statut', choices=[('Actif', 'Actif'), ('Inactif', 'Inactif')],
-                                 validators=[DataRequired()])
-    date_sortie_employe = DateField('Date de Sortie', format='%Y-%m-%d', validators=[Optional()])
-    submit = SubmitField('Ajouter')
-
-
+# Routes principales
 @app.route('/')
 def index():
     return render_template('index.html')
 
 
-@app.route('/utilisateurs', methods=['GET', 'POST'])
+# Gestion des utilisateurs
+@app.route('/utilisateurs')
 def utilisateurs():
-    form = UserForm()
-    search_query = request.form.get('search', '')
-
-    # Populate dropdowns
     conn = get_db_connection()
     cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Employe")
+    employes = cursor.fetchall()
+    conn.close()
+    return render_template('utilisateurs.html', employes=employes)
 
-    # Get services for dropdown
-    cursor.execute("SELECT ID_Service, Service_Service FROM Service")
-    services = cursor.fetchall()
-    form.service_employe.choices = [(s.ID_Service, s.Service_Service) for s in services]
 
-    # Get directions for dropdown
-    cursor.execute("SELECT ID_Direction, Direction_Direction FROM Direction")
-    directions = cursor.fetchall()
-    form.direction_employe.choices = [(d.ID_Direction, d.Direction_Direction) for d in directions]
-
+@app.route('/utilisateur/ajouter', methods=['GET', 'POST'])
+def ajouter_utilisateur():
     if request.method == 'POST':
-        # Handle search
-        if 'search' in request.form:
-            search_query = request.form['search']
-            cursor.execute("""
-                           SELECT *
-                           FROM Employe
-                           WHERE Nom_Employe LIKE ?
-                              OR Prenom_Employe LIKE ?
-                           ORDER BY Nom_Employe
-                           """, (f'%{search_query}%', f'%{search_query}%'))
-            users = cursor.fetchall()
-            conn.close()
-            return render_template('utilisateurs.html', users=users, form=form, search_query=search_query)
+        # Récupérer les données du formulaire
+        data = request.form
 
-        # Handle form submission
-        if form.validate_on_submit():
-            try:
-                cursor.execute("""
-                               INSERT INTO Employe (Code_Employe, Badge_Employe, CIN_Employe, Nom_Employe,
-                                                    Prenom_Employe,
-                                                    Fonction_Employe, Service_Employe, Direction_Employe,
-                                                    Affectation_Employe,
-                                                    Statut_Employe, Date_Sortie_Employe)
-                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                               """, (
-                                   form.code_employe.data,
-                                   form.badge_employe.data,
-                                   form.cin_employe.data,
-                                   form.nom_employe.data,
-                                   form.prenom_employe.data,
-                                   form.fonction_employe.data,
-                                   form.service_employe.data,
-                                   form.direction_employe.data,
-                                   form.affectation_employe.data,
-                                   form.statut_employe.data,
-                                   form.date_sortie_employe.data.strftime(
-                                       '%Y-%m-%d') if form.date_sortie_employe.data else None
-                               ))
-                conn.commit()
-                flash('Utilisateur ajouté avec succès', 'success')
-            except Exception as e:
-                conn.rollback()
-                flash(f'Erreur: {str(e)}', 'error')
-            finally:
-                conn.close()
-                return redirect(url_for('utilisateurs'))
-
-    # GET request - load all users
-    cursor.execute("SELECT * FROM Employe ORDER BY Nom_Employe")
-    users = cursor.fetchall()
-    conn.close()
-
-    return render_template('utilisateurs.html', users=users, form=form, search_query=search_query)
-
-
-@app.route('/utilisateurs/search')
-def search_utilisateurs():
-    query = request.args.get('query', '')
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-                   SELECT *
-                   FROM Employe
-                   WHERE Nom_Employe LIKE ?
-                      OR Prenom_Employe LIKE ?
-                   """, (f'%{query}%', f'%{query}%'))
-    users = cursor.fetchall()
-    conn.close()
-    # Convert rows to dict for JSON
-    user_list = [dict(zip([column[0] for column in cursor.description], user)) for user in users]
-    return jsonify(user_list)
-
-
-@app.route('/utilisateurs/filter')
-def filter_utilisateurs():
-    status = request.args.get('status', 'all')
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    if status == 'all':
-        cursor.execute("SELECT * FROM Employe")
-    else:
-        cursor.execute("SELECT * FROM Employe WHERE Statut_Employe = ?", (status.capitalize(),))
-    users = cursor.fetchall()
-    conn.close()
-    user_list = [dict(zip([column[0] for column in cursor.description], user)) for user in users]
-    return jsonify(user_list)
-
-
-@app.route('/utilisateurs/quick-add', methods=['POST'])
-def quick_add_utilisateur():
-    data = request.get_json()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
         cursor.execute("""
-                       INSERT INTO Employe (Code_Employe, CIN_Employe, Nom_Employe, Prenom_Employe, Statut_Employe)
-                       VALUES (?, ?, ?, ?, ?)
-                       """, (data['code_employe'], data['cin_employe'], data['nom_employe'], data['prenom_employe'],
-                             data['statut_employe']))
+                       INSERT INTO Employe (Code_Employe, Badge_Employe, CIN_Employe, Nom_Employe, Prenom_Employe,
+                                            Fonction_Employe, Service_Employe, Direction_Employe, Affectation_Employe,
+                                            Statut_Employe, Date_Sortie_Employe)
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                       """, (
+                           data['code'], data['badge'], data['cin'], data['nom'], data['prenom'],
+                           data['fonction'], data['service'], data['direction'], data['affectation'],
+                           data['statut'], data['date_sortie']
+                       ))
         conn.commit()
-        return jsonify({'success': True})
-    except Exception as e:
-        conn.rollback()
-        return jsonify({'success': False, 'error': str(e)})
-    finally:
         conn.close()
-
-
-@app.route('/edit-utilisateur/<int:id>', methods=['GET', 'POST'])
-def edit_utilisateur(id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Get user data
-    cursor.execute("SELECT * FROM Employe WHERE ID_Employe = ?", (id,))
-    user = cursor.fetchone()
-
-    if not user:
-        conn.close()
-        flash('Utilisateur non trouvé', 'error')
+        flash('Utilisateur ajouté avec succès', 'success')
         return redirect(url_for('utilisateurs'))
 
-    # Populate dropdowns
-    cursor.execute("SELECT ID_Service, Service_Service FROM Service")
-    services = cursor.fetchall()
-
-    cursor.execute("SELECT ID_Direction, Direction_Direction FROM Direction")
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Direction")
     directions = cursor.fetchall()
-
-    form = UserForm(
-        code_employe=user.Code_Employe,
-        badge_employe=user.Badge_Employe,
-        cin_employe=user.CIN_Employe,
-        nom_employe=user.Nom_Employe,
-        prenom_employe=user.Prenom_Employe,
-        fonction_employe=user.Fonction_Employe,
-        service_employe=user.Service_Employe,
-        direction_employe=user.Direction_Employe,
-        affectation_employe=user.Affectation_Employe,
-        statut_employe=user.Statut_Employe,
-        date_sortie_employe=user.Date_Sortie_Employe
-    )
-
-    form.service_employe.choices = [(s.ID_Service, s.Service_Service) for s in services]
-    form.direction_employe.choices = [(d.ID_Direction, d.Direction_Direction) for d in directions]
-
-    if request.method == 'POST' and form.validate_on_submit():
-        try:
-            cursor.execute("""
-                           UPDATE Employe
-                           SET Code_Employe        = ?,
-                               Badge_Employe       = ?,
-                               CIN_Employe         = ?,
-                               Nom_Employe         = ?,
-                               Prenom_Employe      = ?,
-                               Fonction_Employe    = ?,
-                               Service_Employe     = ?,
-                               Direction_Employe   = ?,
-                               Affectation_Employe = ?,
-                               Statut_Employe      = ?,
-                               Date_Sortie_Employe = ?
-                           WHERE ID_Employe = ?
-                           """, (
-                               form.code_employe.data,
-                               form.badge_employe.data,
-                               form.cin_employe.data,
-                               form.nom_employe.data,
-                               form.prenom_employe.data,
-                               form.fonction_employe.data,
-                               form.service_employe.data,
-                               form.direction_employe.data,
-                               form.affectation_employe.data,
-                               form.statut_employe.data,
-                               form.date_sortie_employe.data.strftime(
-                                   '%Y-%m-%d') if form.date_sortie_employe.data else None,
-                               id
-                           ))
-            conn.commit()
-            flash('Utilisateur modifié avec succès', 'success')
-        except Exception as e:
-            conn.rollback()
-            flash(f'Erreur: {str(e)}', 'error')
-        finally:
-            conn.close()
-            return redirect(url_for('utilisateurs'))
-
-    conn.close()
-    return render_template('edit_utilisateur.html', form=form, user=user)
-
-
-@app.route('/delete-utilisateur/<int:id>', methods=['POST'])
-def delete_utilisateur(id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute("DELETE FROM Employe WHERE ID_Employe = ?", (id,))
-        conn.commit()
-        flash('Utilisateur supprimé avec succès', 'success')
-    except Exception as e:
-        conn.rollback()
-        flash(f'Erreur: {str(e)}', 'error')
-    finally:
-        conn.close()
-        return redirect(url_for('utilisateurs'))
-
-
-class ArticleForm(FlaskForm):
-    ref_article = StringField('Référence', validators=[DataRequired()])
-    libelle_article = StringField('Libellé', validators=[DataRequired()])
-    type_article = StringField('Type', validators=[DataRequired()])
-    categorie_article = StringField('Catégorie')
-    marque_article = StringField('Marque')
-    description_article = StringField('Description')
-    date_achat_article = DateField('Date Achat', format='%Y-%m-%d', validators=[Optional()])
-    date_echeance_article = DateField('Date Échéance', format='%Y-%m-%d', validators=[Optional()])
-    etat_article = StringField('État')
-    statut_article = SelectField('Statut', choices=[('NON AFFECTE', 'Non Affecté'), ('AFFECTE', 'Affecté')],
-                                 validators=[DataRequired()])
-    location_article = StringField('Localisation')
-    affecter_au_article = StringField('Affecté à')
-    service_employe_article = SelectField('Service', coerce=int, validators=[Optional()])
-    agence_article = StringField('Agence')
-    date_affectation_article = DateField('Date Affectation', format='%Y-%m-%d', validators=[Optional()])
-    date_restitution_article = DateField('Date Restitution', format='%Y-%m-%d', validators=[Optional()])
-    compte_comptable_article = StringField('Compte Comptable')
-    modifier_o = StringField('Modifier')
-    achete_par_article = StringField('Acheté par')
-    affecte_a_article = StringField('Affecté à (Nom)')
-    numero_affectation = StringField('Numéro Affectation')
-    image_path_article = StringField('Chemin de l\'Image', validators=[Optional()])
-    submit = SubmitField('Ajouter')
-
-
-@app.route('/materiel', methods=['GET', 'POST'])
-def materiel():
-    form = ArticleForm()
-    search_query = request.form.get('search', '')
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Populate services dropdown
-    cursor.execute("SELECT ID_Service, Service_Service FROM Service")
+    cursor.execute("SELECT * FROM Service")
     services = cursor.fetchall()
-    form.service_employe_article.choices = [(s.ID_Service, s.Service_Service) for s in services]
+    conn.close()
+    return render_template('ajouter_utilisateur.html', directions=directions, services=services)
+
+
+@app.route('/utilisateur/editer/<int:id>', methods=['GET', 'POST'])
+def editer_utilisateur(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
     if request.method == 'POST':
-        if 'search' in request.form:
-            search_query = request.form['search']
-            cursor.execute("""
-                           SELECT *
-                           FROM Article
-                           WHERE Libelle_Article LIKE ?
-                              OR Ref_Article LIKE ?
-                           ORDER BY Libelle_Article
-                           """, (f'%{search_query}%', f'%{search_query}%'))
-            items = cursor.fetchall()
-            conn.close()
-            return render_template('materiel.html', items=items, form=form, search_query=search_query)
+        data = request.form
+        cursor.execute("""
+                       UPDATE Employe
+                       SET Code_Employe        = ?,
+                           Badge_Employe       = ?,
+                           CIN_Employe         = ?,
+                           Nom_Employe         = ?,
+                           Prenom_Employe      = ?,
+                           Fonction_Employe    = ?,
+                           Service_Employe     = ?,
+                           Direction_Employe   = ?,
+                           Affectation_Employe = ?,
+                           Statut_Employe      = ?,
+                           Date_Sortie_Employe = ?
+                       WHERE ID_Employe = ?
+                       """, (
+                           data['code'], data['badge'], data['cin'], data['nom'], data['prenom'],
+                           data['fonction'], data['service'], data['direction'], data['affectation'],
+                           data['statut'], data['date_sortie'], id
+                       ))
+        conn.commit()
+        conn.close()
+        flash('Utilisateur mis à jour avec succès', 'success')
+        return redirect(url_for('utilisateurs'))
 
-        if form.validate_on_submit():
-            try:
-                cursor.execute("""
-                               INSERT INTO Article (Ref_Article, Libelle_Article, Type_Article, Categorie_Article,
-                                                    Marque_Article,
-                                                    Description_Article, Date_Achat_Article, Date_Echeance_Article,
-                                                    Etat_Article,
-                                                    Statut_Article, Location_Article, Affecter_au_Article,
-                                                    Service_Employe_Article,
-                                                    Agence_Article, Date_Affectation_Article, Date_Restitution_Article,
-                                                    Compte_Comptable_Article, modifier_o, Achete_Par_Article,
-                                                    Affecte_A_Article,
-                                                    Numero_Affectation, Image_Path)
-                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                               """, (
-                                   form.ref_article.data,
-                                   form.libelle_article.data,
-                                   form.type_article.data,
-                                   form.categorie_article.data,
-                                   form.marque_article.data,
-                                   form.description_article.data,
-                                   form.date_achat_article.data.strftime(
-                                       '%Y-%m-%d') if form.date_achat_article.data else None,
-                                   form.date_echeance_article.data.strftime(
-                                       '%Y-%m-%d') if form.date_echeance_article.data else None,
-                                   form.etat_article.data,
-                                   form.statut_article.data,
-                                   form.location_article.data,
-                                   form.affecter_au_article.data,
-                                   form.service_employe_article.data,
-                                   form.agence_article.data,
-                                   form.date_affectation_article.data.strftime(
-                                       '%Y-%m-%d') if form.date_affectation_article.data else None,
-                                   form.date_restitution_article.data.strftime(
-                                       '%Y-%m-%d') if form.date_restitution_article.data else None,
-                                   form.compte_comptable_article.data,
-                                   form.modifier_o.data,
-                                   form.achete_par_article.data,
-                                   form.affecte_a_article.data,
-                                   form.numero_affectation.data,
-                                   form.image_path_article.data
-                               ))
-                conn.commit()
-                flash('Article ajouté avec succès', 'success')
-            except Exception as e:
-                conn.rollback()
-                flash(f'Erreur: {str(e)}', 'error')
-            finally:
-                conn.close()
-                return redirect(url_for('materiel'))
-
-    # GET request - load all articles
-    cursor.execute("SELECT * FROM Article ORDER BY Libelle_Article")
-    items = cursor.fetchall()
+    cursor.execute("SELECT * FROM Employe WHERE ID_Employe = ?", (id,))
+    employe = cursor.fetchone()
+    cursor.execute("SELECT * FROM Direction")
+    directions = cursor.fetchall()
+    cursor.execute("SELECT * FROM Service")
+    services = cursor.fetchall()
     conn.close()
 
-    return render_template('materiel.html', items=items, form=form, search_query=search_query)
+    if employe:
+        return render_template('edit_utilisateur.html', employe=employe, directions=directions, services=services)
+    else:
+        flash('Utilisateur non trouvé', 'danger')
+        return redirect(url_for('utilisateurs'))
 
-
-@app.route('/materiel/edit/<int:id>', methods=['GET', 'POST'])
-def edit_materiel(id):
+@app.route('/utilisateur/supprimer/<int:id>', methods=['POST'])
+def supprimer_utilisateur(id):
     conn = get_db_connection()
     cursor = conn.cursor()
+    cursor.execute("DELETE FROM Employe WHERE ID_Employe = ?", (id,))
+    conn.commit()
+    conn.close()
+    flash('Utilisateur supprimé avec succès', 'success')
+    return redirect(url_for('utilisateurs'))
+# Gestion du matériel
+@app.route('/materiel')
+def materiel():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Article")
+    articles = cursor.fetchall()
+    conn.close()
+    return render_template('materiel.html', articles=articles)
 
-    # Get article data
-    cursor.execute("SELECT * FROM Article WHERE ID_Article = ?", (id,))
-    item = cursor.fetchone()
 
-    if not item:
-        conn.close()
-        flash('Article non trouvé', 'error')
-        return redirect(url_for('materiel'))
+from flask import Flask, render_template, request, redirect, url_for, flash
+import pyodbc
+from datetime import datetime
+import logging
 
-    # Populate services dropdown
-    cursor.execute("SELECT ID_Service, Service_Service FROM Service")
-    services = cursor.fetchall()
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, filename='app.log', filemode='a',
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
-    form = ArticleForm(
-        ref_article=item.Ref_Article,
-        libelle_article=item.Libelle_Article,
-        type_article=item.Type_Article,
-        categorie_article=item.Categorie_Article,
-        marque_article=item.Marque_Article,
-        description_article=item.Description_Article,
-        date_achat_article=datetime.strptime(item.Date_Achat_Article, '%Y-%m-%d') if item.Date_Achat_Article else None,
-        date_echeance_article=datetime.strptime(item.Date_Echeance_Article,
-                                                '%Y-%m-%d') if item.Date_Echeance_Article else None,
-        etat_article=item.Etat_Article,
-        statut_article=item.Statut_Article,
-        location_article=item.Location_Article,
-        affecter_au_article=item.Affecter_au_Article,
-        service_employe_article=item.Service_Employe_Article,
-        agence_article=item.Agence_Article,
-        date_affectation_article=datetime.strptime(item.Date_Affectation_Article,
-                                                   '%Y-%m-%d') if item.Date_Affectation_Article else None,
-        date_restitution_article=datetime.strptime(item.Date_Restitution_Article,
-                                                   '%Y-%m-%d') if item.Date_Restitution_Article else None,
-        compte_comptable_article=item.Compte_Comptable_Article,
-        modifier_o=item.modifier_o,
-        achete_par_article=item.Achete_Par_Article,
-        affecte_a_article=item.Affecte_A_Article,
-        numero_affectation=item.Numero_Affectation,
-        image_path_article=item.Image_Path
-    )
+# ... (other imports and app setup)
 
-    form.service_employe_article.choices = [(s.ID_Service, s.Service_Service) for s in services]
+@app.route('/materiel/ajouter', methods=['GET', 'POST'])
+def ajouter_materiel():
+    # Predefined lists for Statut_Article and Etat_Article
+    statuts = ['affecté', 'non affecté']
+    etats = ['disponible', 'non disponible', 'en maintenance', 'occupé']
+    types = ['ordinateur', 'imprimante', 'scanner', 'autre']  # Example types
+    categories = ['informatique', 'bureautique', 'réseau']  # Example categories
+    locations = ['bureau 1', 'bureau 2', 'entrepôt', 'autre']  # Example locations
 
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == 'POST':
+        data = request.form
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
         try:
+            # Validate required fields
+            required_fields = ['ref', 'libelle', 'type', 'categorie', 'marque', 'etat', 'statut']
+            for field in required_fields:
+                if not data.get(field) or data.get(field).strip() == '':
+                    raise ValueError(f"Le champ {field} est requis.")
+
+            # Get column lengths for all VARCHAR columns
+            varchar_columns = [
+                'Ref_Article', 'Libelle_Article', 'Type_Article', 'Categorie_Article',
+                'Marque_Article', 'Description_Article', 'Etat_Article', 'Statut_Article',
+                'Location_Article', 'Affecter_au_Article', 'Service_Employe_Article',
+                'Agence_Article', 'Compte_Comptable_Article', 'modifier_o',
+                'Achete_Par_Article', 'Affecte_A_Article', 'Numero_Affectation'
+            ]
+            column_lengths = {}
+            for col in varchar_columns:
+                cursor.execute("""
+                    SELECT CHARACTER_MAXIMUM_LENGTH
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = 'Article' AND COLUMN_NAME = ?
+                """, (col,))
+                length = cursor.fetchone()
+                column_lengths[col] = length[0] if length and length[0] is not None else 50  # Default to 50 if unknown
+
+            # Prepare form data with dynamic truncation
+            ref = data.get('ref', '')[:column_lengths['Ref_Article']]
+            libelle = data.get('libelle', '')[:column_lengths['Libelle_Article']]
+            type_article = data.get('type', '')[:column_lengths['Type_Article']]
+            categorie = data.get('categorie', '')[:column_lengths['Categorie_Article']]
+            marque = data.get('marque', '')[:column_lengths['Marque_Article']]
+            description = data.get('description', '')[:column_lengths['Description_Article']]
+            etat = data.get('etat', '')[:column_lengths['Etat_Article']]
+            statut = data.get('statut', '')[:column_lengths['Statut_Article']]
+            location = data.get('location', '')[:column_lengths['Location_Article']]
+            affecter_au = data.get('affecter_au', '')[:column_lengths['Affecter_au_Article']]
+            service_employe = data.get('service_employe', '')[:column_lengths['Service_Employe_Article']]
+            agence = data.get('agence', '')[:column_lengths['Agence_Article']]
+            compte_comptable = data.get('compte_comptable', '')[:column_lengths['Compte_Comptable_Article']]
+            modifier_o = data.get('modifier_o', '')[:column_lengths['modifier_o']]
+            achete_par = data.get('achete_par', '')[:column_lengths['Achete_Par_Article']]
+            affecte_a = data.get('affecte_a', '')[:column_lengths['Affecte_A_Article']]
+            numero_affectation = data.get('numero_affectation', '')[:column_lengths['Numero_Affectation']]
+
+            # Log all string values to identify truncation issues
+            logger.debug(f"Insert values: ref={ref} (len={len(ref)}), libelle={libelle} (len={len(libelle)}), "
+                        f"type={type_article} (len={len(type_article)}), categorie={categorie} (len={len(categorie)}), "
+                        f"marque={marque} (len={len(marque)}), description={description} (len={len(description)}), "
+                        f"etat={etat} (len={len(etat)}), statut={statut} (len={len(statut)}), "
+                        f"location={location} (len={len(location)}), affecter_au={affecter_au} (len={len(affecter_au)}), "
+                        f"service_employe={service_employe} (len={len(service_employe)}), agence={agence} (len={len(agence)}), "
+                        f"compte_comptable={compte_comptable} (len={len(compte_comptable)}), "
+                        f"modifier_o={modifier_o} (len={len(modifier_o)}), achete_par={achete_par} (len={len(achete_par)}), "
+                        f"affecte_a={affecte_a} (len={len(affecte_a)}), numero_affectation={numero_affectation} (len={len(numero_affectation)})")
+
+            # Validate Statut_Article and Etat_Article
+            if not statut or statut not in statuts:
+                raise ValueError(f"Statut invalide. Choisissez parmi : {', '.join(statuts)}")
+            if not etat or etat not in etats:
+                raise ValueError(f"État invalide. Choisissez parmi : {', '.join(etats)}")
+
+            # Validate dates
+            date_achat = data.get('date_achat') or None
+            date_echeance = data.get('date_echeance') or None
+            date_affectation = data.get('date_affectation') or None
+            date_restitution = data.get('date_restitution') or None
+            if date_achat and date_achat.strip():
+                try:
+                    date_achat = datetime.strptime(date_achat, '%Y-%m-%d').strftime('%Y-%m-%d')
+                except ValueError:
+                    raise ValueError("Format de date d'achat invalide (utilisez AAAA-MM-JJ).")
+            if date_echeance and date_echeance.strip():
+                try:
+                    date_echeance = datetime.strptime(date_echeance, '%Y-%m-%d').strftime('%Y-%m-%d')
+                except ValueError:
+                    raise ValueError("Format de date d'échéance invalide (utilisez AAAA-MM-JJ).")
+            if date_affectation and date_affectation.strip():
+                try:
+                    date_affectation = datetime.strptime(date_affectation, '%Y-%m-%d').strftime('%Y-%m-%d')
+                except ValueError:
+                    raise ValueError("Format de date d'affectation invalide (utilisez AAAA-MM-JJ).")
+            if date_restitution and date_restitution.strip():
+                try:
+                    date_restitution = datetime.strptime(date_restitution, '%Y-%m-%d').strftime('%Y-%m-%d')
+                except ValueError:
+                    raise ValueError("Format de date de restitution invalide (utilisez AAAA-MM-JJ).")
+
+            # Log parameters
+            logger.debug(f"Adding article: ref={ref}, libelle={libelle}, statut={statut}, etat={etat}, location={location}")
+
+            # Insert into Article
             cursor.execute("""
-                           UPDATE Article
-                           SET Ref_Article              = ?,
-                               Libelle_Article          = ?,
-                               Type_Article             = ?,
-                               Categorie_Article        = ?,
-                               Marque_Article           = ?,
-                               Description_Article      = ?,
-                               Date_Achat_Article       = ?,
-                               Date_Echeance_Article    = ?,
-                               Etat_Article             = ?,
-                               Statut_Article           = ?,
-                               Location_Article         = ?,
-                               Affecter_au_Article      = ?,
-                               Service_Employe_Article  = ?,
-                               Agence_Article           = ?,
-                               Date_Affectation_Article = ?,
-                               Date_Restitution_Article = ?,
-                               Compte_Comptable_Article = ?,
-                               modifier_o               = ?,
-                               Achete_Par_Article       = ?,
-                               Affecte_A_Article        = ?,
-                               Numero_Affectation       = ?,
-                               Image_Path               = ?
-                           WHERE ID_Article = ?
-                           """, (
-                               form.ref_article.data,
-                               form.libelle_article.data,
-                               form.type_article.data,
-                               form.categorie_article.data,
-                               form.marque_article.data,
-                               form.description_article.data,
-                               form.date_achat_article.data.strftime(
-                                   '%Y-%m-%d') if form.date_achat_article.data else None,
-                               form.date_echeance_article.data.strftime(
-                                   '%Y-%m-%d') if form.date_echeance_article.data else None,
-                               form.etat_article.data,
-                               form.statut_article.data,
-                               form.location_article.data,
-                               form.affecter_au_article.data,
-                               form.service_employe_article.data,
-                               form.agence_article.data,
-                               form.date_affectation_article.data.strftime(
-                                   '%Y-%m-%d') if form.date_affectation_article.data else None,
-                               form.date_restitution_article.data.strftime(
-                                   '%Y-%m-%d') if form.date_restitution_article.data else None,
-                               form.compte_comptable_article.data,
-                               form.modifier_o.data,
-                               form.achete_par_article.data,
-                               form.affecte_a_article.data,
-                               form.numero_affectation.data,
-                               form.image_path_article.data,
-                               id
-                           ))
+                INSERT INTO Article (Ref_Article, Libelle_Article, Type_Article, Categorie_Article,
+                                    Marque_Article, Description_Article, Date_Achat_Article,
+                                    Date_Echeance_Article, Etat_Article, Statut_Article, Location_Article,
+                                    Affecter_au_Article, Service_Employe_Article, Agence_Article,
+                                    Date_Affectation_Article, Date_Restitution_Article,
+                                    Compte_Comptable_Article, modifier_o, Achete_Par_Article,
+                                    Affecte_A_Article, Numero_Affectation)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (ref, libelle, type_article, categorie, marque, description, date_achat,
+                  date_echeance, etat, statut, location, affecter_au, service_employe, agence,
+                  date_affectation, date_restitution, compte_comptable, modifier_o,
+                  achete_par, affecte_a, numero_affectation))
+
             conn.commit()
-            flash('Article modifié avec succès', 'success')
-        except Exception as e:
-            conn.rollback()
-            flash(f'Erreur: {str(e)}', 'error')
-        finally:
-            conn.close()
+            flash('Matériel ajouté avec succès', 'success')
             return redirect(url_for('materiel'))
 
-    conn.close()
-    return render_template('edit_materiel.html', form=form, id=id)
+        except ValueError as ve:
+            conn.rollback()
+            flash(str(ve), 'danger')
+        except pyodbc.DataError as de:
+            conn.rollback()
+            error_msg = str(de)
+            logger.error(f"Data error: {error_msg}")
+            if '22001' in error_msg:
+                flash('Erreur : Une valeur saisie est trop longue pour une colonne de la base de données. Vérifiez les longueurs des champs.', 'danger')
+            else:
+                flash(f'Erreur lors de l\'ajout du matériel : {error_msg}', 'danger')
+        except Exception as e:
+            conn.rollback()
+            logger.error(f"Error adding materiel: {str(e)}")
+            flash(f'Erreur lors de l\'ajout du matériel : {str(e)}', 'danger')
+        finally:
+            conn.close()
 
-
-@app.route('/materiel/delete/<int:id>', methods=['POST'])
-def delete_materiel(id):
+    return render_template('ajouter_materiel.html', statuts=statuts, etats=etats, types=types,
+                           categories=categories, locations=locations)
+@app.route('/materiel/editer/<int:id>', methods=['GET', 'POST'])
+def editer_materiel(id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    try:
-        cursor.execute("DELETE FROM Article WHERE ID_Article = ?", (id,))
+    if request.method == 'POST':
+        data = request.form
+        # Fetch current article data
+        cursor.execute("SELECT * FROM Article WHERE ID_Article = ?", (id,))
+        article = cursor.fetchone()
+        # Map tuple to dictionary for easier access (assuming row_factory isn’t set)
+        columns = [desc[0] for desc in cursor.description]
+        article_dict = dict(zip(columns, article))
+
+        # Use form data or fallback to current values
+        ref = data.get('ref', article_dict['Ref_Article'])
+        libelle = data.get('libelle', article_dict['Libelle_Article'])
+        type_article = data.get('type', article_dict['Type_Article'])
+        categorie = data.get('categorie', article_dict['Categorie_Article'])
+        marque = data.get('marque', article_dict['Marque_Article'])
+        description = data.get('description', article_dict['Description_Article'])
+        date_achat = data.get('date_achat', article_dict['Date_Achat_Article'])
+        date_echeance = data.get('date_echeance', article_dict['Date_Echeance_Article'])
+        etat = data.get('etat', article_dict['Etat_Article'])
+        statut = data.get('statut', article_dict['Statut_Article'])
+        location = data.get('location', article_dict['Location_Article'])
+        affecter_au = data.get('affecter_au', article_dict['Affecter_au_Article'])
+        service_employe = data.get('service_employe', article_dict['Service_Employe_Article'])
+        agence = data.get('agence', article_dict['Agence_Article'])
+        date_affectation = data.get('date_affectation', article_dict['Date_Affectation_Article'])
+        date_restitution = data.get('date_restitution', article_dict['Date_Restitution_Article'])
+        compte_comptable = data.get('compte_comptable', article_dict['Compte_Comptable_Article'])
+        modifier_o = data.get('modifier_o', article_dict['modifier_o'])
+        achete_par = data.get('achete_par', article_dict['Achete_Par_Article'])
+        affecte_a = data.get('affecte_a', article_dict['Affecte_A_Article'])
+        numero_affectation = data.get('numero_affectation', article_dict['Numero_Affectation'])
+
+        cursor.execute("""
+                       UPDATE Article
+                       SET Ref_Article              = ?,
+                           Libelle_Article          = ?,
+                           Type_Article             = ?,
+                           Categorie_Article        = ?,
+                           Marque_Article           = ?,
+                           Description_Article      = ?,
+                           Date_Achat_Article       = ?,
+                           Date_Echeance_Article    = ?,
+                           Etat_Article             = ?,
+                           Statut_Article           = ?,
+                           Location_Article         = ?,
+                           Affecter_au_Article      = ?,
+                           Service_Employe_Article  = ?,
+                           Agence_Article           = ?,
+                           Date_Affectation_Article = ?,
+                           Date_Restitution_Article = ?,
+                           Compte_Comptable_Article = ?,
+                           modifier_o               = ?,
+                           Achete_Par_Article       = ?,
+                           Affecte_A_Article        = ?,
+                           Numero_Affectation       = ?
+                       WHERE ID_Article = ?
+                       """, (
+                           ref, libelle, type_article, categorie, marque, description, date_achat,
+                           date_echeance, etat, statut, location, affecter_au, service_employe, agence,
+                           date_affectation, date_restitution, compte_comptable, modifier_o, achete_par,
+                           affecte_a, numero_affectation, id
+                       ))
         conn.commit()
-        flash('Article supprimé avec succès', 'success')
-    except Exception as e:
-        conn.rollback()
-        flash(f'Erreur: {str(e)}', 'error')
-    finally:
         conn.close()
+        flash('Matériel mis à jour avec succès', 'success')
         return redirect(url_for('materiel'))
 
+    cursor.execute("SELECT * FROM Article WHERE ID_Article = ?", (id,))
+    article = cursor.fetchone()
+    conn.close()
 
-class AffectationForm(FlaskForm):
-    id_article_affectation = SelectField('Article', coerce=int, validators=[DataRequired()])
-    service_employe_article = SelectField('Service', coerce=int, validators=[Optional()])
-    date_affectation = DateField('Date Affectation', format='%Y-%m-%d', validators=[DataRequired()])
-    date_restitution_affectation = DateField('Date Restitution', format='%Y-%m-%d', validators=[Optional()])
-    affecter_au_article = StringField('Affecté à')
-    numero_affectation = StringField('Numéro Affectation')
-    submit = SubmitField('Affecter')
+    if article:
+        return render_template('edit_materiel.html', article=article)
+    else:
+        flash('Matériel non trouvé', 'danger')
+        return redirect(url_for('materiel'))
 
-
-@app.route('/affectation', methods=['GET', 'POST'])
-def affectation():
-    form = AffectationForm()
-    search_query = request.form.get('search', '')
-
+@app.route('/materiel/supprimer/<int:id>', methods=['POST'])
+def supprimer_materiel(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM Article WHERE ID_Article = ?", (id,))
+    conn.commit()
+    conn.close()
+    flash('Matériel supprimé avec succès', 'success')
+    return redirect(url_for('materiel'))
+# Gestion des affectations
+@app.route('/affectations')
+def affectations():
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Populate dropdowns
-    cursor.execute("SELECT ID_Service, Service_Service FROM Service")
-    services = cursor.fetchall()
-    form.service_employe_article.choices = [(s.ID_Service, s.Service_Service) for s in services]
-
-    cursor.execute("SELECT ID_Article, Libelle_Article FROM Article")
-    articles = cursor.fetchall()
-    form.id_article_affectation.choices = [(a.ID_Article, a.Libelle_Article) for a in articles]
-
-    if request.method == 'POST':
-        if 'search' in request.form:
-            search_query = request.form['search']
-            cursor.execute("""
-                           SELECT a.*, ar.Libelle_Article
-                           FROM Affectation a
-                                    JOIN Article ar ON a.ID_Article_Affectation = ar.ID_Article
-                           WHERE ar.Libelle_Article LIKE ?
-                              OR a.Service_Employe_Article LIKE ?
-                           """, (f'%{search_query}%', f'%{search_query}%'))
-            affectations = cursor.fetchall()
-            conn.close()
-            return render_template('affectation.html', affectations=affectations, form=form, search_query=search_query)
-
-        if form.validate_on_submit():
-            try:
-                cursor.execute("""
-                               INSERT INTO Affectation (ID_Article_Affectation, Service_Employe_Article,
-                                                        Date_Affectation,
-                                                        Date_Restitution_Affectation, Affecter_au_Article,
-                                                        Numero_Affectation)
-                               VALUES (?, ?, ?, ?, ?, ?)
-                               """, (
-                                   form.id_article_affectation.data,
-                                   form.service_employe_article.data,
-                                   form.date_affectation.data.strftime('%Y-%m-%d'),
-                                   form.date_restitution_affectation.data.strftime(
-                                       '%Y-%m-%d') if form.date_restitution_affectation.data else None,
-                                   form.affecter_au_article.data,
-                                   form.numero_affectation.data
-                               ))
-                conn.commit()
-                flash('Affectation ajoutée avec succès', 'success')
-            except Exception as e:
-                conn.rollback()
-                flash(f'Erreur: {str(e)}', 'error')
-            finally:
-                conn.close()
-                return redirect(url_for('affectation'))
-
-    # GET request - load all affectations
+    # Récupérer les affectations avec les détails du matériel et de l'employé
     cursor.execute("""
-                   SELECT a.*, ar.Libelle_Article
+                   SELECT a.ID_Affectation,
+                          ar.Libelle_Article,
+                          e.Nom_Employe,
+                          e.Prenom_Employe,
+                          a.Date_Affectation,
+                          a.Date_Restitution_Affectation,
+                          a.Service_Employe_Article
                    FROM Affectation a
-                            JOIN Article ar ON a.ID_Article_Affectation = ar.ID_Article
+                            LEFT JOIN Article ar ON a.ID_Article_Affectation = ar.ID_Article
+                            LEFT JOIN Employe e ON a.Affecter_au_Article = e.Code_Employe
                    """)
     affectations = cursor.fetchall()
+
+    # Récupérer la liste des matériels disponibles
+    cursor.execute("SELECT ID_Article, Libelle_Article FROM Article WHERE Statut_Article = 'NON AFFECTE'")
+    articles = cursor.fetchall()
+
+    # Récupérer la liste des employés
+    cursor.execute("SELECT Code_Employe, Nom_Employe, Prenom_Employe FROM Employe")
+    employes = cursor.fetchall()
+
     conn.close()
 
-    return render_template('affectation.html', affectations=affectations, form=form, search_query=search_query)
+    return render_template('affectation.html', affectations=affectations, articles=articles, employes=employes)
 
 
-@app.route('/affectation/delete/<int:id>', methods=['POST'])
-def delete_affectation(id):
+from flask import Flask, render_template, request, redirect, url_for, flash
+import pyodbc
+from datetime import datetime
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+# ... (other imports and app setup)
+
+from flask import Flask, render_template, request, redirect, url_for, flash
+import pyodbc
+from datetime import datetime
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, filename='app.log', filemode='a',
+                    format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+# ... (other imports and app setup)
+
+@app.route('/affectation/ajouter', methods=['POST'])
+def ajouter_affectation():
+    data = request.form
     conn = get_db_connection()
     cursor = conn.cursor()
 
     try:
-        cursor.execute("DELETE FROM Affectation WHERE ID_Affectation = ?", (id,))
-        conn.commit()
-        flash('Affectation supprimée avec succès', 'success')
-    except Exception as e:
-        conn.rollback()
-        flash(f'Erreur: {str(e)}', 'error')
-    finally:
-        conn.close()
-        return redirect(url_for('affectation'))
+        # Validate and convert inputs
+        article_id = int(data.get('article')) if data.get('article') else None
+        employe_code = data.get('employe')
+        date_affectation = data.get('date_affectation')
+        date_restitution = data.get('date_restitution') or None
+        numero_affectation = data.get('numero_affectation') or "AUTO_" + datetime.now().strftime('%Y%m%d%H%M%S')
 
+        if not article_id:
+            raise ValueError("Matériel non sélectionné.")
+        if not employe_code:
+            raise ValueError("Employé non sélectionné.")
+        if not date_affectation:
+            raise ValueError("Date d'affectation requise.")
 
-@app.route('/profile', methods=['GET', 'POST'])
-def profile():
-    if request.method == 'POST':
-        username = request.form.get('username', 'Utilisateur')
-        email = request.form.get('email', 'utilisateur@fedex.com')
-        return render_template('profile.html', username=username, email=email)
-    return render_template('profile.html', username='Utilisateur', email='utilisateur@fedex.com')
+        # Validate article
+        cursor.execute("SELECT Statut_Article FROM Article WHERE ID_Article = ?", (article_id,))
+        article = cursor.fetchone()
+        if not article:
+            raise ValueError("Matériel non trouvé.")
+        if article[0] == 'AFFECTE':
+            raise ValueError("Ce matériel est déjà affecté.")
 
+        # Validate employee and get service
+        cursor.execute("SELECT Service_Employe FROM Employe WHERE Code_Employe = ?", (employe_code,))
+        employe = cursor.fetchone()
+        if not employe:
+            raise ValueError("Employé non trouvé.")
+        service = employe[0] or "Inconnu"
 
+        # Get column lengths from database
+        cursor.execute("SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Affectation' AND COLUMN_NAME = 'Service_Employe_Article'")
+        service_max_length = cursor.fetchone()[0] or 50
+        cursor.execute("SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Affectation' AND COLUMN_NAME = 'Numero_Affectation'")
+        numero_max_length = cursor.fetchone()[0] or 20
+        cursor.execute("SELECT CHARACTER_MAXIMUM_LENGTH FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Affectation' AND COLUMN_NAME = 'Affecter_au_Article'")
+        employe_code_max_length = cursor.fetchone()[0] or 50
 
+        # Truncate strings to fit column lengths
+        if len(service) > service_max_length:
+            service = service[:service_max_length]
+        if len(numero_affectation) > numero_max_length:
+            numero_affectation = numero_affectation[:numero_max_length]
+        if len(employe_code) > employe_code_max_length:
+            employe_code = employe_code[:employe_code_max_length]
 
-@app.route('/materiel/search')
-def search_materiel():
-    query = request.args.get('query', '')
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT * FROM Article 
-        WHERE Libelle_Article LIKE ? OR Ref_Article LIKE ?
-    """, (f'%{query}%', f'%{query}%'))
-    items = cursor.fetchall()
-    conn.close()
-    item_list = [dict(zip([column[0] for column in cursor.description], item)) for item in items]
-    return jsonify(item_list)
+        # Convert and validate dates as strings
+        try:
+            date_affectation_str = datetime.strptime(date_affectation, '%Y-%m-%d').strftime('%Y-%m-%d')
+            if datetime.strptime(date_affectation, '%Y-%m-%d').date() > datetime.now().date():
+                raise ValueError("La date d'affectation ne peut pas être future.")
+        except ValueError as ve:
+            raise ValueError("Format de date d'affectation invalide (utilisez AAAA-MM-JJ).")
 
-@app.route('/materiel/filter')
-def filter_materiel():
-    status = request.args.get('status', 'all')
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    if status == 'all':
-        cursor.execute("SELECT * FROM Article")
-    else:
-        cursor.execute("SELECT * FROM Article WHERE Statut_Article = ?", (status,))
-    items = cursor.fetchall()
-    conn.close()
-    item_list = [dict(zip([column[0] for column in cursor.description], item)) for item in items]
-    return jsonify(item_list)
+        date_restitution_str = None
+        if date_restitution and date_restitution.strip():
+            try:
+                date_restitution_str = datetime.strptime(date_restitution, '%Y-%m-%d').strftime('%Y-%m-%d')
+                if datetime.strptime(date_restitution, '%Y-%m-%d').date() < datetime.strptime(date_affectation, '%Y-%m-%d').date():
+                    raise ValueError("La date de restitution doit être après la date d'affectation.")
+            except ValueError as ve:
+                raise ValueError("Format de date de restitution invalide (utilisez AAAA-MM-JJ).")
 
-@app.route('/materiel/quick-add', methods=['POST'])
-def quick_add_materiel():
-    data = request.get_json()
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    try:
+        # Validate numero_affectation uniqueness
+        cursor.execute("SELECT COUNT(*) FROM Affectation WHERE Numero_Affectation = ?", (numero_affectation,))
+        if cursor.fetchone()[0] > 0:
+            raise ValueError("Numéro d'affectation déjà utilisé.")
+
+        # Log parameters for debugging
+        logger.debug(f"Parameters: article_id={article_id}, service={service} (len={len(service)}), "
+                     f"date_affectation={date_affectation_str}, date_restitution={date_restitution_str}, "
+                     f"employe_code={employe_code} (len={len(employe_code)}), numero_affectation={numero_affectation} (len={len(numero_affectation)})")
+
+        # Insert into Affectation
         cursor.execute("""
-            INSERT INTO Article (Ref_Article, Libelle_Article, Type_Article, Statut_Article)
-            VALUES (?, ?, ?, ?)
-        """, (data['ref_article'], data['libelle_article'], data['type_article'], data['statut_article']))
+            INSERT INTO Affectation (ID_Article_Affectation, Service_Employe_Article, Date_Affectation,
+                                    Date_Restitution_Affectation, Affecter_au_Article, Numero_Affectation)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (article_id, service, date_affectation_str, date_restitution_str, employe_code, numero_affectation))
+
+        # Update Article
+        cursor.execute("""
+            UPDATE Article
+            SET Statut_Article = 'AFFECTE',
+                Affecter_au_Article = ?,
+                Service_Employe_Article = ?,
+                Date_Affectation_Article = ?,
+                Date_Restitution_Article = ?,
+                Numero_Affectation = ?
+            WHERE ID_Article = ?
+        """, (employe_code, service, date_affectation_str, date_restitution_str, numero_affectation, article_id))
+
         conn.commit()
-        return jsonify({'success': True})
+        flash('Affectation ajoutée avec succès', 'success')
+    except ValueError as ve:
+        conn.rollback()
+        flash(str(ve), 'danger')
     except Exception as e:
         conn.rollback()
-        return jsonify({'success': False, 'error': str(e)})
+        logger.error(f"Database error: {str(e)}")
+        flash(f'Erreur lors de l\'affectation : {str(e)}', 'danger')
     finally:
         conn.close()
+
+    return redirect(url_for('affectations'))
+@app.route('/affectation/terminer/<int:id>', methods=['POST'])
+def terminer_affectation(id):
+    date_restitution = datetime.now().strftime('%Y-%m-%d')
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    try:
+        # Récupérer l'ID de l'article concerné
+        cursor.execute("SELECT ID_Article_Affectation FROM Affectation WHERE ID_Affectation = ?", (id,))
+        id_article = cursor.fetchone()[0]
+
+        # Terminer l'affectation
+        cursor.execute("""
+                       UPDATE Affectation
+                       SET Date_Restitution_Affectation = ?
+                       WHERE ID_Affectation = ?
+                       """, (date_restitution, id))
+
+        # Mettre à jour le statut de l'article
+        cursor.execute("""
+                       UPDATE Article
+                       SET Statut_Article           = 'NON AFFECTE',
+                           Affecter_au_Article      = NULL,
+                           Service_Employe_Article  = NULL,
+                           Date_Restitution_Article = ?,
+                           Numero_Affectation       = NULL
+                       WHERE ID_Article = ?
+                       """, (date_restitution, id_article))
+
+        conn.commit()
+        flash('Affectation terminée avec succès', 'success')
+    except Exception as e:
+        conn.rollback()
+        flash(f'Erreur lors de la terminaison de l\'affectation: {str(e)}', 'danger')
+    finally:
+        conn.close()
+
+    return redirect(url_for('affectations'))
+
+
+# Tableau de bord statistiques
+@app.route('/dashboard')
+def dashboard():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Statistiques générales
+    cursor.execute("SELECT COUNT(*) FROM Employe")
+    total_employes = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM Article")
+    total_articles = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM Article WHERE Statut_Article = 'AFFECTE'")
+    articles_affectes = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM Article WHERE Statut_Article = 'NON AFFECTE'")
+    articles_non_affectes = cursor.fetchone()[0]
+
+    # Répartition par type d'article
+    cursor.execute("SELECT Type_Article, COUNT(*) FROM Article GROUP BY Type_Article")
+    repartition_types = cursor.fetchall()
+
+    # Répartition par service
+    cursor.execute(
+        "SELECT Service_Employe_Article, COUNT(*) FROM Article WHERE Service_Employe_Article IS NOT NULL GROUP BY Service_Employe_Article")
+    repartition_services = cursor.fetchall()
+
+    conn.close()
+
+    return render_template('dashboard.html',
+                           total_employes=total_employes,
+                           total_articles=total_articles,
+                           articles_affectes=articles_affectes,
+                           articles_non_affectes=articles_non_affectes,
+                           repartition_types=repartition_types,
+                           repartition_services=repartition_services)
+
+
+# API pour les graphiques
+@app.route('/api/stats')
+def api_stats():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Données pour le graphique de répartition des articles
+    cursor.execute("""
+                   SELECT SUM(CASE WHEN Statut_Article = 'AFFECTE' THEN 1 ELSE 0 END)     as affectes,
+                          SUM(CASE WHEN Statut_Article = 'NON AFFECTE' THEN 1 ELSE 0 END) as non_affectes
+                   FROM Article
+                   """)
+    statut_articles = cursor.fetchone()
+
+    # Données pour le graphique des types d'articles
+    cursor.execute("SELECT Type_Article, COUNT(*) FROM Article GROUP BY Type_Article")
+    types_articles = [{'type': row[0], 'count': row[1]} for row in cursor.fetchall()]
+
+    conn.close()
+
+    return jsonify({
+        'statut_articles': {
+            'affectes': statut_articles[0],
+            'non_affectes': statut_articles[1]
+        },
+        'types_articles': types_articles
+    })
+
+@app.route('/profile')
+def profile():
+    user_id = session.get('user_id')
+
+
+    # Connexion à la base de données
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Employe WHERE ID_Employe = ?", (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+
+    if user:
+        columns = [desc[0] for desc in cursor.description]
+        user_dict = dict(zip(columns, user))
+        return render_template('profile.html', user=user_dict)
+    else:
+        flash('Utilisateur non trouvé.', 'danger')
+        return redirect(url_for('index'))
 if __name__ == '__main__':
     app.run(debug=True)

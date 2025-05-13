@@ -1,16 +1,201 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <title>Tableau de Bord - Gestion Parc</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
-<body>
-    <div class="content">
-        <h1>📊 Tableau de Bord</h1>
-        <p>Nombre total d'employés : {{ total_employes }}</p>
-        <a href="http://localhost:8502" class="admin-link">Aller à l'Administration (Streamlit)</a>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
 
+{% block title %}Tableau de Bord{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xl-12">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h4><i class="bi bi-graph-up"></i> Tableau de Bord</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-primary shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                            Employés</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_employes }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-people-fill fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-success shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                            Matériels</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_articles }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-pc-display-horizontal fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-info shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                            Matériels Affectés</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles_affectes }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-clipboard-check fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <div class="card border-left-warning shadow h-100 py-2">
+                            <div class="card-body">
+                                <div class="row no-gutters align-items-center">
+                                    <div class="col mr-2">
+                                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                            Matériels Non Affectés</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles_non_affectes }}</div>
+                                    </div>
+                                    <div class="col-auto">
+                                        <i class="bi bi-clipboard-x fa-2x text-gray-300"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xl-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6>Répartition des matériels par statut</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="statutChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-6">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6>Répartition des matériels par type</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="typeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6>Répartition des matériels par service</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Service</th>
+                                                <th>Nombre de matériels</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for service in repartition_services %}
+                                            <tr>
+                                                <td>{{ service.Service_Employe_Article }}</td>
+                                                <td>{{ service[1] }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart for material status
+    const statutCtx = document.getElementById('statutChart').getContext('2d');
+    new Chart(statutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Affectés', 'Non affectés'],
+            datasets: [{
+                data: [{{ articles_affectes }}, {{ articles_non_affectes }}],
+                backgroundColor: ['#4e73df', '#1cc88a'],
+                hoverBackgroundColor: ['#2e59d9', '#17a673'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Chart for material types
+    const typeCtx = document.getElementById('typeChart').getContext('2d');
+    const typeData = [
+        {% for type in repartition_types %}
+        { type: "{{ type.Type_Article }}", count: {{ type[1] }} },
+        {% endfor %}
+    ];
+
+    new Chart(typeCtx, {
+        type: 'bar',
+        data: {
+            labels: typeData.map(item => item.type),
+            datasets: [{
+                label: 'Nombre',
+                data: typeData.map(item => item.count),
+                backgroundColor: '#4e73df',
+                hoverBackgroundColor: '#2e59d9',
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Ajouter du Matériel{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header">
+        <h3><i class="bi bi-pc-display"></i> Ajouter du Matériel</h3>
+    </div>
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('ajouter_materiel') }}" id="materielForm">
+            <div class="row">
+                <!-- Required Fields -->
+                <div class="col-md-4 mb-3">
+                    <label for="ref" class="form-label">Référence</label>
+                    <input type="text" class="form-control" id="ref" name="ref" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="libelle" class="form-label">Libellé</label>
+                    <input type="text" class="form-control" id="libelle" name="libelle" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="type" class="form-label">Type</label>
+                    <select class="form-select" id="type" name="type" required>
+                        <option value="" disabled selected>Sélectionner un type</option>
+                        {% for type in types %}
+                        <option value="{{ type }}">{{ type }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="categorie" class="form-label">Catégorie</label>
+                    <select class="form-select" id="categorie" name="categorie" required>
+                        <option value="" disabled selected>Sélectionner une catégorie</option>
+                        {% for categorie in categories %}
+                        <option value="{{ categorie }}">{{ categorie }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="marque" class="form-label">Marque</label>
+                    <input type="text" class="form-control" id="marque" name="marque" required>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="etat" class="form-label">État</label>
+                    <select class="form-select" id="etat" name="etat" required>
+                        <option value="" disabled selected>Sélectionner un état</option>
+                        {% for etat in etats %}
+                        <option value="{{ etat }}">{{ etat }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="statut" class="form-label">Statut</label>
+                    <select class="form-select" id="statut" name="statut" required>
+                        <option value="" disabled selected>Sélectionner un statut</option>
+                        {% for statut in statuts %}
+                        <option value="{{ statut }}">{{ statut|capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <!-- Optional Fields -->
+                <div class="col-md-4 mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="date_achat" class="form-label">Date d'achat</label>
+                    <input type="date" class="form-control" id="date_achat" name="date_achat">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="date_echeance" class="form-label">Date d'échéance</label>
+                    <input type="date" class="form-control" id="date_echeance" name="date_echeance">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="location" class="form-label">Localisation</label>
+                    <select class="form-select" id="location" name="location">
+                        <option value="">Sélectionner une localisation</option>
+                        {% for location in locations %}
+                        <option value="{{ location }}">{{ location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="affecter_au" class="form-label">Affecté à</label>
+                    <input type="text" class="form-control" id="affecter_au" name="affecter_au" placeholder="Code employé">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="service_employe" class="form-label">Service employé</label>
+                    <input type="text" class="form-control" id="service_employe" name="service_employe">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="agence" class="form-label">Agence</label>
+                    <input type="text" class="form-control" id="agence" name="agence">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="date_affectation" class="form-label">Date d'affectation</label>
+                    <input type="date" class="form-control" id="date_affectation" name="date_affectation">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="date_restitution" class="form-label">Date de restitution</label>
+                    <input type="date" class="form-control" id="date_restitution" name="date_restitution">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="compte_comptable" class="form-label">Compte comptable</label>
+                    <input type="text" class="form-control" id="compte_comptable" name="compte_comptable">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="modifier_o" class="form-label">Modifié par</label>
+                    <input type="text" class="form-control" id="modifier_o" name="modifier_o">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="achete_par" class="form-label">Acheté par</label>
+                    <input type="text" class="form-control" id="achete_par" name="achete_par">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="affecte_a" class="form-label">Affecté à (autre)</label>
+                    <input type="text" class="form-control" id="affecte_a" name="affecte_a">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="numero_affectation" class="form-label">Numéro d'affectation</label>
+                    <input type="text" class="form-control" id="numero_affectation" name="numero_affectation">
+                </div>
+                <div class="col-md-12 mb-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Ajouter
+                    </button>
+                    <a href="{{ url_for('materiel') }}" class="btn btn-secondary">Annuler</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block scripts %}
+<script>
+    // Prevent future dates for date_achat and date_affectation
+    document.getElementById('date_achat').addEventListener('change', function() {
+        const today = new Date().toISOString().split('T')[0];
+        if (this.value > today) {
+            alert('La date d\'achat ne peut pas être future.');
+            this.value = '';
+        }
+    });
+    document.getElementById('date_affectation').addEventListener('change', function() {
+        const today = new Date().toISOString().split('T')[0];
+        if (this.value > today) {
+            alert('La date d\'affectation ne peut pas être future.');
+            this.value = '';
+        }
+    });
+
+    // Ensure statut is selected before submission
+    document.getElementById('materielForm').addEventListener('submit', function(event) {
+        const statut = document.getElementById('statut').value;
+        if (!statut || statut === '') {
+            event.preventDefault();
+            alert('Veuillez sélectionner un statut valide.');
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

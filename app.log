@@ -1,0 +1,348 @@
+2025-05-12 16:49:30,857 - WARNING -  * Debugger is active!
+2025-05-12 16:49:30,864 - INFO -  * Debugger PIN: 659-548-423
+2025-05-12 16:50:06,853 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\PythonProject1\\flask_app.py', reloading
+2025-05-12 16:50:08,475 - WARNING -  * Debugger is active!
+2025-05-12 16:50:08,483 - INFO -  * Debugger PIN: 659-548-423
+2025-05-12 16:51:05,695 - INFO - 127.0.0.1 - - [12/May/2025 16:51:05] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 16:51:05,773 - INFO - 127.0.0.1 - - [12/May/2025 16:51:05] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:51:05,905 - INFO - 127.0.0.1 - - [12/May/2025 16:51:05] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:51:14,790 - DEBUG - Parameters: article_id=1, service=IT Support (len=10), date_affectation=2025-05-12, date_restitution=None, employe_code=dadada (len=6), numero_affectation=4 (len=1)
+2025-05-12 16:51:14,796 - INFO - 127.0.0.1 - - [12/May/2025 16:51:14] "[32mPOST /affectation/ajouter HTTP/1.1[0m" 302 -
+2025-05-12 16:51:14,801 - INFO - 127.0.0.1 - - [12/May/2025 16:51:14] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 16:51:15,002 - INFO - 127.0.0.1 - - [12/May/2025 16:51:15] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:51:15,126 - INFO - 127.0.0.1 - - [12/May/2025 16:51:15] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:51:23,395 - INFO - 127.0.0.1 - - [12/May/2025 16:51:23] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 16:51:23,498 - INFO - 127.0.0.1 - - [12/May/2025 16:51:23] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:51:23,652 - INFO - 127.0.0.1 - - [12/May/2025 16:51:23] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:51:23,807 - INFO - 127.0.0.1 - - [12/May/2025 16:51:23] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 16:51:24,103 - INFO - 127.0.0.1 - - [12/May/2025 16:51:24] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:51:24,130 - INFO - 127.0.0.1 - - [12/May/2025 16:51:24] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:51:33,965 - INFO - 127.0.0.1 - - [12/May/2025 16:51:33] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 16:51:34,097 - INFO - 127.0.0.1 - - [12/May/2025 16:51:34] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:51:34,205 - INFO - 127.0.0.1 - - [12/May/2025 16:51:34] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:52:38,423 - INFO - 127.0.0.1 - - [12/May/2025 16:52:38] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 16:52:38,436 - INFO - 127.0.0.1 - - [12/May/2025 16:52:38] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:52:38,674 - INFO - 127.0.0.1 - - [12/May/2025 16:52:38] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:58:21,141 - INFO - 127.0.0.1 - - [12/May/2025 16:58:21] "GET / HTTP/1.1" 200 -
+2025-05-12 16:58:21,300 - INFO - 127.0.0.1 - - [12/May/2025 16:58:21] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:58:21,420 - INFO - 127.0.0.1 - - [12/May/2025 16:58:21] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 16:58:21,463 - INFO - 127.0.0.1 - - [12/May/2025 16:58:21] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:58:23,535 - INFO - 127.0.0.1 - - [12/May/2025 16:58:23] "GET /utilisateurs HTTP/1.1" 200 -
+2025-05-12 16:58:23,833 - INFO - 127.0.0.1 - - [12/May/2025 16:58:23] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:58:23,866 - INFO - 127.0.0.1 - - [12/May/2025 16:58:23] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:58:25,579 - INFO - 127.0.0.1 - - [12/May/2025 16:58:25] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 16:58:25,715 - INFO - 127.0.0.1 - - [12/May/2025 16:58:25] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:58:25,841 - INFO - 127.0.0.1 - - [12/May/2025 16:58:25] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:58:26,814 - INFO - 127.0.0.1 - - [12/May/2025 16:58:26] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 16:58:27,117 - INFO - 127.0.0.1 - - [12/May/2025 16:58:27] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:58:27,148 - INFO - 127.0.0.1 - - [12/May/2025 16:58:27] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:58:28,656 - INFO - 127.0.0.1 - - [12/May/2025 16:58:28] "GET /dashboard HTTP/1.1" 200 -
+2025-05-12 16:58:28,789 - INFO - 127.0.0.1 - - [12/May/2025 16:58:28] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:58:28,897 - INFO - 127.0.0.1 - - [12/May/2025 16:58:28] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:58:29,304 - INFO - 127.0.0.1 - - [12/May/2025 16:58:29] "GET / HTTP/1.1" 200 -
+2025-05-12 16:58:29,613 - INFO - 127.0.0.1 - - [12/May/2025 16:58:29] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:58:29,630 - INFO - 127.0.0.1 - - [12/May/2025 16:58:29] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 16:58:29,943 - INFO - 127.0.0.1 - - [12/May/2025 16:58:29] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 16:59:50,549 - INFO - 127.0.0.1 - - [12/May/2025 16:59:50] "GET / HTTP/1.1" 200 -
+2025-05-12 16:59:50,563 - INFO - 127.0.0.1 - - [12/May/2025 16:59:50] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 16:59:50,814 - INFO - 127.0.0.1 - - [12/May/2025 16:59:50] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 16:59:50,886 - INFO - 127.0.0.1 - - [12/May/2025 16:59:50] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:04,191 - INFO - 127.0.0.1 - - [12/May/2025 17:00:04] "GET / HTTP/1.1" 200 -
+2025-05-12 17:00:04,215 - INFO - 127.0.0.1 - - [12/May/2025 17:00:04] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:04,449 - INFO - 127.0.0.1 - - [12/May/2025 17:00:04] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:00:04,557 - INFO - 127.0.0.1 - - [12/May/2025 17:00:04] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:06,592 - INFO - 127.0.0.1 - - [12/May/2025 17:00:06] "GET / HTTP/1.1" 200 -
+2025-05-12 17:00:06,687 - INFO - 127.0.0.1 - - [12/May/2025 17:00:06] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:06,860 - INFO - 127.0.0.1 - - [12/May/2025 17:00:06] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:00:06,922 - INFO - 127.0.0.1 - - [12/May/2025 17:00:06] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:40,966 - INFO - 127.0.0.1 - - [12/May/2025 17:00:40] "GET / HTTP/1.1" 200 -
+2025-05-12 17:00:41,280 - INFO - 127.0.0.1 - - [12/May/2025 17:00:41] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:41,286 - INFO - 127.0.0.1 - - [12/May/2025 17:00:41] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:41,611 - INFO - 127.0.0.1 - - [12/May/2025 17:00:41] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:00:42,379 - INFO - 127.0.0.1 - - [12/May/2025 17:00:42] "GET /utilisateurs HTTP/1.1" 200 -
+2025-05-12 17:00:42,683 - INFO - 127.0.0.1 - - [12/May/2025 17:00:42] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:42,704 - INFO - 127.0.0.1 - - [12/May/2025 17:00:42] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:43,718 - INFO - 127.0.0.1 - - [12/May/2025 17:00:43] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:00:43,770 - INFO - 127.0.0.1 - - [12/May/2025 17:00:43] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:43,970 - INFO - 127.0.0.1 - - [12/May/2025 17:00:43] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:44,621 - INFO - 127.0.0.1 - - [12/May/2025 17:00:44] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 17:00:44,923 - INFO - 127.0.0.1 - - [12/May/2025 17:00:44] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:44,953 - INFO - 127.0.0.1 - - [12/May/2025 17:00:44] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:46,513 - INFO - 127.0.0.1 - - [12/May/2025 17:00:46] "GET /dashboard HTTP/1.1" 200 -
+2025-05-12 17:00:46,624 - INFO - 127.0.0.1 - - [12/May/2025 17:00:46] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:46,751 - INFO - 127.0.0.1 - - [12/May/2025 17:00:46] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:51,094 - INFO - 127.0.0.1 - - [12/May/2025 17:00:51] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 17:00:51,405 - INFO - 127.0.0.1 - - [12/May/2025 17:00:51] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:51,421 - INFO - 127.0.0.1 - - [12/May/2025 17:00:51] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:56,131 - INFO - 127.0.0.1 - - [12/May/2025 17:00:56] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:00:56,194 - INFO - 127.0.0.1 - - [12/May/2025 17:00:56] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:56,378 - INFO - 127.0.0.1 - - [12/May/2025 17:00:56] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:00:58,073 - INFO - 127.0.0.1 - - [12/May/2025 17:00:58] "GET /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:00:58,382 - INFO - 127.0.0.1 - - [12/May/2025 17:00:58] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:00:58,396 - INFO - 127.0.0.1 - - [12/May/2025 17:00:58] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:01:33,568 - INFO - 127.0.0.1 - - [12/May/2025 17:01:33] "[35m[1mPOST /materiel/ajouter HTTP/1.1[0m" 500 -
+2025-05-12 17:01:33,588 - INFO - 127.0.0.1 - - [12/May/2025 17:01:33] "GET /materiel/ajouter?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-05-12 17:01:33,820 - INFO - 127.0.0.1 - - [12/May/2025 17:01:33] "GET /materiel/ajouter?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-05-12 17:01:34,180 - INFO - 127.0.0.1 - - [12/May/2025 17:01:34] "GET /materiel/ajouter?__debugger__=yes&cmd=resource&f=console.png&s=wXkh4QArHj9OOlEpoYlb HTTP/1.1" 200 -
+2025-05-12 17:01:34,429 - INFO - 127.0.0.1 - - [12/May/2025 17:01:34] "GET /materiel/ajouter?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-05-12 17:05:35,074 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\PythonProject1\\flask_app.py', reloading
+2025-05-12 17:05:36,448 - WARNING -  * Debugger is active!
+2025-05-12 17:05:36,460 - INFO -  * Debugger PIN: 659-548-423
+2025-05-12 17:06:32,992 - INFO - 127.0.0.1 - - [12/May/2025 17:06:32] "POST /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:06:33,087 - INFO - 127.0.0.1 - - [12/May/2025 17:06:33] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:06:33,132 - INFO - 127.0.0.1 - - [12/May/2025 17:06:33] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:07:04,806 - INFO - 127.0.0.1 - - [12/May/2025 17:07:04] "POST /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:07:04,819 - INFO - 127.0.0.1 - - [12/May/2025 17:07:04] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:07:05,012 - INFO - 127.0.0.1 - - [12/May/2025 17:07:05] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:09:43,352 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\PythonProject1\\flask_app.py', reloading
+2025-05-12 17:09:44,185 - WARNING -  * Debugger is active!
+2025-05-12 17:09:44,196 - INFO -  * Debugger PIN: 659-548-423
+2025-05-12 17:10:18,018 - DEBUG - Submitted statut: NON AFFECTE
+2025-05-12 17:10:18,032 - INFO - 127.0.0.1 - - [12/May/2025 17:10:18] "POST /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:10:18,109 - INFO - 127.0.0.1 - - [12/May/2025 17:10:18] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:10:18,201 - INFO - 127.0.0.1 - - [12/May/2025 17:10:18] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:10:44,877 - INFO - 127.0.0.1 - - [12/May/2025 17:10:44] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:10:45,005 - INFO - 127.0.0.1 - - [12/May/2025 17:10:45] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:10:45,129 - INFO - 127.0.0.1 - - [12/May/2025 17:10:45] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:10:46,173 - INFO - 127.0.0.1 - - [12/May/2025 17:10:46] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:10:46,482 - INFO - 127.0.0.1 - - [12/May/2025 17:10:46] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:10:46,489 - INFO - 127.0.0.1 - - [12/May/2025 17:10:46] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:10:48,241 - INFO - 127.0.0.1 - - [12/May/2025 17:10:48] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:10:48,384 - INFO - 127.0.0.1 - - [12/May/2025 17:10:48] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:10:48,507 - INFO - 127.0.0.1 - - [12/May/2025 17:10:48] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:10:49,454 - INFO - 127.0.0.1 - - [12/May/2025 17:10:49] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:10:49,754 - INFO - 127.0.0.1 - - [12/May/2025 17:10:49] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:10:49,775 - INFO - 127.0.0.1 - - [12/May/2025 17:10:49] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:11:24,174 - INFO - 127.0.0.1 - - [12/May/2025 17:11:24] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:11:24,188 - INFO - 127.0.0.1 - - [12/May/2025 17:11:24] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:11:24,415 - INFO - 127.0.0.1 - - [12/May/2025 17:11:24] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:14:26,301 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\PythonProject1\\flask_app.py', reloading
+2025-05-12 17:14:26,826 - WARNING -  * Debugger is active!
+2025-05-12 17:14:26,834 - INFO -  * Debugger PIN: 659-548-423
+2025-05-12 17:15:11,242 - INFO - 127.0.0.1 - - [12/May/2025 17:15:11] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:15:11,331 - INFO - 127.0.0.1 - - [12/May/2025 17:15:11] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:15:11,440 - INFO - 127.0.0.1 - - [12/May/2025 17:15:11] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:15:13,339 - INFO - 127.0.0.1 - - [12/May/2025 17:15:13] "GET /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:15:13,486 - INFO - 127.0.0.1 - - [12/May/2025 17:15:13] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:15:13,577 - INFO - 127.0.0.1 - - [12/May/2025 17:15:13] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:16:21,752 - DEBUG - Submitted statut: non affecté, etat: disponible
+2025-05-12 17:16:21,756 - DEBUG - Adding article: ref=231231kda11, libelle=projecteur, statut=non affecté, etat=disponible, location=autre
+2025-05-12 17:16:21,759 - ERROR - Error adding materiel: ('22001', '[22001] [Microsoft][ODBC SQL Server Driver][SQL Server]String or binary data would be truncated. (8152) (SQLExecDirectW); [22001] [Microsoft][ODBC SQL Server Driver][SQL Server]The statement has been terminated. (3621)')
+2025-05-12 17:16:21,760 - INFO - 127.0.0.1 - - [12/May/2025 17:16:21] "POST /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:16:21,776 - INFO - 127.0.0.1 - - [12/May/2025 17:16:21] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:16:21,951 - INFO - 127.0.0.1 - - [12/May/2025 17:16:21] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:18:38,049 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\PythonProject1\\flask_app.py', reloading
+2025-05-12 17:18:38,604 - WARNING -  * Debugger is active!
+2025-05-12 17:18:38,613 - INFO -  * Debugger PIN: 659-548-423
+2025-05-12 17:18:49,094 - DEBUG - Insert values: ref=231231kda11 (len=11), libelle=projecteur (len=10), type=autre (len=5), categorie=informatique (len=12), marque=HP (len=2), description= (len=0), etat=disponible (len=10), statut=non affecté (len=11), location=aut (len=3), affecter_au= (len=0), service_employe= (len=0), agence=Rabat (len=5), compte_comptable= (len=0), modifier_o= (len=0), achete_par= (len=0), affecte_a= (len=0), numero_affectation= (len=0)
+2025-05-12 17:18:49,098 - DEBUG - Adding article: ref=231231kda11, libelle=projecteur, statut=non affecté, etat=disponible, location=aut
+2025-05-12 17:18:49,105 - INFO - 127.0.0.1 - - [12/May/2025 17:18:49] "[32mPOST /materiel/ajouter HTTP/1.1[0m" 302 -
+2025-05-12 17:18:49,128 - INFO - 127.0.0.1 - - [12/May/2025 17:18:49] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:18:49,263 - INFO - 127.0.0.1 - - [12/May/2025 17:18:49] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:18:49,456 - INFO - 127.0.0.1 - - [12/May/2025 17:18:49] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:18:56,439 - INFO - 127.0.0.1 - - [12/May/2025 17:18:56] "GET /materiel/editer/7 HTTP/1.1" 200 -
+2025-05-12 17:18:56,544 - INFO - 127.0.0.1 - - [12/May/2025 17:18:56] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:18:56,686 - INFO - 127.0.0.1 - - [12/May/2025 17:18:56] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:19:57,813 - INFO - 127.0.0.1 - - [12/May/2025 17:19:57] "GET /materiel/editer/7 HTTP/1.1" 200 -
+2025-05-12 17:19:57,825 - INFO - 127.0.0.1 - - [12/May/2025 17:19:57] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:19:58,075 - INFO - 127.0.0.1 - - [12/May/2025 17:19:58] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:23:39,722 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\PythonProject1\\flask_app.py', reloading
+2025-05-12 17:23:40,273 - WARNING -  * Debugger is active!
+2025-05-12 17:23:40,281 - INFO -  * Debugger PIN: 659-548-423
+2025-05-12 17:24:10,557 - INFO - 127.0.0.1 - - [12/May/2025 17:24:10] "GET /materiel/editer/7 HTTP/1.1" 200 -
+2025-05-12 17:24:10,661 - INFO - 127.0.0.1 - - [12/May/2025 17:24:10] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:24:10,748 - INFO - 127.0.0.1 - - [12/May/2025 17:24:10] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:24:13,498 - INFO - 127.0.0.1 - - [12/May/2025 17:24:13] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:24:13,596 - INFO - 127.0.0.1 - - [12/May/2025 17:24:13] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:24:13,747 - INFO - 127.0.0.1 - - [12/May/2025 17:24:13] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:24:17,772 - INFO - 127.0.0.1 - - [12/May/2025 17:24:17] "GET /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:24:18,066 - INFO - 127.0.0.1 - - [12/May/2025 17:24:18] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:24:18,096 - INFO - 127.0.0.1 - - [12/May/2025 17:24:18] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:25:19,275 - DEBUG - Insert values: ref=231231kda11q11 (len=14), libelle=carte sim (len=9), type=autre (len=5), categorie=informatique (len=12), marque=iam (len=3), description= (len=0), etat=disponible (len=10), statut=non affecté (len=11), location=aut (len=3), affecter_au= (len=0), service_employe= (len=0), agence=Rabat (len=5), compte_comptable= (len=0), modifier_o= (len=0), achete_par= (len=0), affecte_a= (len=0), numero_affectation= (len=0)
+2025-05-12 17:25:19,278 - DEBUG - Adding article: ref=231231kda11q11, libelle=carte sim, statut=non affecté, etat=disponible, location=aut
+2025-05-12 17:25:19,283 - INFO - 127.0.0.1 - - [12/May/2025 17:25:19] "[32mPOST /materiel/ajouter HTTP/1.1[0m" 302 -
+2025-05-12 17:25:19,289 - INFO - 127.0.0.1 - - [12/May/2025 17:25:19] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:25:19,430 - INFO - 127.0.0.1 - - [12/May/2025 17:25:19] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:25:19,634 - INFO - 127.0.0.1 - - [12/May/2025 17:25:19] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:25:24,292 - INFO - 127.0.0.1 - - [12/May/2025 17:25:24] "GET /materiel/editer/8 HTTP/1.1" 200 -
+2025-05-12 17:25:24,445 - INFO - 127.0.0.1 - - [12/May/2025 17:25:24] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:25:24,551 - INFO - 127.0.0.1 - - [12/May/2025 17:25:24] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:28:34,569 - INFO - 127.0.0.1 - - [12/May/2025 17:28:34] "GET / HTTP/1.1" 200 -
+2025-05-12 17:28:34,704 - INFO - 127.0.0.1 - - [12/May/2025 17:28:34] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:28:34,823 - INFO - 127.0.0.1 - - [12/May/2025 17:28:34] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:28:34,896 - INFO - 127.0.0.1 - - [12/May/2025 17:28:34] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:28:35,030 - INFO - 127.0.0.1 - - [12/May/2025 17:28:35] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-12 17:28:54,331 - INFO - 127.0.0.1 - - [12/May/2025 17:28:54] "GET /utilisateurs HTTP/1.1" 200 -
+2025-05-12 17:28:54,634 - INFO - 127.0.0.1 - - [12/May/2025 17:28:54] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:28:54,656 - INFO - 127.0.0.1 - - [12/May/2025 17:28:54] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:29:17,287 - INFO - 127.0.0.1 - - [12/May/2025 17:29:17] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:29:17,410 - INFO - 127.0.0.1 - - [12/May/2025 17:29:17] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:29:17,539 - INFO - 127.0.0.1 - - [12/May/2025 17:29:17] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:29:26,500 - INFO - 127.0.0.1 - - [12/May/2025 17:29:26] "GET /materiel/editer/1 HTTP/1.1" 200 -
+2025-05-12 17:29:26,802 - INFO - 127.0.0.1 - - [12/May/2025 17:29:26] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:29:26,833 - INFO - 127.0.0.1 - - [12/May/2025 17:29:26] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:29:38,684 - INFO - 127.0.0.1 - - [12/May/2025 17:29:38] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 17:29:38,816 - INFO - 127.0.0.1 - - [12/May/2025 17:29:38] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:29:38,944 - INFO - 127.0.0.1 - - [12/May/2025 17:29:38] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:30:41,667 - INFO - 127.0.0.1 - - [12/May/2025 17:30:41] "GET /dashboard HTTP/1.1" 200 -
+2025-05-12 17:30:41,801 - INFO - 127.0.0.1 - - [12/May/2025 17:30:41] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:30:41,926 - INFO - 127.0.0.1 - - [12/May/2025 17:30:41] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:34:28,201 - INFO - 127.0.0.1 - - [12/May/2025 17:34:28] "GET /dashboard HTTP/1.1" 200 -
+2025-05-12 17:34:28,215 - INFO - 127.0.0.1 - - [12/May/2025 17:34:28] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:34:28,440 - INFO - 127.0.0.1 - - [12/May/2025 17:34:28] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:34:29,257 - INFO - 127.0.0.1 - - [12/May/2025 17:34:29] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:34:29,329 - INFO - 127.0.0.1 - - [12/May/2025 17:34:29] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:34:29,503 - INFO - 127.0.0.1 - - [12/May/2025 17:34:29] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:34:32,853 - INFO - 127.0.0.1 - - [12/May/2025 17:34:32] "GET /materiel/editer/1 HTTP/1.1" 200 -
+2025-05-12 17:34:33,115 - INFO - 127.0.0.1 - - [12/May/2025 17:34:33] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:34:33,282 - INFO - 127.0.0.1 - - [12/May/2025 17:34:33] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:36:29,340 - INFO - 127.0.0.1 - - [12/May/2025 17:36:29] "[35m[1mGET /materiel/editer/1 HTTP/1.1[0m" 500 -
+2025-05-12 17:36:29,365 - INFO - 127.0.0.1 - - [12/May/2025 17:36:29] "GET /materiel/editer/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-05-12 17:36:29,539 - INFO - 127.0.0.1 - - [12/May/2025 17:36:29] "GET /materiel/editer/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-05-12 17:36:29,875 - INFO - 127.0.0.1 - - [12/May/2025 17:36:29] "GET /materiel/editer/1?__debugger__=yes&cmd=resource&f=console.png&s=nRpxE3UTi5Psm1IPQPI4 HTTP/1.1" 200 -
+2025-05-12 17:36:30,138 - INFO - 127.0.0.1 - - [12/May/2025 17:36:30] "GET /materiel/editer/1?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-05-12 17:37:06,827 - INFO - 127.0.0.1 - - [12/May/2025 17:37:06] "[35m[1mGET /materiel/editer/1 HTTP/1.1[0m" 500 -
+2025-05-12 17:37:07,097 - INFO - 127.0.0.1 - - [12/May/2025 17:37:07] "[36mGET /materiel/editer/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-12 17:37:07,160 - INFO - 127.0.0.1 - - [12/May/2025 17:37:07] "[36mGET /materiel/editer/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-12 17:37:07,486 - INFO - 127.0.0.1 - - [12/May/2025 17:37:07] "[36mGET /materiel/editer/1?__debugger__=yes&cmd=resource&f=console.png&s=nRpxE3UTi5Psm1IPQPI4 HTTP/1.1[0m" 304 -
+2025-05-12 17:37:07,749 - INFO - 127.0.0.1 - - [12/May/2025 17:37:07] "[36mGET /materiel/editer/1?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-12 17:37:08,871 - INFO - 127.0.0.1 - - [12/May/2025 17:37:08] "[35m[1mGET /materiel/editer/1 HTTP/1.1[0m" 500 -
+2025-05-12 17:37:09,169 - INFO - 127.0.0.1 - - [12/May/2025 17:37:09] "[36mGET /materiel/editer/1?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-12 17:37:09,200 - INFO - 127.0.0.1 - - [12/May/2025 17:37:09] "[36mGET /materiel/editer/1?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-12 17:37:09,517 - INFO - 127.0.0.1 - - [12/May/2025 17:37:09] "[36mGET /materiel/editer/1?__debugger__=yes&cmd=resource&f=console.png&s=nRpxE3UTi5Psm1IPQPI4 HTTP/1.1[0m" 304 -
+2025-05-12 17:37:09,767 - INFO - 127.0.0.1 - - [12/May/2025 17:37:09] "[36mGET /materiel/editer/1?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-12 17:38:44,348 - INFO - 127.0.0.1 - - [12/May/2025 17:38:44] "GET /materiel/editer/1 HTTP/1.1" 200 -
+2025-05-12 17:38:44,362 - INFO - 127.0.0.1 - - [12/May/2025 17:38:44] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:38:44,554 - INFO - 127.0.0.1 - - [12/May/2025 17:38:44] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:39:05,912 - INFO - 127.0.0.1 - - [12/May/2025 17:39:05] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:39:06,215 - INFO - 127.0.0.1 - - [12/May/2025 17:39:06] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:39:06,233 - INFO - 127.0.0.1 - - [12/May/2025 17:39:06] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:39:08,934 - INFO - 127.0.0.1 - - [12/May/2025 17:39:08] "GET /materiel/editer/1 HTTP/1.1" 200 -
+2025-05-12 17:39:09,039 - INFO - 127.0.0.1 - - [12/May/2025 17:39:09] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:39:09,181 - INFO - 127.0.0.1 - - [12/May/2025 17:39:09] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:44:05,512 - INFO - 127.0.0.1 - - [12/May/2025 17:44:05] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 17:44:05,582 - INFO - 127.0.0.1 - - [12/May/2025 17:44:05] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:44:05,728 - INFO - 127.0.0.1 - - [12/May/2025 17:44:05] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:46:57,447 - INFO - 127.0.0.1 - - [12/May/2025 17:46:57] "GET / HTTP/1.1" 200 -
+2025-05-12 17:46:57,585 - INFO - 127.0.0.1 - - [12/May/2025 17:46:57] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:46:57,721 - INFO - 127.0.0.1 - - [12/May/2025 17:46:57] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:46:57,773 - INFO - 127.0.0.1 - - [12/May/2025 17:46:57] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:47:15,539 - INFO - 127.0.0.1 - - [12/May/2025 17:47:15] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:47:15,841 - INFO - 127.0.0.1 - - [12/May/2025 17:47:15] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:47:15,864 - INFO - 127.0.0.1 - - [12/May/2025 17:47:15] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:47:17,661 - INFO - 127.0.0.1 - - [12/May/2025 17:47:17] "GET /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:47:17,755 - INFO - 127.0.0.1 - - [12/May/2025 17:47:17] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:47:17,924 - INFO - 127.0.0.1 - - [12/May/2025 17:47:17] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:47:56,656 - DEBUG - Insert values: ref=dadasd (len=6), libelle=pc (len=2), type=autre (len=5), categorie=informatique (len=12), marque=HP (len=2), description= (len=0), etat=disponible (len=10), statut=non affecté (len=11), location=aut (len=3), affecter_au= (len=0), service_employe= (len=0), agence=Rabat (len=5), compte_comptable= (len=0), modifier_o= (len=0), achete_par= (len=0), affecte_a= (len=0), numero_affectation= (len=0)
+2025-05-12 17:47:56,656 - DEBUG - Adding article: ref=dadasd, libelle=pc, statut=non affecté, etat=disponible, location=aut
+2025-05-12 17:47:56,666 - INFO - 127.0.0.1 - - [12/May/2025 17:47:56] "[32mPOST /materiel/ajouter HTTP/1.1[0m" 302 -
+2025-05-12 17:47:56,849 - INFO - 127.0.0.1 - - [12/May/2025 17:47:56] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:47:57,181 - INFO - 127.0.0.1 - - [12/May/2025 17:47:57] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:47:57,182 - INFO - 127.0.0.1 - - [12/May/2025 17:47:57] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:48:12,882 - INFO - 127.0.0.1 - - [12/May/2025 17:48:12] "GET / HTTP/1.1" 200 -
+2025-05-12 17:48:13,198 - INFO - 127.0.0.1 - - [12/May/2025 17:48:13] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:48:13,215 - INFO - 127.0.0.1 - - [12/May/2025 17:48:13] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:48:13,529 - INFO - 127.0.0.1 - - [12/May/2025 17:48:13] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:48:24,426 - INFO - 127.0.0.1 - - [12/May/2025 17:48:24] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:48:24,592 - INFO - 127.0.0.1 - - [12/May/2025 17:48:24] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:48:24,684 - INFO - 127.0.0.1 - - [12/May/2025 17:48:24] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:48:27,604 - INFO - 127.0.0.1 - - [12/May/2025 17:48:27] "GET / HTTP/1.1" 200 -
+2025-05-12 17:48:27,916 - INFO - 127.0.0.1 - - [12/May/2025 17:48:27] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:48:27,930 - INFO - 127.0.0.1 - - [12/May/2025 17:48:27] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:48:28,242 - INFO - 127.0.0.1 - - [12/May/2025 17:48:28] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:48:46,927 - INFO - 127.0.0.1 - - [12/May/2025 17:48:46] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:48:47,065 - INFO - 127.0.0.1 - - [12/May/2025 17:48:47] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:48:47,190 - INFO - 127.0.0.1 - - [12/May/2025 17:48:47] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:48:50,832 - INFO - 127.0.0.1 - - [12/May/2025 17:48:50] "GET / HTTP/1.1" 200 -
+2025-05-12 17:48:51,149 - INFO - 127.0.0.1 - - [12/May/2025 17:48:51] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:48:51,165 - INFO - 127.0.0.1 - - [12/May/2025 17:48:51] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:48:51,478 - INFO - 127.0.0.1 - - [12/May/2025 17:48:51] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:48:56,510 - INFO - 127.0.0.1 - - [12/May/2025 17:48:56] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:48:56,811 - INFO - 127.0.0.1 - - [12/May/2025 17:48:56] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:48:56,833 - INFO - 127.0.0.1 - - [12/May/2025 17:48:56] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:48:59,713 - INFO - 127.0.0.1 - - [12/May/2025 17:48:59] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:48:59,854 - INFO - 127.0.0.1 - - [12/May/2025 17:48:59] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:48:59,977 - INFO - 127.0.0.1 - - [12/May/2025 17:48:59] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:49:00,733 - INFO - 127.0.0.1 - - [12/May/2025 17:49:00] "GET /materiel/ajouter HTTP/1.1" 200 -
+2025-05-12 17:49:01,035 - INFO - 127.0.0.1 - - [12/May/2025 17:49:01] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:49:01,066 - INFO - 127.0.0.1 - - [12/May/2025 17:49:01] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:49:27,297 - DEBUG - Insert values: ref=231231kda (len=9), libelle=imprimante (len=10), type=imprimante (len=10), categorie=bureautique (len=11), marque=HP (len=2), description= (len=0), etat=occupé (len=6), statut=non affecté (len=11), location= (len=0), affecter_au= (len=0), service_employe= (len=0), agence= (len=0), compte_comptable= (len=0), modifier_o= (len=0), achete_par= (len=0), affecte_a= (len=0), numero_affectation= (len=0)
+2025-05-12 17:49:27,298 - DEBUG - Adding article: ref=231231kda, libelle=imprimante, statut=non affecté, etat=occupé, location=
+2025-05-12 17:49:27,309 - INFO - 127.0.0.1 - - [12/May/2025 17:49:27] "[32mPOST /materiel/ajouter HTTP/1.1[0m" 302 -
+2025-05-12 17:49:27,315 - INFO - 127.0.0.1 - - [12/May/2025 17:49:27] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:49:27,451 - INFO - 127.0.0.1 - - [12/May/2025 17:49:27] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:49:27,653 - INFO - 127.0.0.1 - - [12/May/2025 17:49:27] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:49:31,274 - INFO - 127.0.0.1 - - [12/May/2025 17:49:31] "GET / HTTP/1.1" 200 -
+2025-05-12 17:49:31,413 - INFO - 127.0.0.1 - - [12/May/2025 17:49:31] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:49:31,536 - INFO - 127.0.0.1 - - [12/May/2025 17:49:31] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:49:31,614 - INFO - 127.0.0.1 - - [12/May/2025 17:49:31] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:49:38,611 - INFO - 127.0.0.1 - - [12/May/2025 17:49:38] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:49:38,912 - INFO - 127.0.0.1 - - [12/May/2025 17:49:38] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:49:38,945 - INFO - 127.0.0.1 - - [12/May/2025 17:49:38] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:49:41,474 - INFO - 127.0.0.1 - - [12/May/2025 17:49:41] "GET /materiel/editer/7 HTTP/1.1" 200 -
+2025-05-12 17:49:41,612 - INFO - 127.0.0.1 - - [12/May/2025 17:49:41] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:49:41,737 - INFO - 127.0.0.1 - - [12/May/2025 17:49:41] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:49:46,950 - INFO - 127.0.0.1 - - [12/May/2025 17:49:46] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 17:49:47,251 - INFO - 127.0.0.1 - - [12/May/2025 17:49:47] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:49:47,298 - INFO - 127.0.0.1 - - [12/May/2025 17:49:47] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:50:17,186 - INFO - 127.0.0.1 - - [12/May/2025 17:50:17] "GET /materiel HTTP/1.1" 200 -
+2025-05-12 17:50:17,326 - INFO - 127.0.0.1 - - [12/May/2025 17:50:17] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:50:17,451 - INFO - 127.0.0.1 - - [12/May/2025 17:50:17] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:50:18,801 - INFO - 127.0.0.1 - - [12/May/2025 17:50:18] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 17:50:19,097 - INFO - 127.0.0.1 - - [12/May/2025 17:50:19] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:50:19,129 - INFO - 127.0.0.1 - - [12/May/2025 17:50:19] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:51:22,161 - INFO - 127.0.0.1 - - [12/May/2025 17:51:22] "GET / HTTP/1.1" 200 -
+2025-05-12 17:51:22,301 - INFO - 127.0.0.1 - - [12/May/2025 17:51:22] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:51:22,428 - INFO - 127.0.0.1 - - [12/May/2025 17:51:22] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:51:22,503 - INFO - 127.0.0.1 - - [12/May/2025 17:51:22] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:51:31,988 - INFO - 127.0.0.1 - - [12/May/2025 17:51:31] "GET /affectations HTTP/1.1" 200 -
+2025-05-12 17:51:32,293 - INFO - 127.0.0.1 - - [12/May/2025 17:51:32] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:51:32,324 - INFO - 127.0.0.1 - - [12/May/2025 17:51:32] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:51:54,378 - INFO - 127.0.0.1 - - [12/May/2025 17:51:54] "[32mGET /profile HTTP/1.1[0m" 302 -
+2025-05-12 17:51:54,684 - INFO - 127.0.0.1 - - [12/May/2025 17:51:54] "GET / HTTP/1.1" 200 -
+2025-05-12 17:51:55,029 - INFO - 127.0.0.1 - - [12/May/2025 17:51:55] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:51:55,031 - INFO - 127.0.0.1 - - [12/May/2025 17:51:55] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:51:55,274 - INFO - 127.0.0.1 - - [12/May/2025 17:51:55] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:52:00,567 - INFO - 127.0.0.1 - - [12/May/2025 17:52:00] "GET / HTTP/1.1" 200 -
+2025-05-12 17:52:00,873 - INFO - 127.0.0.1 - - [12/May/2025 17:52:00] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:52:00,896 - INFO - 127.0.0.1 - - [12/May/2025 17:52:00] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:52:01,212 - INFO - 127.0.0.1 - - [12/May/2025 17:52:01] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:52:13,775 - INFO - 127.0.0.1 - - [12/May/2025 17:52:13] "GET /dashboard HTTP/1.1" 200 -
+2025-05-12 17:52:13,909 - INFO - 127.0.0.1 - - [12/May/2025 17:52:13] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:52:14,031 - INFO - 127.0.0.1 - - [12/May/2025 17:52:14] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-12 17:55:08,074 - INFO - 127.0.0.1 - - [12/May/2025 17:55:08] "GET / HTTP/1.1" 200 -
+2025-05-12 17:55:08,216 - INFO - 127.0.0.1 - - [12/May/2025 17:55:08] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-12 17:55:08,340 - INFO - 127.0.0.1 - - [12/May/2025 17:55:08] "GET /api/stats HTTP/1.1" 200 -
+2025-05-12 17:55:08,400 - INFO - 127.0.0.1 - - [12/May/2025 17:55:08] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-13 08:59:45,474 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-13 08:59:45,475 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-13 08:59:45,483 - INFO -  * Restarting with stat
+2025-05-13 08:59:46,896 - WARNING -  * Debugger is active!
+2025-05-13 08:59:46,908 - INFO -  * Debugger PIN: 659-548-423
+2025-05-13 09:03:03,194 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-13 09:03:03,195 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-13 09:03:03,201 - INFO -  * Restarting with stat
+2025-05-13 09:03:03,652 - WARNING -  * Debugger is active!
+2025-05-13 09:03:03,660 - INFO -  * Debugger PIN: 325-194-813
+2025-05-13 15:12:20,569 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-13 15:12:20,569 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-13 15:12:20,571 - INFO -  * Restarting with stat
+2025-05-13 15:12:20,927 - WARNING -  * Debugger is active!
+2025-05-13 15:12:20,932 - INFO -  * Debugger PIN: 669-714-365
+2025-05-13 15:12:38,535 - INFO - 127.0.0.1 - - [13/May/2025 15:12:38] "GET / HTTP/1.1" 200 -
+2025-05-13 15:12:38,614 - INFO - 127.0.0.1 - - [13/May/2025 15:12:38] "GET /static/css/styles.css HTTP/1.1" 200 -
+2025-05-13 15:12:38,879 - INFO - 127.0.0.1 - - [13/May/2025 15:12:38] "GET /api/stats HTTP/1.1" 200 -
+2025-05-13 15:12:38,953 - INFO - 127.0.0.1 - - [13/May/2025 15:12:38] "GET /static/images/logo.png HTTP/1.1" 200 -
+2025-05-13 15:12:50,240 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-13 15:12:50,240 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-13 15:12:50,242 - INFO -  * Restarting with stat
+2025-05-13 15:12:50,624 - WARNING -  * Debugger is active!
+2025-05-13 15:12:50,629 - INFO -  * Debugger PIN: 669-714-365
+2025-05-13 15:13:33,786 - INFO - 127.0.0.1 - - [13/May/2025 15:13:33] "GET / HTTP/1.1" 200 -
+2025-05-13 15:13:33,876 - INFO - 127.0.0.1 - - [13/May/2025 15:13:33] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-13 15:13:34,028 - INFO - 127.0.0.1 - - [13/May/2025 15:13:34] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-13 15:13:34,403 - INFO - 127.0.0.1 - - [13/May/2025 15:13:34] "GET /api/stats HTTP/1.1" 200 -

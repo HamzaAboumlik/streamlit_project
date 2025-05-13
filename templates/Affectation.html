@@ -1,71 +1,107 @@
-{% extends 'base.html' %}
-{% block title %}Affectation{% endblock %}
+{% extends "base.html" %}
+
+{% block title %}Gestion des Affectations{% endblock %}
+
 {% block content %}
-<h1>Affectation</h1>
+<div class="card mb-4">
+    <div class="card-header">
+        <h4><i class="bi bi-clipboard-check"></i> Gestion des Affectations</h4>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Nouvelle Affectation</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" action="{{ url_for('ajouter_affectation') }}">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="article" class="form-label">Matériel</label>
+                                    <select class="form-select" id="article" name="article" required>
+                                        <option value="">Sélectionner un matériel</option>
+                                        {% for article in articles %}
+                                        <option value="{{ article.ID_Article }}">{{ article.Libelle_Article }} ({{ article.Ref_Article }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="employe" class="form-label">Employé</label>
+                                    <select class="form-select" id="employe" name="employe" required>
+                                        <option value="">Sélectionner un employé</option>
+                                        {% for employe in employes %}
+                                        <option value="{{ employe.Code_Employe }}">{{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="date_affectation" class="form-label">Date d'affectation</label>
+                                    <input type="date" class="form-control" id="date_affectation" name="date_affectation"
+                                           value="{{ current_date }}" max="{{ current_date }}" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="date_restitution" class="form-label">Date de restitution </label>
+                                    <input type="date" class="form-control" id="date_restitution" name="date_restitution"
+                                           min="{{ current_date }}">
+                                </div>
+                                <div class="col-md-2">
+                                    <label for="numero_affectation" class="form-label">Numéro d'affectation</label>
+                                    <input type="text" class="form-control" id="numero_affectation" name="numero_affectation"
+                                           placeholder="AUTO_YYYYMMDDHHMMSS">
+                                </div>
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">
+                                        <i class="bi bi-check-circle"></i> Affecter
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-<!-- Search Bar -->
-<div class="search-container">
-    <form method="POST" action="{{ url_for('affectation') }}">
-        <input type="text" name="search" placeholder="Rechercher par article ou service..." value="{{ search_query }}">
-        <button type="submit" class="search-btn">🔍 Rechercher</button>
-    </form>
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Matériel</th>
+                        <th>Employé</th>
+                        <th>Service</th>
+                        <th>Date Affectation</th>
+                        <th>Date Restitution</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for affectation in affectations %}
+                    <tr>
+                        <td>{{ affectation.Libelle_Article }}</td>
+                        <td>{{ affectation.Nom_Employe }} {{ affectation.Prenom_Employe }}</td>
+                        <td>{{ affectation.Service_Employe_Article }}</td>
+                        <td>{{ affectation.Date_Affectation }}</td>
+                        <td>{{ affectation.Date_Restitution_Affectation if affectation.Date_Restitution_Affectation else '-' }}</td>
+                        <td>
+                            <span class="badge bg-{% if affectation.Date_Restitution_Affectation %}secondary{% else %}success{% endif %}">
+                                {% if affectation.Date_Restitution_Affectation %}Terminée{% else %}Active{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if not affectation.Date_Restitution_Affectation %}
+                            <form method="POST" action="{{ url_for('terminer_affectation', id=affectation.ID_Affectation) }}" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-warning">
+                                    <i class="bi bi-x-circle"></i> Terminer
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-<!-- Add Affectation Form -->
-<h2>Nouvelle Affectation</h2>
-<form method="POST" action="{{ url_for('affectation') }}" class="form-container">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.id_article_affectation.label }} {{ form.id_article_affectation(class="input-field") }}
-    </div>
-    <div class="form-group">
-        {{ form.service_employe_article.label }} {{ form.service_employe_article(class="input-field") }}
-    </div>
-    <div class="form-group">
-        {{ form.date_affectation.label }} {{ form.date_affectation(class="input-field") }}
-    </div>
-    <div class="form-group">
-        {{ form.date_restitution_affectation.label }} {{ form.date_restitution_affectation(class="input-field") }}
-    </div>
-    <div class="form-group">
-        {{ form.affecter_au_article.label }} {{ form.affecter_au_article(class="input-field") }}
-    </div>
-    <div class="form-group">
-        {{ form.numero_affectation.label }} {{ form.numero_affectation(class="input-field") }}
-    </div>
-    <div class="form-group">
-        {{ form.submit(class="action-btn add-btn") }}
-    </div>
-</form>
-
-<!-- Affectation List Table -->
-<h2>Liste des Affectations</h2>
-<table class="styled-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Article</th>
-            <th>Service</th>
-            <th>Date Affectation</th>
-            <th>Date Restitution</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for affectation in affectations %}
-        <tr>
-            <td>{{ affectation.ID_Affectation }}</td>
-            <td>{{ affectation.Libelle_Article or 'N/A' }}</td>
-            <td>{{ affectation.Service_Employe_Article or 'N/A' }}</td>
-            <td>{{ affectation.Date_Affectation or 'N/A' }}</td>
-            <td>{{ affectation.Date_Restitution_Affectation or 'N/A' }}</td>
-            <td>
-                <form method="POST" action="{{ url_for('delete_affectation', id=affectation.ID_Affectation) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
-                    <button type="submit" class="action-btn delete-btn">Supprimer</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 {% endblock %}

@@ -1,69 +1,72 @@
-{% extends 'base.html' %}
-{% block title %}Utilisateurs{% endblock %}
+{% extends "base.html" %}
 
-{% block head %}
-{{ super() }}
-<link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-{% endblock %}
+{% block title %}Gestion des Utilisateurs{% endblock %}
 
 {% block content %}
-<div class="layout">
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <h2>Actions</h2>
-        <div class="search-box">
-            <input type="text" id="live-search" placeholder="Rechercher un utilisateur..." onkeyup="liveSearch()">
-        </div>
-        <select id="filter-users" onchange="filterUsers()">
-            <option value="all">Tous</option>
-            <option value="actif">Actif</option>
-            <option value="inactif">Inactif</option>
-        </select>
-        <button class="action-btn" onclick="openAddModal()">Ajouter Utilisateur</button>
-        <button class="action-btn" onclick="quickAdd()">Ajout Rapide</button>
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4><i class="bi bi-people"></i> Liste des Utilisateurs</h4>
+        <a href="{{ url_for('ajouter_utilisateur') }}" class="btn btn-light">
+            <i class="bi bi-plus-circle"></i> Ajouter un utilisateur
+        </a>
     </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <div class="header">
-            <h1>Utilisateurs</h1>
-            <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
-        </div>
-
-        <div class="card">
-            <table class="user-table" id="user-table">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
                 <thead>
                     <tr>
+                        <th>Code</th>
                         <th>Nom</th>
                         <th>Prénom</th>
-                        <th>Code</th>
+                        <th>CIN</th>
+                        <th>Service</th>
+                        <th>Direction</th>
+                        <th>Statut</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for user in users %}
-                    <tr class="expandable" onclick="toggleDetails(this)">
-                        <td>{{ user.Nom_Employe or 'N/A' }}</td>
-                        <td>{{ user.Prenom_Employe or 'N/A' }}</td>
-                        <td>{{ user.Code_Employe or 'N/A' }}</td>
+                    {% for employe in employes %}
+                    <tr>
+                        <td>{{ employe.Code_Employe }}</td>
+                        <td>{{ employe.Nom_Employe }}</td>
+                        <td>{{ employe.Prenom_Employe }}</td>
+                        <td>{{ employe.CIN_Employe }}</td>
+                        <td>{{ employe.Service_Employe }}</td>
+                        <td>{{ employe.Direction_Employe }}</td>
                         <td>
-                            <a href="{{ url_for('edit_utilisateur', id=user.ID_Employe) }}" class="action-btn edit-btn">Modifier</a>
-                            <form method="POST" action="{{ url_for('delete_utilisateur', id=user.ID_Employe) }}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
-                                <button type="submit" class="action-btn delete-btn">Supprimer</button>
-                            </form>
+                            <span class="badge bg-{% if employe.Statut_Employe == 'ACTIF' %}success{% else %}danger{% endif %}">
+                                {{ employe.Statut_Employe }}
+                            </span>
                         </td>
-                    </tr>
-                    <tr class="details">
-                        <td colspan="4">
-                            <strong>ID:</strong> {{ user.ID_Employe }}<br>
-                            <strong>CIN:</strong> {{ user.CIN_Employe or 'N/A' }}<br>
-                            <strong>Badge:</strong> {{ user.Badge_Employe or 'N/A' }}<br>
-                            <strong>Fonction:</strong> {{ user.Fonction_Employe or 'N/A' }}<br>
-                            <strong>Service:</strong> {{ user.Service_Employe or 'N/A' }}<br>
-                            <strong>Direction:</strong> {{ user.Direction_Employe or 'N/A' }}<br>
-                            <strong>Affectation:</strong> {{ user.Affectation_Employe or 'N/A' }}<br>
-                            <strong>Statut:</strong> {{ user.Statut_Employe or 'N/A' }}<br>
-                            <strong>Date Sortie:</strong> {{ user.Date_Sortie_Employe or 'N/A' }}
+                        <td>
+                            <a href="{{ url_for('editer_utilisateur', id=employe.ID_Employe) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ employe.ID_Employe }}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+
+                            <!-- Delete Modal -->
+                            <div class="modal fade" id="deleteModal{{ employe.ID_Employe }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Confirmer la suppression</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Êtes-vous sûr de vouloir supprimer l'utilisateur {{ employe.Nom_Employe }} {{ employe.Prenom_Employe }} ?
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                            <form action="{{ url_for('supprimer_utilisateur', id=employe.ID_Employe) }}" method="POST">
+                                                <button type="submit" class="btn btn-danger">Supprimer</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
@@ -72,200 +75,4 @@
         </div>
     </div>
 </div>
-
-<!-- Add User Modal -->
-<div class="modal" id="addModal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>Ajouter Utilisateur</h2>
-            <button class="modal-close" onclick="closeAddModal()">✖</button>
-        </div>
-        <form method="POST" action="{{ url_for('utilisateurs') }}">
-            {{ form.hidden_tag() }}
-            <div class="modal-body">
-                <div>
-                    <label>{{ form.nom_employe.label }}</label>
-                    {{ form.nom_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.prenom_employe.label }}</label>
-                    {{ form.prenom_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.code_employe.label }}</label>
-                    {{ form.code_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.cin_employe.label }}</label>
-                    {{ form.cin_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.badge_employe.label }}</label>
-                    {{ form.badge_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.fonction_employe.label }}</label>
-                    {{ form.fonction_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.service_employe.label }}</label>
-                    {{ form.service_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.direction_employe.label }}</label>
-                    {{ form.direction_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.affectation_employe.label }}</label>
-                    {{ form.affectation_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.statut_employe.label }}</label>
-                    {{ form.statut_employe(class="input-field") }}
-                </div>
-                <div>
-                    <label>{{ form.date_sortie_employe.label }}</label>
-                    {{ form.date_sortie_employe(class="input-field") }}
-                </div>
-            </div>
-            <div class="modal-footer">
-                {{ form.submit(class="action-btn add-btn") }}
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-    // Expandable table rows
-    function toggleDetails(row) {
-        const detailsRow = row.nextElementSibling;
-        detailsRow.style.display = detailsRow.style.display === 'table-row' ? 'none' : 'table-row';
-    }
-
-    // Modal control
-    function openAddModal() {
-        document.getElementById('addModal').style.display = 'block';
-    }
-
-    function closeAddModal() {
-        document.getElementById('addModal').style.display = 'none';
-    }
-
-    // Theme toggle
-    function toggleTheme() {
-        document.body.classList.toggle('dark-mode');
-        localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-    }
-
-    // Load theme preference
-    window.onload = function() {
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.classList.add('dark-mode');
-        }
-    };
-
-    // Live search
-    function liveSearch() {
-        const query = document.getElementById('live-search').value;
-        fetch(`/utilisateurs/search?query=${query}`)
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.querySelector('#user-table tbody');
-                tbody.innerHTML = '';
-                data.forEach(user => {
-                    tbody.innerHTML += `
-                        <tr class="expandable" onclick="toggleDetails(this)">
-                            <td>${user.Nom_Employe || 'N/A'}</td>
-                            <td>${user.Prenom_Employe || 'N/A'}</td>
-                            <td>${user.Code_Employe || 'N/A'}</td>
-                            <td>
-                                <a href="/edit-utilisateur/${user.ID_Employe}" class="action-btn edit-btn">Modifier</a>
-                                <form method="POST" action="/delete-utilisateur/${user.ID_Employe}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
-                                    <button type="submit" class="action-btn delete-btn">Supprimer</button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr class="details">
-                            <td colspan="4">
-                                <strong>ID:</strong> ${user.ID_Employe}<br>
-                                <strong>CIN:</strong> ${user.CIN_Employe || 'N/A'}<br>
-                                <strong>Badge:</strong> ${user.Badge_Employe || 'N/A'}<br>
-                                <strong>Fonction:</strong> ${user.Fonction_Employe || 'N/A'}<br>
-                                <strong>Service:</strong> ${user.Service_Employe || 'N/A'}<br>
-                                <strong>Direction:</strong> ${user.Direction_Employe || 'N/A'}<br>
-                                <strong>Affectation:</strong> ${user.Affectation_Employe || 'N/A'}<br>
-                                <strong>Statut:</strong> ${user.Statut_Employe || 'N/A'}<br>
-                                <strong>Date Sortie:</strong> ${user.Date_Sortie_Employe || 'N/A'}
-                            </td>
-                        </tr>
-                    `;
-                });
-            })
-            .catch(error => console.error('Error:', error));
-    }
-
-    // Filter users
-    function filterUsers() {
-        const filter = document.getElementById('filter-users').value;
-        fetch(`/utilisateurs/filter?status=${filter}`)
-            .then(response => response.json())
-            .then(data => {
-                const tbody = document.querySelector('#user-table tbody');
-                tbody.innerHTML = '';
-                data.forEach(user => {
-                    tbody.innerHTML += `
-                        <tr class="expandable" onclick="toggleDetails(this)">
-                            <td>${user.Nom_Employe || 'N/A'}</td>
-                            <td>${user.Prenom_Employe || 'N/A'}</td>
-                            <td>${user.Code_Employe || 'N/A'}</td>
-                            <td>
-                                <a href="/edit-utilisateur/${user.ID_Employe}" class="action-btn edit-btn">Modifier</a>
-                                <form method="POST" action="/delete-utilisateur/${user.ID_Employe}" style="display:inline;" onsubmit="return confirm('Êtes-vous sûr ?');">
-                                    <button type="submit" class="action-btn delete-btn">Supprimer</button>
-                                </form>
-                            </td>
-                        </tr>
-                        <tr class="details">
-                            <td colspan="4">
-                                <strong>ID:</strong> ${user.ID_Employe}<br>
-                                <strong>CIN:</strong> ${user.CIN_Employe || 'N/A'}<br>
-                                <strong>Badge:</strong> ${user.Badge_Employe || 'N/A'}<br>
-                                <strong>Fonction:</strong> ${user.Fonction_Employe || 'N/A'}<br>
-                                <strong>Service:</strong> ${user.Service_Employe || 'N/A'}<br>
-                                <strong>Direction:</strong> ${user.Direction_Employe || 'N/A'}<br>
-                                <strong>Affectation:</strong> ${user.Affectation_Employe || 'N/A'}<br>
-                                <strong>Statut:</strong> ${user.Statut_Employe || 'N/A'}<br>
-                                <strong>Date Sortie:</strong> ${user.Date_Sortie_Employe || 'N/A'}
-                            </td>
-                        </tr>
-                    `;
-                });
-            })
-            .catch(error => console.error('Error:', error));
-    }
-
-    // Quick Add
-    function quickAdd() {
-        fetch('/utilisateurs/quick-add', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                code_employe: 'QUICK-' + Math.floor(Math.random() * 1000),
-                cin_employe: 'CIN-' + Math.floor(Math.random() * 1000),
-                nom_employe: 'Utilisateur',
-                prenom_employe: 'Rapide',
-                statut_employe: 'Actif'
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-</script>
 {% endblock %}

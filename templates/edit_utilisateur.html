@@ -1,56 +1,99 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
 {% block title %}Modifier Utilisateur{% endblock %}
 
 {% block content %}
-<form method="POST" action="{{ url_for('edit_utilisateur', id=user.ID_Employe) }}" class="form-container">
-    {{ form.hidden_tag() }}
-    <div class="form-group">
-        {{ form.code_employe.label }}
-        {{ form.code_employe(class="input-field", value=user.Code_Employe) }}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h3><i class="bi bi-person-lines-fill"></i> Modifier l'utilisateur {{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</h3>
     </div>
-    <div class="form-group">
-        {{ form.badge_employe.label }}
-        {{ form.badge_employe(class="input-field", value=user.Badge_Employe) }}
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('editer_utilisateur', id=employe.ID_Employe) }}">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="code" class="form-label">Code Employé</label>
+                    <input type="text" class="form-control" id="code" name="code" value="{{ employe.Code_Employe }}" required>
+                </div>
+                <div class="col-md-4">
+                    <label for="badge" class="form-label">Badge</label>
+                    <input type="text" class="form-control" id="badge" name="badge" value="{{ employe.Badge_Employe }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="cin" class="form-label">CIN</label>
+                    <input type="text" class="form-control" id="cin" name="cin" value="{{ employe.CIN_Employe }}" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="nom" class="form-label">Nom</label>
+                    <input type="text" class="form-control" id="nom" name="nom" value="{{ employe.Nom_Employe }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="prenom" class="form-label">Prénom</label>
+                    <input type="text" class="form-control" id="prenom" name="prenom" value="{{ employe.Prenom_Employe }}" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="fonction" class="form-label">Fonction</label>
+                                       <input type="text" class="form-control" id="fonction" name="fonction" value="{{ employe.Fonction_Employe }}" required>
+                </div>
+                <div class="col-md-6">
+                    <label for="service" class="form-label">Service</label>
+                    <select class="form-select" id="service" name="service" required>
+                        <option value="">Sélectionner un service</option>
+                        {% for service in services %}
+                        <option value="{{ service.Service_Service }}" {% if service.Service_Service == employe.Service_Employe %}selected{% endif %}>
+                            {{ service.Service_Service }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="direction" class="form-label">Direction</label>
+                    <select class="form-select" id="direction" name="direction" required>
+                        <option value="">Sélectionner une direction</option>
+                        {% for direction in directions %}
+                        <option value="{{ direction.Direction_Direction }}" {% if direction.Direction_Direction == employe.Direction_Employe %}selected{% endif %}>
+                            {{ direction.Direction_Direction }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="affectation" class="form-label">Affectation</label>
+                    <input type="text" class="form-control" id="affectation" name="affectation" value="{{ employe.Affectation_Employe }}">
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="statut" class="form-label">Statut</label>
+                    <select class="form-select" id="statut" name="statut" required>
+                        <option value="ACTIF" {% if employe.Statut_Employe == 'ACTIF' %}selected{% endif %}>Actif</option>
+                        <option value="INACTIF" {% if employe.Statut_Employe == 'INACTIF' %}selected{% endif %}>Inactif</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="date_sortie" class="form-label">Date de sortie (si inactif)</label>
+                    <input type="date" class="form-control" id="date_sortie" name="date_sortie" value="{{ employe.Date_Sortie_Employe if employe.Date_Sortie_Employe else '' }}">
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a href="{{ url_for('utilisateurs') }}" class="btn btn-secondary me-md-2">
+                    <i class="bi bi-x-circle"></i> Annuler
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save"></i> Enregistrer les modifications
+                </button>
+            </div>
+        </form>
     </div>
-    <div class="form-group">
-        {{ form.cin_employe.label }}
-        {{ form.cin_employe(class="input-field", value=user.CIN_Employe) }}
-    </div>
-    <div class="form-group">
-        {{ form.nom_employe.label }}
-        {{ form.nom_employe(class="input-field", value=user.Nom_Employe) }}
-    </div>
-    <div class="form-group">
-        {{ form.prenom_employe.label }}
-        {{ form.prenom_employe(class="input-field", value=user.Prenom_Employe) }}
-    </div>
-    <div class="form-group">
-        {{ form.fonction_employe.label }}
-        {{ form.fonction_employe(class="input-field", value=user.Fonction_Employe) }}
-    </div>
-    <div class="form-group">
-        {{ form.service_employe.label }}
-        {{ form.service_employe(class="input-field", value=user.Service_Employe) }}
-    </div>
-    <div class="form-group">
-        {{ form.direction_employe.label }}
-        {{ form.direction_employe(class="input-field", value=user.Direction_Employe) }}
-    </div>
-    <div class="form-group">
-        {{ form.affectation_employe.label }}
-        {{ form.affectation_employe(class="input-field", value=user.Affectation_Employe) }}
-    </div>
-    <div class="form-group">
-        {{ form.statut_employe.label }}
-        {{ form.statut_employe(class="input-field", value=user.Statut_Employe) }}
-    </div>
-    <div class="form-group">
-        {{ form.date_sortie_employe.label }}
-        {{ form.date_sortie_employe(class="input-field", value=user.Date_Sortie_Employe) }}
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="action-btn btn-cancel" onclick="closeEditModal()">Annuler</button>
-        {{ form.submit(class="action-btn btn-confirm", value="Enregistrer") }}
-    </div>
-</form>
+</div>
 {% endblock %}
