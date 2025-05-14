@@ -4,192 +4,88 @@
 
 {% block content %}
 <div class="card mb-4">
-    <div class="card-header">
-        <h3><i class="bi bi-pc-display-horizontal"></i> Modifier le matériel {{ article.Libelle_Article }}</h3>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h4><i class="bi bi-pencil-square"></i> Modifier le matériel {{ article.Libelle_Article }}</h4>
+        <a href="{{ url_for('materiel') }}" class="btn btn-secondary">Retour</a>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ url_for('editer_materiel', id=article.ID_Article) }}" id="materielForm">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" enctype="multipart/form-data">
             <div class="row">
-                <!-- Required Fields -->
-                <div class="col-md-4 mb-3">
-                    <label for="ref" class="form-label">Référence</label>
+                <div class="col-md-6 mb-3">
+                    <label for="ref" class="form-label">Référence <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="ref" name="ref" value="{{ article.Ref_Article }}" maxlength="100" required>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="libelle" class="form-label">Libellé</label>
+                <div class="col-md-6 mb-3">
+                    <label for="libelle" class="form-label">Libellé <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="libelle" name="libelle" value="{{ article.Libelle_Article }}" maxlength="100" required>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="type" class="form-label">Type</label>
+                    <label for="type" class="form-label">Type <span class="text-danger">*</span></label>
                     <select class="form-select" id="type" name="type" required>
                         <option value="" disabled>Sélectionner un type</option>
                         {% for type in types %}
-                        <option value="{{ type }}" {% if article.Type_Article == type %}selected{% endif %}>{{ type|capitalize }}</option>
+                            <option value="{{ type }}" {% if article.Type_Article == type %}selected{% endif %}>{{ type|capitalize }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="categorie" class="form-label">Catégorie</label>
-                    <select class="form-select" id="categorie" name="categorie" required>
-                        <option value="" disabled>Sélectionner une catégorie</option>
-                        {% for categorie in categories %}
-                        <option value="{{ categorie }}" {% if article.Categorie_Article == categorie %}selected{% endif %}>{{ categorie|capitalize }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="marque" class="form-label">Marque</label>
+                    <label for="marque" class="form-label">Marque <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="marque" name="marque" value="{{ article.Marque_Article }}" maxlength="50" required>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="etat" class="form-label">État</label>
+                    <label for="etat" class="form-label">État <span class="text-danger">*</span></label>
                     <select class="form-select" id="etat" name="etat" required>
                         <option value="" disabled>Sélectionner un état</option>
                         {% for etat in etats %}
-                        <option value="{{ etat }}" {% if article.Etat_Article == etat %}selected{% endif %}>{{ etat|capitalize }}</option>
+                            <option value="{{ etat }}" {% if article.Etat_Article == etat %}selected{% endif %}>{{ etat|capitalize }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="statut" class="form-label">Statut</label>
-                    <select class="form-select" id="statut" name="statut" required>
-                        <option value="" disabled>Sélectionner un statut</option>
-                        {% for statut in statuts %}
-                        <option value="{{ statut }}" {% if article.Statut_Article == statut %}selected{% endif %}>{{ statut|capitalize }}</option>
+                <div class="col-md-6 mb-3">
+                    <label for="affecte_a" class="form-label">Affecté à</label>
+                    <select class="form-select" id="affecte_a" name="affecte_a">
+                        <option value="">Non affecté</option>
+                        {% for employe in employes %}
+                            <option value="{{ employe.Code_Employe }}" {% if article.Affecter_au_Article == employe.Code_Employe %}selected{% endif %}>
+                                {{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}
+                            </option>
                         {% endfor %}
                     </select>
                 </div>
-                <!-- Optional Fields -->
-                <div class="col-md-4 mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" maxlength="255">{{ article.Description_Article if article.Description_Article else '' }}</textarea>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Statut</label>
+                    <p class="form-control-plaintext">{{ article.Statut_Article|capitalize }}</p>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="date_achat" class="form-label">Date d'achat</label>
-                    <input type="date" class="form-control" id="date_achat" name="date_achat" value="{{ article.Date_Achat_Article if article.Date_Achat_Article else '' }}">
+                <div class="col-md-6 mb-3">
+                    <label for="image" class="form-label">Image</label>
+                    {% if article.Image_Path %}
+                        <div class="mb-2">
+                            <img src="{{ url_for('static', filename=article.Image_Path) }}" alt="Image" class="img-thumbnail" style="max-width: 100px;">
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="checkbox" id="remove_image" name="remove_image">
+                                <label class="form-check-label" for="remove_image">Supprimer l'image</label>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <input type="file" class="form-control" id="image" name="image" accept="image/png,image/jpeg,image/jpg">
+                    <small class="form-text text-muted">Formats acceptés : PNG, JPEG, JPG (max 5 Mo)</small>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="date_echeance" class="form-label">Date d'échéance</label>
-                    <input type="date" class="form-control" id="date_echeance" name="date_echeance" value="{{ article.Date_Echeance_Article if article.Date_Echeance_Article else '' }}">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="location" class="form-label">Localisation</label>
-                    <select class="form-select" id="location" name="location">
-                        <option value="">Sélectionner une localisation</option>
-                        {% for location in locations %}
-                        <option value="{{ location }}" {% if article.Location_Article == location %}selected{% endif %}>{{ location|capitalize }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="affecter_au" class="form-label">Affecté à</label>
-                    <input type="text" class="form-control" id="affecter_au" name="affecter_au" value="{{ article.Affecter_au_Article if article.Affecter_au_Article else '' }}" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="service_employe" class="form-label">Service employé</label>
-                    <input type="text" class="form-control" id="service_employe" name="service_employe" value="{{ article.Service_Employe_Article if article.Service_Employe_Article else '' }}" maxlength="100">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="agence" class="form-label">Agence</label>
-                    <input type="text" class="form-control" id="agence" name="agence" value="{{ article.Agence_Article if article.Agence_Article else '' }}" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="date_affectation" class="form-label">Date d'affectation</label>
-                    <input type="date" class="form-control" id="date_affectation" name="date_affectation" value="{{ article.Date_Affectation_Article if article.Date_Affectation_Article else '' }}">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="date_restitution" class="form-label">Date de restitution</label>
-                    <input type="date" class="form-control" id="date_restitution" name="date_restitution" value="{{ article.Date_Restitution_Article if article.Date_Restitution_Article else '' }}">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="compte_comptable" class="form-label">Compte comptable</label>
-                    <input type="text" class="form-control" id="compte_comptable" name="compte_comptable" value="{{ article.Compte_Comptable_Article if article.Compte_Comptable_Article else '' }}" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="modifier_o" class="form-label">Modifié par</label>
-                    <input type="text" class="form-control" id="modifier_o" name="modifier_o" value="{{ article.modifier_o if article.modifier_o else '' }}" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="achete_par" class="form-label">Acheté par</label>
-                    <input type="text" class="form-control" id="achete_par" name="achete_par" value="{{ article.Achete_Par_Article if article.Achete_Par_Article else '' }}" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="affecte_a" class="form-label">Affecté à (autre)</label>
-                    <input type="text" class="form-control" id="affecte_a" name="affecte_a" value="{{ article.Affecte_A_Article if article.Affecte_A_Article else '' }}" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="numero_affectation" class="form-label">Numéro d'affectation</label>
-                    <input type="text" class="form-control" id="numero_affectation" name="numero_affectation" value="{{ article.Numero_Affectation if article.Numero_Affectation else '' }}" maxlength="20">
-                </div>
-                <div class="col-md-12 mb-3">
-                    <a href="{{ url_for('materiel') }}" class="btn btn-secondary me-md-2">
-                        <i class="bi bi-x-circle"></i> Annuler
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i> Enregistrer
-                    </button>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                    <a href="{{ url_for('materiel') }}" class="btn btn-secondary ms-2">Annuler</a>
                 </div>
             </div>
         </form>
     </div>
 </div>
-
-{% block scripts %}
-<script>
-    // Prevent future dates for date_achat and date_affectation
-    document.getElementById('date_achat').addEventListener('change', function() {
-        const today = new Date().toISOString().split('T')[0];
-        if (this.value > today) {
-            alert('La date d\'achat ne peut pas être future.');
-            this.value = '';
-        }
-    });
-    document.getElementById('date_affectation').addEventListener('change', function() {
-        const today = new Date().toISOString().split('T')[0];
-        if (this.value > today) {
-            alert('La date d\'affectation ne peut pas être future.');
-            this.value = '';
-        }
-    });
-
-    // Ensure statut and etat are valid
-    document.getElementById('materielForm').addEventListener('submit', function(event) {
-        const statut = document.getElementById('statut').value;
-        const etat = document.getElementById('etat').value;
-        if (!statut || statut === '') {
-            event.preventDefault();
-            alert('Veuillez sélectionner un statut valide.');
-        }
-        if (!etat || etat === '') {
-            event.preventDefault();
-            alert('Veuillez sélectionner un état valide.');
-        }
-    });
-
-    // Enforce maxlength
-    const inputs = [
-        { id: 'ref', max: 100, label: 'Référence' },
-        { id: 'libelle', max: 100, label: 'Libellé' },
-        { id: 'marque', max: 50, label: 'Marque' },
-        { id: 'description', max: 255, label: 'Description' },
-        { id: 'affecter_au', max: 50, label: 'Affecté à' },
-        { id: 'service_employe', max: 100, label: 'Service employé' },
-        { id: 'agence', max: 50, label: 'Agence' },
-        { id: 'compte_comptable', max: 50, label: 'Compte comptable' },
-        { id: 'modifier_o', max: 50, label: 'Modifié par' },
-        { id: 'achete_par', max: 50, label: 'Acheté par' },
-        { id: 'affecte_a', max: 50, label: 'Affecté à (autre)' },
-        { id: 'numero_affectation', max: 20, label: 'Numéro d\'affectation' }
-    ];
-
-    inputs.forEach(input => {
-        document.getElementById(input.id).addEventListener('input', function() {
-            if (this.value.length > input.max) {
-                this.value = this.value.slice(0, input.max);
-                alert(`${input.label} ne peut pas dépasser ${input.max} caractères.`);
-            }
-        });
-    });
-</script>
-{% endblock %}
 {% endblock %}

@@ -1,76 +1,386 @@
 {% extends "base.html" %}
 
-{% block title %}Gestion du Matériel{% endblock %}
+{% block title %}Matériel{% endblock %}
 
 {% block content %}
 <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h4><i class="bi bi-pc-display"></i> Inventaire du Matériel</h4>
-        <a href="{{ url_for('ajouter_materiel') }}" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Ajouter du matériel
-        </a>
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h3><i class="bi bi-hdd"></i> Liste du Matériel</h3>
+        <a href="{{ url_for('ajouter_materiel') }}" class="btn btn-light"><i class="bi bi-plus-circle"></i> Ajouter Matériel</a>
     </div>
     <div class="card-body">
+        <!-- Search and Filter Section -->
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un article par référence, libellé...">
+                    <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                        <i class="bi bi-search"></i> Rechercher
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="row">
+                    <div class="col-6">
+                        <select id="filterType" class="form-select">
+                            <option value="">Tous les types</option>
+                            {% for type in types %}
+                            <option value="{{ type }}">{{ type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-6">
+                        <select id="filterEtat" class="form-select">
+                            <option value="">Tous les états</option>
+                            {% for etat in etats %}
+                            <option value="{{ etat }}">{{ etat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Filters -->
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <select id="filterMarque" class="form-select">
+                    <option value="">Toutes les marques</option>
+                    {% for marque in marques %}
+                    <option value="{{ marque }}">{{ marque }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select id="filterStatut" class="form-select">
+                    <option value="">Tous les statuts</option>
+                    {% for statut in statuts %}
+                    <option value="{{ statut }}">{{ statut }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select id="filterAffectation" class="form-select">
+                    <option value="">Toutes les affectations</option>
+                    <option value="non-affecte">Non affecté</option>
+                    {% for employe in employes_liste %}
+                    <option value="{{ employe.Code_Employe }}">{{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
+            <table class="table table-striped table-hover" id="materielTable">
                 <thead>
                     <tr>
-                        <th>Référence</th>
-                        <th>Libellé</th>
-                        <th>Type</th>
-                        <th>Marque</th>
-                        <th>Statut</th>
-                        <th>Affecté à</th>
+                        <th class="sortable" data-sort="reference">Référence <i class="bi bi-arrow-down-up"></i></th>
+                        <th class="sortable" data-sort="libelle">Libellé <i class="bi bi-arrow-down-up"></i></th>
+                        <th class="sortable" data-sort="type">Type <i class="bi bi-arrow-down-up"></i></th>
+                        <th class="sortable" data-sort="marque">Marque <i class="bi bi-arrow-down-up"></i></th>
+                        <th class="sortable" data-sort="etat">État <i class="bi bi-arrow-down-up"></i></th>
+                        <th class="sortable" data-sort="statut">Statut <i class="bi bi-arrow-down-up"></i></th>
+                        <th class="sortable" data-sort="affecte">Affecté à <i class="bi bi-arrow-down-up"></i></th>
+                        <th>Image</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for article in articles %}
-                    <tr>
-                        <td>{{ article.Ref_Article }}</td>
-                        <td>{{ article.Libelle_Article }}</td>
-                        <td>{{ article.Type_Article }}</td>
-                        <td>{{ article.Marque_Article }}</td>
-                        <td>
-                            <span class="badge bg-{% if article.Statut_Article == 'affecté' %}success{% else %}warning{% endif %}">
-                                {{ article.Statut_Article|capitalize }}
-                            </span>
-                        </td>
-                        <td>{{ article.Affecter_au_Article if article.Affecter_au_Article else 'Non affecté' }}</td>
-                        <td>
-                            <a href="{{ url_for('editer_materiel', id=article.ID_Article) }}" class="btn btn-sm btn-primary">
-                                <i class="bi bi-pencil"></i>
-                            </a>
-                            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ article.ID_Article }}">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                        <tr>
+                            <td>{{ article['Ref_Article'] }}</td>
+                            <td>{{ article['Libelle_Article'] }}</td>
+                            <td>{{ article['Type_Article'] }}</td>
+                            <td>{{ article['Marque_Article'] }}</td>
+                            <td>
+                                <span class="badge {% if article['Etat_Article'] == 'Neuf' %}bg-success{% elif article['Etat_Article'] == 'Bon' %}bg-info{% elif article['Etat_Article'] == 'Moyen' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ article['Etat_Article'] }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge {% if article['Statut_Article'] == 'En service' %}bg-success{% elif article['Statut_Article'] == 'En stock' %}bg-primary{% elif article['Statut_Article'] == 'En panne' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ article['Statut_Article'] }}
+                                </span>
+                            </td>
+                            <td>
+                                {% for employe in employes %}
+                                    {% if employe['Code_Employe'] == article['Affecter_au_Article'] %}
+                                        {{ employe['Nom_Employe'] }} {{ employe['Prenom_Employe'] }}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td>
+                                {% if article['Image_Path'] and article['Image_Path']|length > 0 %}
+                                    <img src="{{ url_for('static', filename='images/' + article['Image_Path']) }}"
+                                         alt="{{ article['Libelle_Article'] }}"
+                                         class="img-thumbnail"
+                                         style="max-width: 80px; height: auto;"
+                                         data-bs-toggle="modal"
+                                         data-bs-target="#imageModal{{ article['ID_Article'] }}"
+                                         >
 
-                            <!-- Delete Modal -->
-                            <div class="modal fade" id="deleteModal{{ article.ID_Article }}" tabindex="-1">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Confirmer la suppression</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <!-- Image Modal -->
+                                    <div class="modal fade" id="imageModal{{ article['ID_Article'] }}" tabindex="-1">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">{{ article['Libelle_Article'] }}</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-center">
+                                                    <img src="{{ url_for('static', filename='images/' + article['Image_Path']) }}"
+                                                         alt="{{ article['Libelle_Article'] }}"
+                                                         class="img-fluid"
+                                                         >
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="modal-body">
-                                            Êtes-vous sûr de vouloir supprimer le matériel {{ article.Libelle_Article }} ({{ article.Ref_Article }}) ?
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                            <form action="{{ url_for('supprimer_materiel', id=article.ID_Article) }}" method="POST">
-                                                <button type="submit" class="btn btn-danger">Supprimer</button>
-                                            </form>
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">Pas d'image</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ url_for('editer_materiel', id=article['ID_Article']) }}" class="btn btn-sm btn-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ article['ID_Article'] }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ article['ID_Article'] }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Details Modal -->
+                                <div class="modal fade" id="detailsModal{{ article['ID_Article'] }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Détails du matériel</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p><strong>Référence:</strong> {{ article['Ref_Article'] }}</p>
+                                                        <p><strong>Libellé:</strong> {{ article['Libelle_Article'] }}</p>
+                                                        <p><strong>Type:</strong> {{ article['Type_Article'] }}</p>
+                                                        <p><strong>Marque:</strong> {{ article['Marque_Article'] }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <p><strong>État:</strong> {{ article['Etat_Article'] }}</p>
+                                                        <p><strong>Statut:</strong> {{ article['Statut_Article'] }}</p>
+                                                        <p><strong>Affecté à:</strong>
+                                                            {% for employe in employes %}
+                                                                {% if employe['Code_Employe'] == article['Affecter_au_Article'] %}
+                                                                    {{ employe['Nom_Employe'] }} {{ employe['Prenom_Employe'] }}
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                {% if article['Image_Path'] and article['Image_Path']|length > 0 %}
+                                                    <div class="text-center mt-3">
+                                                        <img src="{{ url_for('static', filename='images/' + article['Image_Path']) }}"
+                                                             alt="{{ article['Libelle_Article'] }}"
+                                                             class="img-fluid"
+                                                             style="max-height: 200px;"
+                                                             >
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                                <a href="{{ url_for('editer_materiel', id=article['ID_Article']) }}" class="btn btn-primary">Modifier</a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
+
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ article['ID_Article'] }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Confirmer la suppression</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Êtes-vous sûr de vouloir supprimer l'article "{{ article['Libelle_Article'] }}" ({{ article['Ref_Article'] }}) ?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                                <form action="{{ url_for('supprimer_materiel', id=article['ID_Article']) }}" method="POST">
+                                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <!-- Pagination -->
+        <div class="mt-3">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Précédent</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Suivant</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 </div>
+
+<!-- JavaScript for Search and Sort -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Variables
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const filterType = document.getElementById('filterType');
+    const filterEtat = document.getElementById('filterEtat');
+    const filterMarque = document.getElementById('filterMarque');
+    const filterStatut = document.getElementById('filterStatut');
+    const filterAffectation = document.getElementById('filterAffectation');
+    const tableRows = document.querySelectorAll('#materielTable tbody tr');
+    const sortableHeaders = document.querySelectorAll('.sortable');
+
+    // Search functionality
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const typeFilter = filterType.value.toLowerCase();
+        const etatFilter = filterEtat.value.toLowerCase();
+        const marqueFilter = filterMarque.value.toLowerCase();
+        const statutFilter = filterStatut.value.toLowerCase();
+        const affectationFilter = filterAffectation.value.toLowerCase();
+
+        tableRows.forEach(row => {
+            const reference = row.cells[0].textContent.toLowerCase();
+            const libelle = row.cells[1].textContent.toLowerCase();
+            const type = row.cells[2].textContent.toLowerCase();
+            const marque = row.cells[3].textContent.toLowerCase();
+            const etat = row.cells[4].textContent.trim().toLowerCase();
+            const statut = row.cells[5].textContent.trim().toLowerCase();
+            const affecte = row.cells[6].textContent.trim().toLowerCase();
+
+            // Check if non-affected filter is selected
+            const isNonAffecteSelected = affectationFilter === 'non-affecte';
+            const isRowNonAffecte = affecte.trim() === '';
+
+            const matchesSearch = searchTerm === '' ||
+                reference.includes(searchTerm) ||
+                libelle.includes(searchTerm);
+
+            const matchesType = typeFilter === '' || type === typeFilter;
+            const matchesEtat = etatFilter === '' || etat.includes(etatFilter);
+            const matchesMarque = marqueFilter === '' || marque === marqueFilter;
+            const matchesStatut = statutFilter === '' || statut.includes(statutFilter);
+            const matchesAffectation = affectationFilter === '' ||
+                                      (isNonAffecteSelected && isRowNonAffecte) ||
+                                      (!isNonAffecteSelected && row.cells[6].textContent.toLowerCase().includes(affectationFilter));
+
+            if (matchesSearch && matchesType && matchesEtat && matchesMarque && matchesStatut && matchesAffectation) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Event listeners for search and filters
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+    filterType.addEventListener('change', performSearch);
+    filterEtat.addEventListener('change', performSearch);
+    filterMarque.addEventListener('change', performSearch);
+    filterStatut.addEventListener('change', performSearch);
+    filterAffectation.addEventListener('change', performSearch);
+
+    // Sorting functionality
+    let currentSort = {
+        column: null,
+        direction: 'asc'
+    };
+
+    sortableHeaders.forEach(header => {
+        header.addEventListener('click', function() {
+            const sortColumn = this.getAttribute('data-sort');
+            let sortDirection = 'asc';
+
+            // Toggle sort direction if same column is clicked
+            if (currentSort.column === sortColumn) {
+                sortDirection = currentSort.direction === 'asc' ? 'desc' : 'asc';
+            }
+
+            currentSort = {
+                column: sortColumn,
+                direction: sortDirection
+            };
+
+            // Get column index
+            let columnIndex;
+            switch(sortColumn) {
+                case 'reference': columnIndex = 0; break;
+                case 'libelle': columnIndex = 1; break;
+                case 'type': columnIndex = 2; break;
+                case 'marque': columnIndex = 3; break;
+                case 'etat': columnIndex = 4; break;
+                case 'statut': columnIndex = 5; break;
+                case 'affecte': columnIndex = 6; break;
+                default: columnIndex = 0;
+            }
+
+            // Sort the table
+            const rowsArray = Array.from(tableRows);
+            const sortedRows = rowsArray.sort((a, b) => {
+                const aValue = a.cells[columnIndex].textContent.trim();
+                const bValue = b.cells[columnIndex].textContent.trim();
+
+                if (sortDirection === 'asc') {
+                    return aValue.localeCompare(bValue, 'fr', {sensitivity: 'base'});
+                } else {
+                    return bValue.localeCompare(aValue, 'fr', {sensitivity: 'base'});
+                }
+            });
+
+            // Update table with sorted rows
+            const tbody = document.querySelector('#materielTable tbody');
+            sortedRows.forEach(row => {
+                tbody.appendChild(row);
+            });
+
+            // Update sort icons
+            sortableHeaders.forEach(h => {
+                h.querySelector('i').className = 'bi bi-arrow-down-up';
+            });
+
+            this.querySelector('i').className = sortDirection === 'asc' ?
+                'bi bi-arrow-up' : 'bi bi-arrow-down';
+        });
+    });
+
+    // Make table images clickable to show in modal
+    document.querySelectorAll('#materielTable img').forEach(img => {
+        img.style.cursor = 'pointer';
+    });
+});
+</script>
 {% endblock %}

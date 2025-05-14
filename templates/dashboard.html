@@ -27,7 +27,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card border-left-success shadow h-100 py-2">
                             <div class="card-body">
@@ -44,7 +43,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card border-left-info shadow h-100 py-2">
                             <div class="card-body">
@@ -61,7 +59,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="col-xl-3 col-md-6 mb-4">
                         <div class="card border-left-warning shadow h-100 py-2">
                             <div class="card-body">
@@ -79,7 +76,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-xl-6">
                         <div class="card mb-4">
@@ -106,7 +102,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card mb-4">
@@ -125,10 +120,89 @@
                                         <tbody>
                                             {% for service in repartition_services %}
                                             <tr>
-                                                <td>{{ service.Service_Employe_Article }}</td>
+                                                <td>{{ service.Service_Employe }}</td>
                                                 <td>{{ service[1] }}</td>
                                             </tr>
                                             {% endfor %}
+                                            {% if not repartition_services %}
+                                            <tr>
+                                                <td colspan="2" class="text-center">Aucun matériel affecté à un service</td>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6>Répartition des employés par direction et service</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Direction</th>
+                                                <th>Service</th>
+                                                <th>Nombre d'employés</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for employe in repartition_employes %}
+                                            <tr>
+                                                <td>{{ employe.Direction_Employe }}</td>
+                                                <td>{{ employe.Service_Employe }}</td>
+                                                <td>{{ employe.Nombre_Employes }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% if not repartition_employes %}
+                                            <tr>
+                                                <td colspan="3" class="text-center">Aucun employé trouvé</td>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-xl-12">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6>Répartition des matériels affectés et non affectés par direction et service</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Direction</th>
+                                                <th>Service</th>
+                                                <th>Matériels Affectés</th>
+                                                <th>Matériels Non Affectés</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for materiel in repartition_materiel_direction_service %}
+                                            <tr>
+                                                <td>{{ materiel.Direction_Employe }}</td>
+                                                <td>{{ materiel.Service_Employe }}</td>
+                                                <td>{{ materiel.Affectes }}</td>
+                                                <td>{{ materiel.Non_Affectes }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                            {% if not repartition_materiel_direction_service %}
+                                            <tr>
+                                                <td colspan="4" class="text-center">Aucun matériel trouvé</td>
+                                            </tr>
+                                            {% endif %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -143,9 +217,9 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Chart for material status
     const statutCtx = document.getElementById('statutChart').getContext('2d');
     new Chart(statutCtx, {
         type: 'doughnut',
@@ -168,7 +242,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Chart for material types
     const typeCtx = document.getElementById('typeChart').getContext('2d');
     const typeData = [
         {% for type in repartition_types %}

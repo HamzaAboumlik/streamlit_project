@@ -1,99 +1,109 @@
 {% extends "base.html" %}
 
-{% block title %}Modifier Utilisateur{% endblock %}
+{% block title %}Modifier un Utilisateur{% endblock %}
 
 {% block content %}
 <div class="card mb-4">
-    <div class="card-header bg-primary text-white">
-        <h3><i class="bi bi-person-lines-fill"></i> Modifier l'utilisateur {{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</h3>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3><i class="bi bi-person-gear"></i> Modifier l'Utilisateur</h3>
+        <a href="{{ url_for('utilisateurs') }}" class="btn btn-secondary">Retour</a>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ url_for('editer_utilisateur', id=employe.ID_Employe) }}">
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="code" class="form-label">Code Employé</label>
-                    <input type="text" class="form-control" id="code" name="code" value="{{ employe.Code_Employe }}" required>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" id="utilisateurForm">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label for="code" class="form-label">Code</label>
+                    <input type="text" class="form-control" id="code" name="code" maxlength="50" value="{{ employe.Code_Employe }}" data-original="{{ employe.Code_Employe }}">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mb-3">
                     <label for="badge" class="form-label">Badge</label>
-                    <input type="text" class="form-control" id="badge" name="badge" value="{{ employe.Badge_Employe }}">
+                    <input type="text" class="form-control" id="badge" name="badge" maxlength="50" value="{{ employe.Badge_Employe }}" data-original="{{ employe.Badge_Employe }}">
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mb-3">
                     <label for="cin" class="form-label">CIN</label>
-                    <input type="text" class="form-control" id="cin" name="cin" value="{{ employe.CIN_Employe }}" required>
+                    <input type="text" class="form-control" id="cin" name="cin" maxlength="20" value="{{ employe.CIN_Employe }}" data-original="{{ employe.CIN_Employe }}">
                 </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="col-md-4 mb-3">
                     <label for="nom" class="form-label">Nom</label>
-                    <input type="text" class="form-control" id="nom" name="nom" value="{{ employe.Nom_Employe }}" required>
+                    <input type="text" class="form-control" id="nom" name="nom" maxlength="100" value="{{ employe.Nom_Employe }}" data-original="{{ employe.Nom_Employe }}">
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4 mb-3">
                     <label for="prenom" class="form-label">Prénom</label>
-                    <input type="text" class="form-control" id="prenom" name="prenom" value="{{ employe.Prenom_Employe }}" required>
+                    <input type="text" class="form-control" id="prenom" name="prenom" maxlength="100" value="{{ employe.Prenom_Employe }}" data-original="{{ employe.Prenom_Employe }}">
                 </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="col-md-4 mb-3">
                     <label for="fonction" class="form-label">Fonction</label>
-                                       <input type="text" class="form-control" id="fonction" name="fonction" value="{{ employe.Fonction_Employe }}" required>
+                    <input type="text" class="form-control" id="fonction" name="fonction" maxlength="100" value="{{ employe.Fonction_Employe | default('') }}" data-original="{{ employe.Fonction_Employe | default('') }}">
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4 mb-3">
                     <label for="service" class="form-label">Service</label>
-                    <select class="form-select" id="service" name="service" required>
-                        <option value="">Sélectionner un service</option>
+                    <select class="form-select" id="service" name="service" data-original="{{ employe.Service_Employe | default('') }}">
+                        <option value="" {% if not employe.Service_Employe %}selected{% endif %}>Sélectionner un service</option>
                         {% for service in services %}
-                        <option value="{{ service.Service_Service }}" {% if service.Service_Service == employe.Service_Employe %}selected{% endif %}>
-                            {{ service.Service_Service }}
-                        </option>
+                            <option value="{{ service.Service_Service }}" {% if employe.Service_Employe == service.Service_Service %}selected{% endif %}>{{ service.Service_Service }}</option>
                         {% endfor %}
                     </select>
                 </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="col-md-4 mb-3">
                     <label for="direction" class="form-label">Direction</label>
-                    <select class="form-select" id="direction" name="direction" required>
-                        <option value="">Sélectionner une direction</option>
+                    <select class="form-select" id="direction" name="direction" data-original="{{ employe.Direction_Employe | default('') }}">
+                        <option value="" {% if not employe.Direction_Employe %}selected{% endif %}>Sélectionner une direction</option>
                         {% for direction in directions %}
-                        <option value="{{ direction.Direction_Direction }}" {% if direction.Direction_Direction == employe.Direction_Employe %}selected{% endif %}>
-                            {{ direction.Direction_Direction }}
-                        </option>
+                            <option value="{{ direction.Direction_Direction }}" {% if employe.Direction_Employe == direction.Direction_Direction %}selected{% endif %}>{{ direction.Direction_Direction }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4 mb-3">
                     <label for="affectation" class="form-label">Affectation</label>
-                    <input type="text" class="form-control" id="affectation" name="affectation" value="{{ employe.Affectation_Employe }}">
+                    <input type="text" class="form-control" id="affectation" name="affectation" maxlength="100" value="{{ employe.Affectation_Employe | default('') }}" data-original="{{ employe.Affectation_Employe | default('') }}">
                 </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-md-6">
+                <div class="col-md-4 mb-3">
                     <label for="statut" class="form-label">Statut</label>
-                    <select class="form-select" id="statut" name="statut" required>
-                        <option value="ACTIF" {% if employe.Statut_Employe == 'ACTIF' %}selected{% endif %}>Actif</option>
-                        <option value="INACTIF" {% if employe.Statut_Employe == 'INACTIF' %}selected{% endif %}>Inactif</option>
+                    <select class="form-select" id="statut" name="statut" data-original="{{ employe.Statut_Employe }}">
+                        <option value="" disabled>Sélectionner un statut</option>
+                        {% for statut in statuts %}
+                            <option value="{{ statut }}" {% if employe.Statut_Employe == statut %}selected{% endif %}>{{ statut }}</option>
+                        {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-6">
-                    <label for="date_sortie" class="form-label">Date de sortie (si inactif)</label>
-                    <input type="date" class="form-control" id="date_sortie" name="date_sortie" value="{{ employe.Date_Sortie_Employe if employe.Date_Sortie_Employe else '' }}">
+                <div class="col-md-4 mb-3">
+                    <label for="date_sortie" class="form-label">Date de Sortie</label>
+                    <input type="date" class="form-control" id="date_sortie" name="date_sortie" value="{{ employe.Date_Sortie_Employe | default('') }}" data-original="{{ employe.Date_Sortie_Employe | default('') }}">
                 </div>
-            </div>
-
-            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a href="{{ url_for('utilisateurs') }}" class="btn btn-secondary me-md-2">
-                    <i class="bi bi-x-circle"></i> Annuler
-                </a>
-                <button type="submit" class="btn btn-primary">
-                    <i class="bi bi-save"></i> Enregistrer les modifications
-                </button>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Enregistrer
+                    </button>
+                    <a href="{{ url_for('utilisateurs') }}" class="btn btn-secondary ms-2">Annuler</a>
+                </div>
             </div>
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('utilisateurForm').addEventListener('submit', function(event) {
+        // Clear unchanged fields to avoid sending them
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            const original = input.getAttribute('data-original') || '';
+            const current = input.value || '';
+            if (current === original) {
+                input.name = ''; // Remove name to exclude from form data
+            }
+        });
+    });
+</script>
 {% endblock %}

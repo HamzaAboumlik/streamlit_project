@@ -4,128 +4,77 @@
 
 {% block content %}
 <div class="card mb-4">
-    <div class="card-header">
+    <div class="card-header d-flex justify-content-between align-items-center">
         <h3><i class="bi bi-pc-display"></i> Ajouter du Matériel</h3>
+        <a href="{{ url_for('materiel') }}" class="btn btn-secondary">Retour</a>
     </div>
     <div class="card-body">
-        <form method="POST" action="{{ url_for('ajouter_materiel') }}" id="materielForm">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST" enctype="multipart/form-data" id="materielForm">
             <div class="row">
-                <!-- Required Fields -->
-                <div class="col-md-4 mb-3">
-                    <label for="ref" class="form-label">Référence</label>
+                <div class="col-md-6 mb-3">
+                    <label for="ref" class="form-label">Référence <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="ref" name="ref" maxlength="100" required>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="libelle" class="form-label">Libellé</label>
+                <div class="col-md-6 mb-3">
+                    <label for="libelle" class="form-label">Libellé <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="libelle" name="libelle" maxlength="100" required>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="type" class="form-label">Type</label>
+                    <label for="type" class="form-label">Type <span class="text-danger">*</span></label>
                     <select class="form-select" id="type" name="type" required>
                         <option value="" disabled selected>Sélectionner un type</option>
                         {% for type in types %}
-                        <option value="{{ type }}">{{ type|capitalize }}</option>
+                            <option value="{{ type }}">{{ type|capitalize }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="categorie" class="form-label">Catégorie</label>
-                    <select class="form-select" id="categorie" name="categorie" required>
-                        <option value="" disabled selected>Sélectionner une catégorie</option>
-                        {% for categorie in categories %}
-                        <option value="{{ categorie }}">{{ categorie|capitalize }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="marque" class="form-label">Marque</label>
+                    <label for="marque" class="form-label">Marque <span class="text-danger">*</span></label>
                     <input type="text" class="form-control" id="marque" name="marque" maxlength="50" required>
                 </div>
                 <div class="col-md-4 mb-3">
-                    <label for="etat" class="form-label">État</label>
+                    <label for="etat" class="form-label">État <span class="text-danger">*</span></label>
                     <select class="form-select" id="etat" name="etat" required>
                         <option value="" disabled selected>Sélectionner un état</option>
                         {% for etat in etats %}
-                        <option value="{{ etat }}">{{ etat|capitalize }}</option>
+                            <option value="{{ etat }}">{{ etat|capitalize }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="statut" class="form-label">Statut</label>
-                    <select class="form-select" id="statut" name="statut" required>
-                        <option value="" disabled selected>Sélectionner un statut</option>
-                        {% for statut in statuts %}
-                        <option value="{{ statut }}">{{ statut|capitalize }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <!-- Optional Fields -->
-                <div class="col-md-4 mb-3">
-                    <label for="description" class="form-label">Description</label>
-                    <textarea class="form-control" id="description" name="description" rows="3" maxlength="255"></textarea>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="date_achat" class="form-label">Date d'achat</label>
-                    <input type="date" class="form-control" id="date_achat" name="date_achat">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="date_echeance" class="form-label">Date d'échéance</label>
-                    <input type="date" class="form-control" id="date_echeance" name="date_echeance">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="location" class="form-label">Localisation</label>
-                    <select class="form-select" id="location" name="location">
-                        <option value="">Sélectionner une localisation</option>
-                        {% for location in locations %}
-                        <option value="{{ location }}">{{ location|capitalize }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-6 mb-3">
                     <label for="affecter_au" class="form-label">Affecté à</label>
-                    <input type="text" class="form-control" id="affecter_au" name="affecter_au" maxlength="50" placeholder="Code employé">
+                    <select class="form-select" id="affecter_au" name="affecter_au">
+                        <option value="">Non affecté</option>
+                        {% for employe in employes %}
+                            <option value="{{ employe.ID_Employe }}">{{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="service_employe" class="form-label">Service employé</label>
-                    <input type="text" class="form-control" id="service_employe" name="service_employe" maxlength="100">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Statut</label>
+                    <p class="form-control-plaintext" id="statut_display">Non affecté</p>
+                    <input type="hidden" id="statut" name="statut" value="non affecte">
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="agence" class="form-label">Agence</label>
-                    <input type="text" class="form-control" id="agence" name="agence" maxlength="50">
+                <div class="col-md-6 mb-3">
+                    <label for="image" class="form-label">Image</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/png,image/jpeg,image/jpg">
+                    <small class="form-text text-muted">Formats acceptés : PNG, JPEG, JPG (max 5 Mo)</small>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label for="date_affectation" class="form-label">Date d'affectation</label>
-                    <input type="date" class="form-control" id="date_affectation" name="date_affectation">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="date_restitution" class="form-label">Date de restitution</label>
-                    <input type="date" class="form-control" id="date_restitution" name="date_restitution">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="compte_comptable" class="form-label">Compte comptable</label>
-                    <input type="text" class="form-control" id="compte_comptable" name="compte_comptable" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="modifier_o" class="form-label">Modifié par</label>
-                    <input type="text" class="form-control" id="modifier_o" name="modifier_o" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="achete_par" class="form-label">Acheté par</label>
-                    <input type="text" class="form-control" id="achete_par" name="achete_par" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="affecte_a" class="form-label">Affecté à (autre)</label>
-                    <input type="text" class="form-control" id="affecte_a" name="affecte_a" maxlength="50">
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label for="numero_affectation" class="form-label">Numéro d'affectation</label>
-                    <input type="text" class="form-control" id="numero_affectation" name="numero_affectation" maxlength="20">
-                </div>
-                <div class="col-md-12 mb-3">
+                <div class="col-12">
                     <button type="submit" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Ajouter
                     </button>
-                    <a href="{{ url_for('materiel') }}" class="btn btn-secondary">Annuler</a>
+                    <a href="{{ url_for('materiel') }}" class="btn btn-secondary ms-2">Annuler</a>
                 </div>
             </div>
         </form>
@@ -134,59 +83,17 @@
 
 {% block scripts %}
 <script>
-    // Prevent future dates for date_achat and date_affectation
-    document.getElementById('date_achat').addEventListener('change', function() {
-        const today = new Date().toISOString().split('T')[0];
-        if (this.value > today) {
-            alert('La date d\'achat ne peut pas être future.');
-            this.value = '';
+    // Update statut display based on affecter_au selection
+    document.getElementById('affecter_au').addEventListener('change', function() {
+        const statutDisplay = document.getElementById('statut_display');
+        const statutInput = document.getElementById('statut');
+        if (this.value) {
+            statutDisplay.textContent = 'Affecté';
+            statutInput.value = 'affecte';
+        } else {
+            statutDisplay.textContent = 'Non affecté';
+            statutInput.value = 'non affecte';
         }
-    });
-    document.getElementById('date_affectation').addEventListener('change', function() {
-        const today = new Date().toISOString().split('T')[0];
-        if (this.value > today) {
-            alert('La date d\'affectation ne peut pas être future.');
-            this.value = '';
-        }
-    });
-
-    // Ensure statut and etat are selected before submission
-    document.getElementById('materielForm').addEventListener('submit', function(event) {
-        const statut = document.getElementById('statut').value;
-        const etat = document.getElementById('etat').value;
-        if (!statut || statut === '') {
-            event.preventDefault();
-            alert('Veuillez sélectionner un statut valide (affecté ou non affecté).');
-        }
-        if (!etat || etat === '') {
-            event.preventDefault();
-            alert('Veuillez sélectionner un état valide.');
-        }
-    });
-
-    // Enforce maxlength with alerts
-    const inputs = [
-        { id: 'ref', max: 100, label: 'Référence' },
-        { id: 'libelle', max: 100, label: 'Libellé' },
-        { id: 'marque', max: 50, label: 'Marque' },
-        { id: 'description', max: 255, label: 'Description' },
-        { id: 'affecter_au', max: 50, label: 'Affecté à' },
-        { id: 'service_employe', max: 100, label: 'Service employé' },
-        { id: 'agence', max: 50, label: 'Agence' },
-        { id: 'compte_comptable', max: 50, label: 'Compte comptable' },
-        { id: 'modifier_o', max: 50, label: 'Modifié par' },
-        { id: 'achete_par', max: 50, label: 'Acheté par' },
-        { id: 'affecte_a', max: 50, label: 'Affecté à (autre)' },
-        { id: 'numero_affectation', max: 20, label: 'Numéro d\'affectation' }
-    ];
-
-    inputs.forEach(input => {
-        document.getElementById(input.id).addEventListener('input', function() {
-            if (this.value.length > input.max) {
-                this.value = this.value.slice(0, input.max);
-                alert(`${input.label} ne peut pas dépasser ${input.max} caractères.`);
-            }
-        });
     });
 </script>
 {% endblock %}

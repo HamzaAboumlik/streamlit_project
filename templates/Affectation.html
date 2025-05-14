@@ -22,7 +22,7 @@
                                     <select class="form-select" id="article" name="article" required>
                                         <option value="">Sélectionner un matériel</option>
                                         {% for article in articles %}
-                                        <option value="{{ article.ID_Article }}">{{ article.Libelle_Article }} ({{ article.Ref_Article }})</option>
+                                        <option value="{{ article.ID_Article }}">{{ article.Libelle_Article }} {{ article.Ref_Article }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -45,12 +45,8 @@
                                     <input type="date" class="form-control" id="date_restitution" name="date_restitution"
                                            min="{{ current_date }}">
                                 </div>
-                                <div class="col-md-2">
-                                    <label for="numero_affectation" class="form-label">Numéro d'affectation</label>
-                                    <input type="text" class="form-control" id="numero_affectation" name="numero_affectation"
-                                           placeholder="AUTO_YYYYMMDDHHMMSS">
-                                </div>
-                                <div class="col-md-2 d-flex align-items-end">
+
+                                <div class="col-md-2 py-3 ">
                                     <button type="submit" class="btn btn-primary w-100">
                                         <i class="bi bi-check-circle"></i> Affecter
                                     </button>
