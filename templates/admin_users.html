@@ -1,0 +1,339 @@
+{% extends 'base.html' %}
+{% block title %}Gestion Utilisateurs{% endblock %}
+
+{% block styles %}
+{{ super() }}
+<style>
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    background-color: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    color: #495057;
+    font-size: 16px;
+  }
+  
+  .user-card {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  .user-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+  }
+  
+  .role-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  
+  .role-admin {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .role-user {
+    background-color: #28a745;
+    color: white;
+  }
+  
+  .role-editor {
+    background-color: #17a2b8;
+    color: white;
+  }
+  
+  .search-container {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  
+  .search-container i {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #6c757d;
+  }
+  
+  .search-input {
+    padding-left: 35px;
+    border-radius: 20px;
+  }
+  
+  .action-buttons .btn {
+    margin-right: 5px;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-top: 20px;
+  }
+  
+  .empty-state i {
+    font-size: 48px;
+    color: #6c757d;
+    margin-bottom: 15px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="page-header">
+    <div>
+      <h1 class="mb-2">Gestion Utilisateurs</h1>
+      <p class="text-muted">Gérez les utilisateurs et leurs permissions</p>
+    </div>
+    <a href="{{ url_for('admin_add_user') }}" class="btn btn-primary">
+      <i class="bi bi-plus-lg"></i> Ajouter Utilisateur
+    </a>
+  </div>
+  
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="search-container">
+            <i class="bi bi-search"></i>
+            <input type="text" id="userSearch" class="form-control search-input" placeholder="Rechercher un utilisateur...">
+          </div>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <div class="btn-group">
+            <button class="btn btn-outline-secondary" id="sortByEmail">
+              <i class="bi bi-sort-alpha-down"></i> Email
+            </button>
+            <button class="btn btn-outline-secondary" id="sortByRole">
+              <i class="bi bi-sort-alpha-down"></i> Rôle
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      {% if users %}
+      <div class="table-responsive">
+        <table class="table table-hover" id="usersTable">
+          <thead class="table-light">
+            <tr>
+              <th>Utilisateur</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr class="user-row align-middle">
+              <td>
+                <div class="d-flex align-items-center">
+                  {% if user.Avatar %}
+                  <img src="{{ user.Avatar }}" alt="{{ user.Email }}" class="user-avatar me-2">
+                  {% else %}
+                  <div class="user-avatar me-2" style="background-color: {{ user.AvatarColor | default('#e9ecef') }}">
+                    {{ user.Email[0] | upper }}
+                  </div>
+                  {% endif %}
+                  <div>
+                    <div>{{ user.Nom | default(user.Email.split('@')[0]) | e }}</div>
+                    {% if user.Prenom %}
+                    <small class="text-muted">{{ user.Prenom | e }}</small>
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              <td>{{ user.Email | e }}</td>
+              <td>
+                <span class="role-badge {% if user.Role == 'Admin' %}role-admin{% elif user.Role == 'Editor' %}role-editor{% else %}role-user{% endif %}">
+                  {{ user.Role }}
+                </span>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <a href="{{ url_for('admin_edit_user', id=user.ID_User) }}" class="btn btn-sm btn-outline-warning">
+                    <i class="bi bi-pencil"></i> Modifier
+                  </a>
+                  <button type="button" class="btn btn-sm btn-outline-danger delete-user-btn" 
+                          data-id="{{ user.ID_User }}" data-email="{{ user.Email | e }}">
+                    <i class="bi bi-trash"></i> Supprimer
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+          <span class="text-muted">Affichage de {{ users|length }} utilisateur{% if users|length > 1 %}s{% endif %}</span>
+        </div>
+        <div>
+          <nav aria-label="Navigation des pages">
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item disabled">
+                <a class="page-link" href="#" tabindex="-1">Précédent</a>
+              </li>
+              <li class="page-item active"><a class="page-link" href="#">1</a></li>
+              <li class="page-item"><a class="page-link" href="#">2</a></li>
+              <li class="page-item"><a class="page-link" href="#">3</a></li>
+              <li class="page-item">
+                <a class="page-link" href="#">Suivant</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+      
+      {% else %}
+      <div class="empty-state">
+        <i class="bi bi-people"></i>
+        <h3>Aucun utilisateur trouvé</h3>
+        <p class="text-muted">Commencez par ajouter des utilisateurs à votre système</p>
+        <a href="{{ url_for('admin_add_user') }}" class="btn btn-primary mt-2">
+          <i class="bi bi-plus-lg"></i> Ajouter votre premier utilisateur
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteUserModalLabel">Confirmer la suppression</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body">
+        <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="userEmailToDelete"></strong> ?</p>
+        <p class="text-danger"><i class="bi bi-exclamation-triangle"></i> Cette action est irréversible.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        <form id="deleteUserForm" method="POST" style="display:inline;">
+          <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Recherche d'utilisateurs
+    const userSearch = document.getElementById('userSearch');
+    if (userSearch) {
+      userSearch.addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.user-row');
+        
+        rows.forEach(row => {
+          const email = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+          const name = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+          const role = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+          
+          if (email.includes(searchValue) || name.includes(searchValue) || role.includes(searchValue)) {
+            row.style.display = '';
+          } else {
+            row.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Tri par email
+    const sortByEmail = document.getElementById('sortByEmail');
+    if (sortByEmail) {
+      sortByEmail.addEventListener('click', function() {
+        sortTable(1);
+        toggleSortIcon(this);
+      });
+    }
+    
+    // Tri par rôle
+    const sortByRole = document.getElementById('sortByRole');
+    if (sortByRole) {
+      sortByRole.addEventListener('click', function() {
+        sortTable(2);
+        toggleSortIcon(this);
+      });
+    }
+    
+    // Gestion modale confirmation suppression
+    const deleteButtons = document.querySelectorAll('.delete-user-btn');
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        const userId = this.getAttribute('data-id');
+        const userEmail = this.getAttribute('data-email');
+        
+        document.getElementById('userEmailToDelete').textContent = userEmail;
+        document.getElementById('deleteUserForm').setAttribute('action', 
+          "{{ url_for('admin_delete_user', id=0) }}".replace('0', userId));
+        
+        const deleteModal = new bootstrap.Modal(document.getElementById('deleteUserModal'));
+        deleteModal.show();
+      });
+    });
+    
+    // Fonction pour le tri des tableaux
+    function sortTable(columnIndex) {
+      const table = document.getElementById('usersTable');
+      const tbody = table.querySelector('tbody');
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      
+      // Déterminer la direction du tri
+      const currentDir = table.getAttribute('data-sort-dir') === 'asc' ? 'desc' : 'asc';
+      table.setAttribute('data-sort-dir', currentDir);
+      
+      // Trier les lignes
+      rows.sort((a, b) => {
+        const cellA = a.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
+        const cellB = b.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
+        
+        return currentDir === 'asc' 
+          ? cellA.localeCompare(cellB, 'fr', {sensitivity: 'base'})
+          : cellB.localeCompare(cellA, 'fr', {sensitivity: 'base'});
+      });
+      
+      // Réinsérer les lignes triées
+      rows.forEach(row => tbody.appendChild(row));
+    }
+    
+    // Fonction pour changer l'icône de tri
+    function toggleSortIcon(button) {
+      const table = document.getElementById('usersTable');
+      const dir = table.getAttribute('data-sort-dir');
+      
+      const icon = button.querySelector('i');
+      if (dir === 'asc') {
+        icon.className = 'bi bi-sort-alpha-down';
+      } else {
+        icon.className = 'bi bi-sort-alpha-up';
+      }
+    }
+  });
+</script>
+{% endblock %}

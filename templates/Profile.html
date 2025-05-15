@@ -1,363 +1,124 @@
 {% extends 'base.html' %}
-{% block title %}Profil Utilisateur{% endblock %}
-
+{% block title %}Mon Profil{% endblock %}
 {% block content %}
-<div class="profile-container">
-    <!-- En-tête du profil -->
-    <div class="profile-header">
-        <div class="profile-avatar">
-            <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="Avatar" class="avatar">
-            <button class="avatar-edit-btn"><i class="fas fa-camera"></i></button>
+<div class="container py-4">
+    <h1 class="mb-4">Mon Profil</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-person"></i> Informations du compte</h5>
+            <p><strong>Email :</strong> {{ email | e }}</p>
+            <hr>
+            <h5 class="card-title"><i class="bi bi-shield-lock"></i> Changer le mot de passe</h5>
+            <form method="POST" action="{{ url_for('profile') }}" id="password-form">
+                <div class="mb-3">
+                    <label for="current_password" class="form-label">Mot de passe actuel</label>
+                    <input type="password" class="form-control" id="current_password" name="current_password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="new_password" class="form-label">Nouveau mot de passe</label>
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="new_password" name="new_password" required>
+                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <div class="mt-2">
+                        <div class="progress" style="height: 5px;">
+                            <div id="password-strength" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <small id="password-strength-text" class="form-text">Force du mot de passe</small>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="password_confirm" class="form-label">Confirmer le nouveau mot de passe</label>
+                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+                    <div id="password-match" class="form-text"></div>
+                </div>
+                <button type="submit" class="btn btn-primary" id="save-password" onclick="return confirm('Confirmer le changement de mot de passe ?');">
+                    <i class="bi bi-save"></i> Enregistrer
+                </button>
+            </form>
         </div>
-        <div class="profile-info">
-            <h1>{{ user.Prenom_Employe }} {{ user.Nom_Employe }}</h1>
-            <p class="position">{{ user.Fonction_Employe }}</p>
-            <div class="profile-stats">
-                <div class="stat-item">
-                    <span class="stat-number">4.8</span>
-                    <span class="stat-label">Note</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">127</span>
-                    <span class="stat-label">Projets</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">5</span>
-                    <span class="stat-label">Ans</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Corps du profil -->
-    <div class="profile-body">
-        <!-- Colonne gauche -->
-        <div class="profile-column">
-            <section class="profile-section">
-                <h2><i class="fas fa-user-tie"></i> Informations Personnelles</h2>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Date de naissance</label>
-                        <p>{{ user.Date_Naissance or 'Non spécifiée' }}</p>
-                    </div>
-                    <div class="info-item">
-                        <label>Matricule</label>
-                        <p>{{ user.Code_Employe }}</p>
-                    </div>
-                    <div class="info-item">
-                        <label>Badge</label>
-                        <p>{{ user.Badge_Employe }}</p>
-                    </div>
-                    <div class="info-item">
-                        <label>CIN</label>
-                        <p>{{ user.CIN_Employe }}</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="profile-section">
-                <h2><i class="fas fa-building"></i> Information Professionnelle</h2>
-                <ul class="info-list">
-                    <li>
-                        <i class="fas fa-briefcase"></i>
-                        <div>
-                            <h3>Service</h3>
-                            <p>{{ user.Service_Employe }}</p>
-                        </div>
-                    </li>
-                    <li>
-                        <i class="fas fa-network-wired"></i>
-                        <div>
-                            <h3>Direction</h3>
-                            <p>{{ user.Direction_Employe }}</p>
-                        </div>
-                    </li>
-                    <li>
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <h3>Affectation</h3>
-                            <p>{{ user.Affectation_Employe }}</p>
-                        </div>
-                    </li>
-                </ul>
-            </section>
-        </div>
-
-        <!-- Colonne droite -->
-        <div class="profile-column">
-            <section class="profile-section">
-                <h2><i class="fas fa-id-card"></i> Contact</h2>
-                <ul class="contact-list">
-                    <li>
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <h3>Email</h3>
-                            <p>{{ user.Email or 'Non spécifié' }}</p>
-                        </div>
-                    </li>
-                    <li>
-                        <i class="fas fa-phone"></i>
-                        <div>
-                            <h3>Téléphone</h3>
-                            <p>{{ user.Telephone or 'Non spécifié' }}</p>
-                        </div>
-                    </li>
-                    <li>
-                        <i class="fas fa-location-arrow"></i>
-                        <div>
-                            <h3>Adresse</h3>
-                            <p>{{ user.Adresse or 'Non spécifiée' }}</p>
-                        </div>
-                    </li>
-                </ul>
-            </section>
-
-            <section class="profile-section">
-                <h2><i class="fas fa-user-shield"></i> Sécurité</h2>
-                <div class="security-settings">
-                    <div class="security-item">
-                        <div>
-                            <h3>Mot de passe</h3>
-                            <p>Dernière modification : 15 Jui 2023</p>
-                        </div>
-                        <button class="btn btn-secondary">Changer</button>
-                    </div>
-                    <div class="security-item">
-                        <div>
-                            <h3>Authentification à deux facteurs</h3>
-                            <p>Non activée</p>
-                        </div>
-                        <button class="btn btn-secondary">Activer</button>
-                    </div>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- Actions -->
-    <div class="profile-actions">
-        <button class="btn btn-primary"><i class="fas fa-edit"></i> Modifier le Profil</button>
-        <button class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Déconnexion</button>
     </div>
 </div>
 
-<style>
-    /* Style général */
-    .profile-container {
-        max-width: 1200px;
-        margin: 2rem auto;
-        padding: 2rem;
-        background: #fff;
-        border-radius: 15px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
+<script>
+    // Toggle password visibility
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const passwordInput = document.getElementById('new_password');
+        const icon = this.querySelector('i');
 
-    /* En-tête */
-    .profile-header {
-        display: flex;
-        gap: 3rem;
-        align-items: center;
-        padding-bottom: 2rem;
-        border-bottom: 2px solid #f0f2f5;
-        margin-bottom: 2rem;
-    }
-
-    .profile-avatar {
-        position: relative;
-    }
-
-    .avatar {
-        width: 150px;
-        height: 150px;
-        border-radius: 50%;
-        border: 4px solid #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .avatar-edit-btn {
-        position: absolute;
-        bottom: 10px;
-        right: 10px;
-        background: #3498db;
-        color: white;
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    .avatar-edit-btn:hover {
-        transform: scale(1.1);
-    }
-
-    .profile-info h1 {
-        margin: 0;
-        color: #2c3e50;
-        font-size: 2.5rem;
-    }
-
-    .position {
-        color: #7f8c8d;
-        margin: 0.5rem 0 1.5rem;
-        font-size: 1.2rem;
-    }
-
-    .profile-stats {
-        display: flex;
-        gap: 2.5rem;
-    }
-
-    .stat-item {
-        text-align: center;
-    }
-
-    .stat-number {
-        display: block;
-        font-size: 1.8rem;
-        font-weight: 600;
-        color: #3498db;
-    }
-
-    .stat-label {
-        color: #95a5a6;
-        font-size: 0.9rem;
-    }
-
-    /* Corps du profil */
-    .profile-body {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 3rem;
-    }
-
-    .profile-section {
-        margin-bottom: 2.5rem;
-        background: #f9fafb;
-        padding: 1.5rem;
-        border-radius: 12px;
-    }
-
-    .profile-section h2 {
-        color: #2c3e50;
-        margin: 0 0 1.5rem;
-        font-size: 1.4rem;
-        display: flex;
-        align-items: center;
-        gap: 0.8rem;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 1.5rem;
-    }
-
-    .info-item label {
-        display: block;
-        color: #7f8c8d;
-        font-size: 0.9rem;
-        margin-bottom: 0.3rem;
-    }
-
-    .info-item p {
-        margin: 0;
-        color: #2c3e50;
-        font-weight: 500;
-    }
-
-    .info-list li, .contact-list li {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-        padding: 1rem 0;
-        border-bottom: 1px solid #eee;
-    }
-
-    .security-settings {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-    }
-
-    .security-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 1rem;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    /* Boutons */
-    .btn {
-        padding: 0.8rem 1.5rem;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        font-weight: 600;
-        transition: all 0.2s;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .btn-primary {
-        background: #3498db;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #2980b9;
-    }
-
-    .btn-secondary {
-        background: #ecf0f1;
-        color: #2c3e50;
-    }
-
-    .btn-secondary:hover {
-        background: #dfe6e9;
-    }
-
-    .btn-danger {
-        background: #e74c3c;
-        color: white;
-    }
-
-    .btn-danger:hover {
-        background: #c0392b;
-    }
-
-    .profile-actions {
-        display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
-        margin-top: 2rem;
-        padding-top: 2rem;
-        border-top: 2px solid #f0f2f5;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .profile-header {
-            flex-direction: column;
-            text-align: center;
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
         }
+    });
 
-        .profile-stats {
-            justify-content: center;
-        }
+    // Password strength meter
+    document.getElementById('new_password').addEventListener('input', function() {
+        const password = this.value;
+        const strengthBar = document.getElementById('password-strength');
+        const strengthText = document.getElementById('password-strength-text');
 
-        .profile-body {
-            grid-template-columns: 1fr;
-        }
+        // Calculate password strength
+        let strength = 0;
+        if (password.length >= 8) strength += 25;
+        if (password.match(/[a-z]+/)) strength += 15;
+        if (password.match(/[A-Z]+/)) strength += 20;
+        if (password.match(/[0-9]+/)) strength += 20;
+        if (password.match(/[^a-zA-Z0-9]+/)) strength += 20;
 
-        .info-grid {
-            grid-template-columns: 1fr;
+        // Update strength bar
+        strengthBar.style.width = strength + '%';
+
+        // Update color and text based on strength
+        if (strength < 40) {
+            strengthBar.className = 'progress-bar bg-danger';
+            strengthText.textContent = 'Faible';
+        } else if (strength < 70) {
+            strengthBar.className = 'progress-bar bg-warning';
+            strengthText.textContent = 'Moyen';
+        } else {
+            strengthBar.className = 'progress-bar bg-success';
+            strengthText.textContent = 'Fort';
         }
-    }
-</style>
+    });
+
+    // Password confirmation match
+    document.getElementById('password_confirm').addEventListener('input', function() {
+        const newPassword = document.getElementById('new_password').value;
+        const confirmPassword = this.value;
+        const matchText = document.getElementById('password-match');
+        const saveButton = document.getElementById('save-password');
+
+        if (newPassword === confirmPassword) {
+            matchText.textContent = 'Les mots de passe correspondent';
+            matchText.className = 'form-text text-success';
+            saveButton.disabled = false;
+        } else {
+            matchText.textContent = 'Les mots de passe ne correspondent pas';
+            matchText.className = 'form-text text-danger';
+            saveButton.disabled = true;
+        }
+    });
+
+    // Form validation
+    document.getElementById('password-form').addEventListener('submit', function(e) {
+        const newPass = document.getElementById('new_password').value;
+        const confirmPass = document.getElementById('password_confirm').value;
+
+        if (newPass !== confirmPass) {
+            e.preventDefault();
+            alert('Les nouveaux mots de passe ne correspondent pas.');
+        } else if (newPass.length < 8) {
+            e.preventDefault();
+            alert('Le mot de passe doit contenir au moins 8 caractères.');
+        }
+    });
+</script>
 {% endblock %}

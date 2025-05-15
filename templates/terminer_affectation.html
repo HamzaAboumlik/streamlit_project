@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Terminer Affectation{% endblock %}
+{% block content %}
+<div class="container py-4">
+    <h1 class="mb-4">Terminer Affectation</h1>
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title"><i class="bi bi-box-arrow-left"></i> Terminer l'affectation pour {{ affectation.Libelle_Article | e }}</h5>
+            <form method="POST" action="{{ url_for('terminer_affectation', id=affectation.ID_Affectation) }}">
+                <div class="mb-3">
+                    <label for="date_restitution" class="form-label">Date de restitution</label>
+                    <input type="date" class="form-control" id="date_restitution" name="date_restitution" value="{{ current_date }}" required>
+                </div>
+                <button type="submit" class="btn btn-primary" onclick="return confirm('Confirmer la termination de l\'affectation ?');">
+                    <i class="bi bi-save"></i> Terminer
+                </button>
+                <a href="{{ url_for('affectations') }}" class="btn btn-secondary">Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

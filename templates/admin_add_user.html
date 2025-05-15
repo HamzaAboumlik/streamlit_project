@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Ajouter Utilisateur{% endblock %}
+{% block content %}
+<h1 class="mb-4">Ajouter Utilisateur</h1>
+<form method="POST" action="{{ url_for('admin_add_user') }}">
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Mot de passe</label>
+        <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+    <div class="mb-3">
+        <label for="password_confirm" class="form-label">Confirmer Mot de passe</label>
+        <input type="password" class="form-control" id="password_confirm" name="password_confirm" required>
+    </div>
+    <div class="mb-3">
+        <label for="role" class="form-label">Rôle</label>
+        <select class="form-select" id="role" name="role" required>
+            <option value="user">Utilisateur</option>
+            <option value="admin">Administrateur</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">
+        <i class="bi bi-plus"></i> Ajouter
+    </button>
+    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

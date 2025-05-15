@@ -18,7 +18,7 @@
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
                                             Employés</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_employes }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_employes | default(0) }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="bi bi-people-fill fa-2x text-gray-300"></i>
@@ -34,7 +34,7 @@
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
                                             Matériels</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_articles }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_articles | default(0) }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="bi bi-pc-display-horizontal fa-2x text-gray-300"></i>
@@ -50,7 +50,7 @@
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
                                             Matériels Affectés</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles_affectes }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles_affectes | default(0) }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="bi bi-clipboard-check fa-2x text-gray-300"></i>
@@ -66,7 +66,7 @@
                                     <div class="col mr-2">
                                         <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
                                             Matériels Non Affectés</div>
-                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles_non_affectes }}</div>
+                                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ articles_non_affectes | default(0) }}</div>
                                     </div>
                                     <div class="col-auto">
                                         <i class="bi bi-clipboard-x fa-2x text-gray-300"></i>
@@ -76,135 +76,334 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Statut Chart & Table Section -->
                 <div class="row">
                     <div class="col-xl-6">
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6>Répartition des matériels par statut</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary active" data-view="chart" data-target="statut-views">Graphique</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="table" data-target="statut-views">Tableau</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="cards" data-target="statut-views">Cartes</button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="statutChart"></canvas>
+                                <!-- Chart View -->
+                                <div class="view-content statut-views chart-view active">
+                                    <div class="chart-container">
+                                        <canvas id="statutChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Table View -->
+                                <div class="view-content statut-views table-view d-none">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Statut</th>
+                                                    <th>Nombre</th>
+                                                    <th>Pourcentage</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>Affectés</td>
+                                                    <td>{{ articles_affectes | default(0) }}</td>
+                                                    <td>{{ ((articles_affectes / (articles_affectes + articles_non_affectes)) * 100) | round(1) }}%</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Non affectés</td>
+                                                    <td>{{ articles_non_affectes | default(0) }}</td>
+                                                    <td>{{ ((articles_non_affectes / (articles_affectes + articles_non_affectes)) * 100) | round(1) }}%</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Cards View -->
+                                <div class="view-content statut-views cards-view d-none">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card bg-primary text-white mb-3">
+                                                <div class="card-body text-center">
+                                                    <h5 class="card-title">Affectés</h5>
+                                                    <p class="card-text display-4">{{ articles_affectes | default(0) }}</p>
+                                                    <p class="card-text">{{ ((articles_affectes / (articles_affectes + articles_non_affectes)) * 100) | round(1) }}%</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="card bg-success text-white mb-3">
+                                                <div class="card-body text-center">
+                                                    <h5 class="card-title">Non affectés</h5>
+                                                    <p class="card-text display-4">{{ articles_non_affectes | default(0) }}</p>
+                                                    <p class="card-text">{{ ((articles_non_affectes / (articles_affectes + articles_non_affectes)) * 100) | round(1) }}%</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Type Chart & Table Section -->
                     <div class="col-xl-6">
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6>Répartition des matériels par type</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary active" data-view="chart" data-target="type-views">Graphique</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="table" data-target="type-views">Tableau</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="pie" data-target="type-views">Camembert</button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="chart-container">
-                                    <canvas id="typeChart"></canvas>
+                                <!-- Chart View (Bar) -->
+                                <div class="view-content type-views chart-view active">
+                                    <div class="chart-container">
+                                        <canvas id="typeChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Table View -->
+                                <div class="view-content type-views table-view d-none">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Type de matériel</th>
+                                                    <th>Nombre</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for type in repartition_types %}
+                                                <tr>
+                                                    <td>{{ type.Type_Article | default('N/A') }}</td>
+                                                    <td>{{ type[1] | default(0) }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% if not repartition_types %}
+                                                <tr>
+                                                    <td colspan="2" class="text-center">Aucun matériel trouvé</td>
+                                                </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Pie Chart View -->
+                                <div class="view-content type-views pie-view d-none">
+                                    <div class="chart-container">
+                                        <canvas id="typePieChart"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Services Section -->
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6>Répartition des matériels par service</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary active" data-view="table" data-target="service-views">Tableau</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="chart" data-target="service-views">Graphique</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="pie" data-target="service-views">Camembert</button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Service</th>
-                                                <th>Nombre de matériels</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for service in repartition_services %}
-                                            <tr>
-                                                <td>{{ service.Service_Employe }}</td>
-                                                <td>{{ service[1] }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                            {% if not repartition_services %}
-                                            <tr>
-                                                <td colspan="2" class="text-center">Aucun matériel affecté à un service</td>
-                                            </tr>
-                                            {% endif %}
-                                        </tbody>
-                                    </table>
+                                <!-- Table View -->
+                                <div class="view-content service-views table-view active">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Service</th>
+                                                    <th>Nombre de matériels</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for service in repartition_services %}
+                                                <tr>
+                                                    <td>{{ service.Service_Employe | default('N/A') }}</td>
+                                                    <td>{{ service[1] | default(0) }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% if not repartition_services %}
+                                                <tr>
+                                                    <td colspan="2" class="text-center">Aucun matériel affecté à un service</td>
+                                                </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Chart View (Bar) -->
+                                <div class="view-content service-views chart-view d-none">
+                                    <div class="chart-container">
+                                        <canvas id="serviceBarChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Pie Chart View -->
+                                <div class="view-content service-views pie-view d-none">
+                                    <div class="chart-container">
+                                        <canvas id="servicePieChart"></canvas>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Employés Section -->
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6>Répartition des employés par direction et service</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary active" data-view="table" data-target="employes-views">Tableau</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="chart" data-target="employes-views">Graphique</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="tree" data-target="employes-views">Arborescence</button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Direction</th>
-                                                <th>Service</th>
-                                                <th>Nombre d'employés</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for employe in repartition_employes %}
-                                            <tr>
-                                                <td>{{ employe.Direction_Employe }}</td>
-                                                <td>{{ employe.Service_Employe }}</td>
-                                                <td>{{ employe.Nombre_Employes }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                            {% if not repartition_employes %}
-                                            <tr>
-                                                <td colspan="3" class="text-center">Aucun employé trouvé</td>
-                                            </tr>
-                                            {% endif %}
-                                        </tbody>
-                                    </table>
+                                <!-- Table View -->
+                                <div class="view-content employes-views table-view active">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Direction</th>
+                                                    <th>Service</th>
+                                                    <th>Nombre d'employés</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for employe in repartition_employes %}
+                                                <tr>
+                                                    <td>{{ employe.Direction_Employe | default('N/A') }}</td>
+                                                    <td>{{ employe.Service_Employe | default('N/A') }}</td>
+                                                    <td>{{ employe.Nombre_Employes | default(0) }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% if not repartition_employes %}
+                                                <tr>
+                                                    <td colspan="3" class="text-center">Aucun employé trouvé</td>
+                                                </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Chart View (Grouped Bar) -->
+                                <div class="view-content employes-views chart-view d-none">
+                                    <div class="chart-container">
+                                        <canvas id="employesBarChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Tree View -->
+                                <div class="view-content employes-views tree-view d-none">
+                                    <div id="employesTreeView" class="tree-container"></div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Matériels par direction/service Section -->
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card mb-4">
-                            <div class="card-header">
+                            <div class="card-header d-flex justify-content-between align-items-center">
                                 <h6>Répartition des matériels affectés et non affectés par direction et service</h6>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary active" data-view="table" data-target="materiel-dir-views">Tableau</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="chart" data-target="materiel-dir-views">Graphique</button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="cards" data-target="materiel-dir-views">Cartes</button>
+                                </div>
                             </div>
                             <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Direction</th>
-                                                <th>Service</th>
-                                                <th>Matériels Affectés</th>
-                                                <th>Matériels Non Affectés</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for materiel in repartition_materiel_direction_service %}
-                                            <tr>
-                                                <td>{{ materiel.Direction_Employe }}</td>
-                                                <td>{{ materiel.Service_Employe }}</td>
-                                                <td>{{ materiel.Affectes }}</td>
-                                                <td>{{ materiel.Non_Affectes }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                            {% if not repartition_materiel_direction_service %}
-                                            <tr>
-                                                <td colspan="4" class="text-center">Aucun matériel trouvé</td>
-                                            </tr>
-                                            {% endif %}
-                                        </tbody>
-                                    </table>
+                                <!-- Table View -->
+                                <div class="view-content materiel-dir-views table-view active">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Direction</th>
+                                                    <th>Service</th>
+                                                    <th>Matériels Affectés</th>
+                                                    <th>Matériels Non Affectés</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for materiel in repartition_materiel_direction_service %}
+                                                <tr>
+                                                    <td>{{ materiel.Direction_Employe | default('N/A') }}</td>
+                                                    <td>{{ materiel.Service_Employe | default('N/A') }}</td>
+                                                    <td>{{ materiel.Affectes | default(0) }}</td>
+                                                    <td>{{ materiel.Non_Affectes | default(0) }}</td>
+                                                </tr>
+                                                {% endfor %}
+                                                {% if not repartition_materiel_direction_service %}
+                                                <tr>
+                                                    <td colspan="4" class="text-center">Aucun matériel trouvé</td>
+                                                </tr>
+                                                {% endif %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <!-- Chart View (Stacked Bar) -->
+                                <div class="view-content materiel-dir-views chart-view d-none">
+                                    <div class="chart-container">
+                                        <canvas id="materielDirectionBarChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Cards View -->
+                                <div class="view-content materiel-dir-views cards-view d-none">
+                                    <div class="row" id="materielDirCards">
+                                        {% for materiel in repartition_materiel_direction_service %}
+                                        <div class="col-lg-4 col-md-6 mb-4">
+                                            <div class="card border-left-primary h-100">
+                                                <div class="card-header bg-light">
+                                                    <strong>{{ materiel.Direction_Employe | default('N/A') }}</strong> - {{ materiel.Service_Employe | default('N/A') }}
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-6 border-right">
+                                                            <div class="text-center">
+                                                                <div class="text-xs text-primary mb-1">Affectés</div>
+                                                                <div class="h4 mb-0 font-weight-bold">{{ materiel.Affectes | default(0) }}</div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <div class="text-center">
+                                                                <div class="text-xs text-warning mb-1">Non Affectés</div>
+                                                                <div class="h4 mb-0 font-weight-bold">{{ materiel.Non_Affectes | default(0) }}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -217,19 +416,229 @@
 {% endblock %}
 
 {% block scripts %}
+<style>
+    .tree-container {
+        padding: 15px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .tree-root {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .tree-node {
+        padding: 8px;
+        margin: 5px 0;
+        border-radius: 4px;
+    }
+
+    .direction-node {
+        background-color: #f8f9fa;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+    }
+
+    .service-node {
+        background-color: #ffffff;
+        border: 1px solid #e9ecef;
+    }
+
+    .collapse-control {
+        cursor: pointer;
+        margin-right: 10px;
+        font-size: 1.2em;
+        width: 20px;
+        text-align: center;
+    }
+
+    .count-badge {
+        background-color: #4e73df;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-left: 10px;
+        font-size: 0.9em;
+    }
+
+    .service-count {
+        background-color: #1cc88a;
+    }
+
+    .services-list {
+        list-style: none;
+        padding-left: 20px;
+        margin-top: 5px;
+    }
+
+    .direction-label, .service-label {
+        flex-grow: 1;
+    }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Toggle view buttons functionality
+    document.querySelectorAll('[data-view]').forEach(button => {
+        button.addEventListener('click', function() {
+            const targetGroup = this.getAttribute('data-target');
+            const viewType = this.getAttribute('data-view');
+
+            // Update button states
+            document.querySelectorAll(`[data-target="${targetGroup}"]`).forEach(btn => {
+                btn.classList.remove('active', 'btn-primary');
+                btn.classList.add('btn-outline-primary');
+            });
+            this.classList.add('active', 'btn-primary');
+            this.classList.remove('btn-outline-primary');
+
+            // Hide all views for this target group
+            document.querySelectorAll(`.view-content.${targetGroup}`).forEach(view => {
+                view.classList.add('d-none');
+                view.classList.remove('active');
+            });
+
+            // Show the selected view
+            const selectedView = document.querySelector(`.view-content.${targetGroup}.${viewType}-view`);
+            if (selectedView) {
+                selectedView.classList.remove('d-none');
+                selectedView.classList.add('active');
+                // Render tree view if selected
+                if (viewType === 'tree' && targetGroup === 'employes-views') {
+                    createEmployeesTreeView();
+                }
+            }
+        });
+    });
+
+    // Initialize all charts
+    initializeCharts();
+});
+
+function createEmployeesTreeView() {
+    const employesData = [
+        {% for employe in repartition_employes %}
+        {
+            direction: "{{ employe.Direction_Employe | default('N/A') }}",
+            service: "{{ employe.Service_Employe | default('N/A') }}",
+            nombre: {{ employe.Nombre_Employes | default(0) }}
+        },
+        {% endfor %}
+    ];
+
+    const treeContainer = document.getElementById('employesTreeView');
+    treeContainer.innerHTML = ''; // Clear previous content
+
+    if (!employesData.length) {
+        treeContainer.innerHTML = '<p class="text-center text-muted">Aucun employé trouvé</p>';
+        return;
+    }
+
+    // Group data by direction
+    const groupedData = {};
+    employesData.forEach(item => {
+        if (!groupedData[item.direction]) {
+            groupedData[item.direction] = [];
+        }
+        groupedData[item.direction].push({
+            service: item.service,
+            nombre: item.nombre
+        });
+    });
+
+    // Create root UL element
+    const rootUl = document.createElement('ul');
+    rootUl.className = 'tree-root';
+
+    // Add directions and services
+    for (const direction in groupedData) {
+        const dirLi = document.createElement('li');
+
+        // Create direction container
+        const dirContainer = document.createElement('div');
+        dirContainer.className = 'tree-node direction-node';
+
+        // Create collapsible control
+        const collapseControl = document.createElement('span');
+        collapseControl.className = 'collapse-control';
+        collapseControl.innerHTML = '−';
+        collapseControl.onclick = function() {
+            const servicesUl = this.parentNode.nextElementSibling;
+            if (servicesUl.style.display === 'none') {
+                servicesUl.style.display = 'block';
+                this.innerHTML = '−';
+            } else {
+                servicesUl.style.display = 'none';
+                this.innerHTML = '+';
+            }
+        };
+
+        // Direction label
+        const dirLabel = document.createElement('span');
+        dirLabel.className = 'direction-label';
+        dirLabel.textContent = direction;
+
+        // Total count badge
+        const totalCount = groupedData[direction].reduce((sum, item) => sum + item.nombre, 0);
+        const countBadge = document.createElement('span');
+        countBadge.className = 'count-badge';
+        countBadge.textContent = totalCount;
+
+        // Add elements to direction container
+        dirContainer.appendChild(collapseControl);
+        dirContainer.appendChild(dirLabel);
+        dirContainer.appendChild(countBadge);
+        dirLi.appendChild(dirContainer);
+
+        // Create services list
+        const servicesUl = document.createElement('ul');
+        servicesUl.className = 'services-list';
+
+        // Add service items
+        groupedData[direction].forEach(serviceItem => {
+            const serviceLi = document.createElement('li');
+
+            const serviceNode = document.createElement('div');
+            serviceNode.className = 'tree-node service-node';
+
+            const serviceLabel = document.createElement('span');
+            serviceLabel.className = 'service-label';
+            serviceLabel.textContent = serviceItem.service;
+
+            const serviceCount = document.createElement('span');
+            serviceCount.className = 'count-badge service-count';
+            serviceCount.textContent = serviceItem.nombre;
+
+            serviceNode.appendChild(serviceLabel);
+            serviceNode.appendChild(serviceCount);
+            serviceLi.appendChild(serviceNode);
+            servicesUl.appendChild(serviceLi);
+        });
+
+        dirLi.appendChild(servicesUl);
+        rootUl.appendChild(dirLi);
+    }
+
+    treeContainer.appendChild(rootUl);
+}
+
+function initializeCharts() {
+    // Statut Chart (Doughnut)
     const statutCtx = document.getElementById('statutChart').getContext('2d');
     new Chart(statutCtx, {
         type: 'doughnut',
         data: {
             labels: ['Affectés', 'Non affectés'],
             datasets: [{
-                data: [{{ articles_affectes }}, {{ articles_non_affectes }}],
+                data: [{{ articles_affectes | default(0) }}, {{ articles_non_affectes | default(0) }}],
                 backgroundColor: ['#4e73df', '#1cc88a'],
                 hoverBackgroundColor: ['#2e59d9', '#17a673'],
-                hoverBorderColor: "rgba(234, 236, 244, 1)",
+                hoverBorderColor: 'rgba(234, 236, 244, 1)',
+                borderWidth: 1
             }]
         },
         options: {
@@ -237,15 +646,25 @@ document.addEventListener('DOMContentLoaded', function() {
             plugins: {
                 legend: {
                     position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            return `${label}: ${value}`;
+                        }
+                    }
                 }
             }
         }
     });
 
+    // Type Chart (Bar)
     const typeCtx = document.getElementById('typeChart').getContext('2d');
     const typeData = [
         {% for type in repartition_types %}
-        { type: "{{ type.Type_Article }}", count: {{ type[1] }} },
+        { type: "{{ type.Type_Article | default('N/A') }}", count: {{ type[1] | default(0) }} },
         {% endfor %}
     ];
 
@@ -258,17 +677,282 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: typeData.map(item => item.count),
                 backgroundColor: '#4e73df',
                 hoverBackgroundColor: '#2e59d9',
+                borderColor: '#4e73df',
+                borderWidth: 1
             }]
         },
         options: {
             maintainAspectRatio: false,
             scales: {
                 y: {
-                    beginAtZero: true
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Nombre de matériels'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Type de matériel'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
                 }
             }
         }
     });
-});
+
+    // Type Pie Chart
+    const typePieCtx = document.getElementById('typePieChart').getContext('2d');
+    new Chart(typePieCtx, {
+        type: 'pie',
+        data: {
+            labels: typeData.map(item => item.type),
+            datasets: [{
+                data: typeData.map(item => item.count),
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                    '#5a5c69', '#858796', '#6610f2', '#6f42c1', '#fd7e14'
+                ],
+                hoverBackgroundColor: [
+                    '#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617',
+                    '#3a3b45', '#60616f', '#520dc2', '#59359a', '#ca6510'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Service Bar Chart
+    const serviceData = [
+        {% for service in repartition_services %}
+        { service: "{{ service.Service_Employe | default('N/A') }}", count: {{ service[1] | default(0) }} },
+        {% endfor %}
+    ];
+
+    const serviceBarCtx = document.getElementById('serviceBarChart').getContext('2d');
+    new Chart(serviceBarCtx, {
+        type: 'bar',
+        data: {
+            labels: serviceData.map(item => item.service),
+            datasets: [{
+                label: 'Nombre de matériels',
+                data: serviceData.map(item => item.count),
+                backgroundColor: '#36b9cc',
+                borderColor: '#36b9cc',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Nombre de matériels'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // Service Pie Chart
+    const servicePieCtx = document.getElementById('servicePieChart').getContext('2d');
+    new Chart(servicePieCtx, {
+        type: 'pie',
+        data: {
+            labels: serviceData.map(item => item.service),
+            datasets: [{
+                data: serviceData.map(item => item.count),
+                backgroundColor: [
+                    '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+                    '#5a5c69', '#858796', '#6610f2', '#6f42c1', '#fd7e14'
+                ],
+                hoverBackgroundColor: [
+                    '#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617',
+                    '#3a3b45', '#60616f', '#520dc2', '#59359a', '#ca6510'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    align: 'start'
+                }
+            }
+        }
+    });
+
+    // Employés Bar Chart
+    const employesData = [
+        {% for employe in repartition_employes %}
+        {
+            direction: "{{ employe.Direction_Employe | default('N/A') }}",
+            service: "{{ employe.Service_Employe | default('N/A') }}",
+            nombre: {{ employe.Nombre_Employes | default(0) }}
+        },
+        {% endfor %}
+    ];
+
+    // Group by direction for grouped bar chart
+    const employesByDirection = {};
+    const allServices = new Set();
+
+    employesData.forEach(item => {
+        if (!employesByDirection[item.direction]) {
+            employesByDirection[item.direction] = {};
+        }
+        employesByDirection[item.direction][item.service] = item.nombre;
+        allServices.add(item.service);
+    });
+
+    const directions = Object.keys(employesByDirection);
+    const services = Array.from(allServices);
+
+    const employesDatasets = services.map((service, index) => {
+        return {
+            label: service,
+            data: directions.map(direction => employesByDirection[direction][service] || 0),
+            backgroundColor: getColor(index),
+            borderColor: getBorderColor(index),
+            borderWidth: 1
+        };
+    });
+
+    const employesBarCtx = document.getElementById('employesBarChart').getContext('2d');
+    new Chart(employesBarCtx, {
+        type: 'bar',
+        data: {
+            labels: directions,
+            datasets: employesDatasets
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Direction'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Nombre d\'employés'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+
+    // Matériel Direction Bar Chart (Stacked)
+    const materielDirData = [
+        {% for materiel in repartition_materiel_direction_service %}
+        {
+            direction: "{{ materiel.Direction_Employe | default('N/A') }}",
+            service: "{{ materiel.Service_Employe | default('N/A') }}",
+            affectes: {{ materiel.Affectes | default(0) }},
+            nonAffectes: {{ materiel.Non_Affectes | default(0) }}
+        },
+        {% endfor %}
+    ];
+
+    // Create labels array (Direction - Service)
+    const materielLabels = materielDirData.map(item => `${item.direction} - ${item.service}`);
+
+    const materielDirCtx = document.getElementById('materielDirectionBarChart').getContext('2d');
+    new Chart(materielDirCtx, {
+        type: 'bar',
+        data: {
+            labels: materielLabels,
+            datasets: [
+                {
+                    label: 'Matériels Affectés',
+                    data: materielDirData.map(item => item.affectes),
+                    backgroundColor: '#4e73df',
+                    borderColor: '#4e73df',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Matériels Non Affectés',
+                    data: materielDirData.map(item => item.nonAffectes),
+                    backgroundColor: '#f6c23e',
+                    borderColor: '#f6c23e',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Direction - Service'
+                    }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Nombre de matériels'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+// Helper functions for chart colors
+function getColor(index) {
+    const colors = [
+        '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+        '#5a5c69', '#858796', '#6610f2', '#6f42c1', '#fd7e14'
+    ];
+    return colors[index % colors.length];
+}
+
+function getBorderColor(index) {
+    const colors = [
+        '#2e59d9', '#17a673', '#2c9faf', '#dda20a', '#be2617',
+        '#3a3b45', '#60616f', '#520dc2', '#59359a', '#ca6510'
+    ];
+    return colors[index % colors.length];
+}
 </script>
 {% endblock %}

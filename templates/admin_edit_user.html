@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Modifier Utilisateur{% endblock %}
+{% block content %}
+<h1 class="mb-4">Modifier Utilisateur</h1>
+<form method="POST" action="{{ url_for('admin_edit_user', id=user.ID_User) }}">
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email" value="{{ user.Email | e }}" required>
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Nouveau Mot de passe (laisser vide pour ne pas changer)</label>
+        <input type="password" class="form-control" id="password" name="password">
+    </div>
+    <div class="mb-3">
+        <label for="password_confirm" class="form-label">Confirmer Nouveau Mot de passe</label>
+        <input type="password" class="form-control" id="password_confirm" name="password_confirm">
+    </div>
+    <div class="mb-3">
+        <label for="role" class="form-label">Rôle</label>
+        <select class="form-select" id="role" name="role" required>
+            <option value="user" {% if user.Role == 'user' %}selected{% endif %}>Utilisateur</option>
+            <option value="admin" {% if user.Role == 'admin' %}selected{% endif %}>Administrateur</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary" onclick="return confirm('Confirmer les modifications ?');">
+        <i class="bi bi-save"></i> Enregistrer
+    </button>
+    <a href="{{ url_for('admin_users') }}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

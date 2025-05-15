@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FedEx IT Asset Manager | Connexion</title>
+    <style>
+        :root {
+            --fedex-purple: #4D148C;
+            --fedex-orange: #FF6600;
+            --fedex-light-gray: #F5F5F5;
+            --fedex-dark-gray: #333333;
+            --fedex-blue: #002D72;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'FedEx Sans', 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: var(--fedex-dark-gray);
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI3BhdHRlcm4pIi8+PC9zdmc+');
+        }
+
+        .login-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            width: 550px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-top: 4px solid var(--fedex-purple);
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--fedex-purple), var(--fedex-orange));
+        }
+
+        .fedex-logo {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .fedex-logo svg {
+            height: 40px;
+            width: auto;
+        }
+
+        .fedex-logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--fedex-purple);
+            margin-left: 10px;
+            position: relative;
+        }
+
+        .fedex-logo-text span {
+            color: var(--fedex-orange);
+        }
+
+        h1 {
+            color: var(--fedex-blue);
+            font-size: 18px;
+            margin-bottom: 30px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group {
+            margin-bottom: 24px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--fedex-blue);
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--fedex-orange);
+            background-color: white;
+            box-shadow: 0 0 0 2px rgba(255, 102, 0, 0.2);
+        }
+
+        button {
+            background: var(--fedex-purple);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #3A0F6B;
+        }
+
+        .footer {
+            margin-top: 30px;
+            color: #666;
+            font-size: 12px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .error {
+            color: #D9534F;
+            margin-bottom: 20px;
+            background-color: rgba(217, 83, 79, 0.1);
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 4px solid #D9534F;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: -15px;
+            margin-bottom: 20px;
+        }
+
+        .forgot-password a {
+            color: var(--fedex-blue);
+            font-size: 12px;
+            text-decoration: none;
+            transition: color 0.3s;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .forgot-password a:hover {
+            color: var(--fedex-orange);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="fedex-logo">
+
+            <div class="fedex-logo-text">Fed<span>Ex</span></div>
+        </div>
+
+        <h1>Gestion du Parc Informatique</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="error">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="/login">
+            <div class="input-group">
+                <label for="email">Adresse Email</label>
+                <input type="email" id="email" name="email" required placeholder="votre@email.com" autocomplete="email">
+            </div>
+
+            <div class="input-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" name="password" required placeholder="••••••••" autocomplete="current-password">
+            </div>
+
+
+            <button type="submit">Se connecter</button>
+        </form>
+
+        <div class="footer">
+            © 2023 FedEx parc informatique. Tous droits réservés.
+        </div>
+    </div>
+</body>
+</html>

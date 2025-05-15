@@ -1,51 +1,49 @@
-/* Styles de base */
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #F5F5F5; /* Light gray for a clean background */
-    margin: 0; /* Remove default margin */
-    padding-bottom: 60px; /* Space for fixed footer */
-    min-height: 100vh; /* Ensure body takes full viewport height */
+    background-color: #F5F5F5;
+    margin: 0;
+    padding-bottom: 60px;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
 
-/* Main content wrapper */
 .container {
-    flex: 1 0 auto; /* Allow content to grow and fill space */
+    flex: 1 0 auto;
+
 }
 
-/* Card Styles */
 .card {
     border-radius: 0.5rem;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border: 1px solid #E6D9F2; /* Light purple border */
+    border: 1px solid #E6D9F2;
+    margin-top: 20px;
 }
 
 .card-header {
-    background-color: rgba(192, 188, 188, 0.25) !important; /* Light purple for card headers */
+    background-color: rgba(192, 188, 188, 0.25) !important;
     color: #2e1f1f !important;
     font-weight: 100 !important;
     border-radius: 0.5rem 0.5rem 0 0 !important;
 }
 
-/* Table Responsive */
 .table-responsive {
     overflow-x: auto;
 }
 
-/* Navbar Styles */
 .navbar.navbar-expand-lg {
-    background-color: #4D148C !important; /* FedEx Purple background */
+    background-color: #4D148C !important;
     box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 
 .navbar-brand,
 .navbar .nav-link {
-    color: white !important; /* White for contrast */
+    color: white !important;
 }
 
 .navbar .nav-link:hover {
-    color: #FF6200 !important; /* FedEx Orange on hover */
+    color: #FF6200 !important;
 }
 
 .navbar .btn-outline-light {
@@ -54,21 +52,21 @@ body {
 }
 
 .navbar .btn-outline-light:hover {
-    background-color: #FF6200 !important; /* FedEx Orange background on hover */
+    background-color: #FF6200 !important;
     color: white !important;
     border-color: #FF6200 !important;
 }
 
 /* Buttons */
 .btn-primary {
-    background: linear-gradient(135deg, #4D148C, #3A0F6A) !important; /* FedEx Purple gradient */
+    background: linear-gradient(135deg, #4D148C, #3A0F6A) !important;
     border: none !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     color: white !important;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, #5E1BA8, #4D148C) !important; /* Lighter purple gradient */
+    background: linear-gradient(135deg, #5E1BA8, #4D148C) !important;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 

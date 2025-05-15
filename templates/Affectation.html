@@ -3,6 +3,55 @@
 {% block title %}Gestion des Affectations{% endblock %}
 
 {% block content %}
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+        width: 500px;
+    }
+    .form-check-inline {
+        margin-right: 1.5rem;
+        margin-bottom: 0;
+    }
+    .form-check-label {
+        font-weight: 500;
+        margin-left: 0.5rem;
+        font-size: 0.9rem;
+    }
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    .affectation-group {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+    .affectation-group .form-check {
+        margin-right: 1.5rem;
+    }
+    .affectation-group .form-select {
+        width: 240px;
+        margin-left: 1.5rem;
+        font-size: 0.9rem;
+    }
+    @media (max-width: 768px) {
+        .affectation-group {
+            flex-wrap: wrap;
+        }
+        .affectation-group .form-check {
+            margin-bottom: 0.5rem;
+        }
+        .affectation-group .form-select {
+            width: 100%;
+            margin-left: 0;
+            margin-top: 0.5rem;
+        }
+        .col-md-4, .col-md-2 {
+            margin-bottom: 1rem;
+        }
+    }
+</style>
+
 <div class="card mb-4">
     <div class="card-header">
         <h4><i class="bi bi-clipboard-check"></i> Gestion des Affectations</h4>
@@ -16,8 +65,8 @@
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ url_for('ajouter_affectation') }}">
-                            <div class="row">
-                                <div class="col-md-4">
+                            <div class="row align-items-end">
+                                <div class="col-md-4 form-group">
                                     <label for="article" class="form-label">Matériel</label>
                                     <select class="form-select" id="article" name="article" required>
                                         <option value="">Sélectionner un matériel</option>
@@ -26,27 +75,53 @@
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-md-4">
-                                    <label for="employe" class="form-label">Employé</label>
-                                    <select class="form-select" id="employe" name="employe" required>
-                                        <option value="">Sélectionner un employé</option>
-                                        {% for employe in employes %}
-                                        <option value="{{ employe.Code_Employe }}">{{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</option>
-                                        {% endfor %}
-                                    </select>
+                                <div class="col-md-4 form-group">
+                                    <label class="form-label">Affectation</label>
+                                    <div class="affectation-group">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="affectation_type" id="type_employe" value="EMPLOYEE" checked>
+                                            <label class="form-check-label" for="type_employe">Employé</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="affectation_type" id="type_service" value="SERVICE">
+                                            <label class="form-check-label" for="type_service">Service</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="affectation_type" id="type_direction" value="DIRECTION">
+                                            <label class="form-check-label" for="type_direction">Direction</label>
+                                        </div>
+                                        <select class="form-select" id="employe" name="employe">
+                                            <option value="">Sélectionner un employé &nbsp;&nbsp;&nbsp;&nbsp;</option>
+                                            {% for employe in employes %}
+                                            <option value="{{ employe.Code_Employe }}">{{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</option>
+                                            {% endfor %}
+                                        </select>
+
+                                        <select class="form-select d-none" id="service" name="service">
+                                            <option value="">Sélectionner un service&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                                            {% for service in services %}
+                                            <option value="{{ service.Service_Employe }}">{{ service.Service_Employe }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select class="form-select d-none" id="direction" name="direction">
+                                            <option value="">Sélectionner une direction&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                                            {% for direction in directions %}
+                                            <option value="{{ direction.Direction_Employe }}">{{ direction.Direction_Employe }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-2 form-group">
                                     <label for="date_affectation" class="form-label">Date d'affectation</label>
                                     <input type="date" class="form-control" id="date_affectation" name="date_affectation"
                                            value="{{ current_date }}" max="{{ current_date }}" required>
                                 </div>
-                                <div class="col-md-2">
-                                    <label for="date_restitution" class="form-label">Date de restitution </label>
+                                <div class="col-md-2 form-group">
+                                    <label for="date_restitution" class="form-label">Date de restitution</label>
                                     <input type="date" class="form-control" id="date_restitution" name="date_restitution"
                                            min="{{ current_date }}">
                                 </div>
-
-                                <div class="col-md-2 py-3 ">
+                                <div class="col-md-2 form-group d-flex align-items-end">
                                     <button type="submit" class="btn btn-primary w-100">
                                         <i class="bi bi-check-circle"></i> Affecter
                                     </button>
@@ -63,8 +138,8 @@
                 <thead>
                     <tr>
                         <th>Matériel</th>
-                        <th>Employé</th>
-                        <th>Service</th>
+                        <th>Affecté à</th>
+                        <th>Service/Direction</th>
                         <th>Date Affectation</th>
                         <th>Date Restitution</th>
                         <th>Statut</th>
@@ -75,8 +150,16 @@
                     {% for affectation in affectations %}
                     <tr>
                         <td>{{ affectation.Libelle_Article }}</td>
-                        <td>{{ affectation.Nom_Employe }} {{ affectation.Prenom_Employe }}</td>
-                        <td>{{ affectation.Service_Employe_Article }}</td>
+                        <td>
+                            {% if affectation.Affecter_au_Article %}
+                            {{ affectation.Nom_Employe }} {{ affectation.Prenom_Employe }} (Employé)
+                            {% elif affectation.Service_Employe_Article in directions_list %}
+                            {{ affectation.Service_Employe_Article }} (Direction)
+                            {% else %}
+                            {{ affectation.Service_Employe_Article | default('N/A') }} (Service)
+                            {% endif %}
+                        </td>
+                        <td>{{ affectation.Service_Employe_Article | default('-') }}</td>
                         <td>{{ affectation.Date_Affectation }}</td>
                         <td>{{ affectation.Date_Restitution_Affectation if affectation.Date_Restitution_Affectation else '-' }}</td>
                         <td>
@@ -86,12 +169,17 @@
                         </td>
                         <td>
                             {% if not affectation.Date_Restitution_Affectation %}
-                            <form method="POST" action="{{ url_for('terminer_affectation', id=affectation.ID_Affectation) }}" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-x-circle"></i> Terminer
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#terminerModal"
+                                    data-id="{{ affectation.ID_Affectation }}"
+                                    data-article="{{ affectation.Libelle_Article | e }}">
+                                <i class="bi bi-x-circle"></i> Terminer
+                            </button>
+                            {% endif %}
+                            <form method="POST" action="{{ url_for('supprimer_affectation', id=affectation.ID_Affectation) }}" class="d-inline" onsubmit="return confirm('Voulez-vous vraiment supprimer cette affectation ?');">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i> Supprimer
                                 </button>
                             </form>
-                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -100,4 +188,82 @@
         </div>
     </div>
 </div>
+
+<!-- Modal for Terminer Affectation -->
+<div class="modal fade" id="terminerModal" tabindex="-1" aria-labelledby="terminerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="terminerModalLabel">Terminer l'affectation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="terminerForm" method="POST">
+                    <div class="mb-3">
+                        <p>Affectation pour : <strong id="articleLabel"></strong></p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="date_restitution" class="form-label">Date de restitution</label>
+                        <input type="date" class="form-control" id="date_restitution" name="date_restitution"
+                               value="{{ current_date }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" onclick="return confirm('Confirmer la termination de l\'affectation ?');">
+                        <i class="bi bi-save"></i> Terminer
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Existing script for dynamic select visibility
+    const employeSelect = document.getElementById('employe');
+    const serviceSelect = document.getElementById('service');
+    const directionSelect = document.getElementById('direction');
+    const typeRadios = document.querySelectorAll('input[name="affectation_type"]');
+
+    function updateSelectVisibility() {
+        const selectedType = document.querySelector('input[name="affectation_type"]:checked').value;
+        employeSelect.classList.add('d-none');
+        serviceSelect.classList.add('d-none');
+        directionSelect.classList.add('d-none');
+        employeSelect.removeAttribute('required');
+        serviceSelect.removeAttribute('required');
+        directionSelect.removeAttribute('required');
+
+        if (selectedType === 'EMPLOYEE') {
+            employeSelect.classList.remove('d-none');
+            employeSelect.setAttribute('required', 'required');
+        } else if (selectedType === 'SERVICE') {
+            serviceSelect.classList.remove('d-none');
+            serviceSelect.setAttribute('required', 'required');
+        } else if (selectedType === 'DIRECTION') {
+            directionSelect.classList.remove('d-none');
+            directionSelect.setAttribute('required', 'required');
+        }
+    }
+
+    typeRadios.forEach(radio => {
+        radio.addEventListener('change', updateSelectVisibility);
+    });
+
+    updateSelectVisibility();
+
+    // Modal script to set form action and article label
+    const terminerModal = document.getElementById('terminerModal');
+    terminerModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const article = button.getAttribute('data-article');
+        const form = document.getElementById('terminerForm');
+        const articleLabel = document.getElementById('articleLabel');
+
+        form.action = `/affectation/terminer/${id}`;
+        articleLabel.textContent = article;
+    });
+});
+</script>
 {% endblock %}
