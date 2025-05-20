@@ -96,7 +96,6 @@
                                             <option value="{{ employe.Code_Employe }}">{{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</option>
                                             {% endfor %}
                                         </select>
-
                                         <select class="form-select d-none" id="service" name="service">
                                             <option value="">Sélectionner un service&nbsp;&nbsp;&nbsp;&nbsp;</option>
                                             {% for service in services %}
@@ -163,12 +162,12 @@
                         <td>{{ affectation.Date_Affectation }}</td>
                         <td>{{ affectation.Date_Restitution_Affectation if affectation.Date_Restitution_Affectation else '-' }}</td>
                         <td>
-                            <span class="badge bg-{% if affectation.Date_Restitution_Affectation %}secondary{% else %}success{% endif %}">
-                                {% if affectation.Date_Restitution_Affectation %}Terminée{% else %}Active{% endif %}
+                            <span class="badge bg-{{ affectation.Status_Color }}">
+                                {{ affectation.Status_Display }}
                             </span>
                         </td>
                         <td>
-                            {% if not affectation.Date_Restitution_Affectation %}
+                            {% if affectation.Status_Display == 'Active' %}
                             <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#terminerModal"
                                     data-id="{{ affectation.ID_Affectation }}"
                                     data-article="{{ affectation.Libelle_Article | e }}">
@@ -219,7 +218,6 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Existing script for dynamic select visibility
     const employeSelect = document.getElementById('employe');
     const serviceSelect = document.getElementById('service');
     const directionSelect = document.getElementById('direction');
@@ -252,7 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     updateSelectVisibility();
 
-    // Modal script to set form action and article label
     const terminerModal = document.getElementById('terminerModal');
     terminerModal.addEventListener('show.bs.modal', function(event) {
         const button = event.relatedTarget;

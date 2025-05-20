@@ -76,8 +76,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Statut Chart & Table Section -->
                 <div class="row">
                     <div class="col-xl-6">
                         <div class="card mb-4">
@@ -90,14 +88,11 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <!-- Chart View -->
                                 <div class="view-content statut-views chart-view active">
                                     <div class="chart-container">
                                         <canvas id="statutChart"></canvas>
                                     </div>
                                 </div>
-
-                                <!-- Table View -->
                                 <div class="view-content statut-views table-view d-none">
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
@@ -109,22 +104,33 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
+                                                {% set total = articles_affectes + articles_non_affectes %}
                                                 <tr>
                                                     <td>Affectés</td>
                                                     <td>{{ articles_affectes | default(0) }}</td>
-                                                    <td>{{ ((articles_affectes / (articles_affectes + articles_non_affectes)) * 100) | round(1) }}%</td>
+                                                    <td>
+                                                        {% if total > 0 %}
+                                                            {{ ((articles_affectes / total) * 100) | round(1) }}%
+                                                        {% else %}
+                                                            0.0%
+                                                        {% endif %}
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td>Non affectés</td>
                                                     <td>{{ articles_non_affectes | default(0) }}</td>
-                                                    <td>{{ ((articles_non_affectes / (articles_affectes + articles_non_affectes)) * 100) | round(1) }}%</td>
+                                                    <td>
+                                                        {% if total > 0 %}
+                                                            {{ ((articles_non_affectes / total) * 100) | round(1) }}%
+                                                        {% else %}
+                                                            0.0%
+                                                        {% endif %}
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-
-                                <!-- Cards View -->
                                 <div class="view-content statut-views cards-view d-none">
                                     <div class="row">
                                         <div class="col-md-6">
@@ -132,7 +138,13 @@
                                                 <div class="card-body text-center">
                                                     <h5 class="card-title">Affectés</h5>
                                                     <p class="card-text display-4">{{ articles_affectes | default(0) }}</p>
-                                                    <p class="card-text">{{ ((articles_affectes / (articles_affectes + articles_non_affectes)) * 100) | round(1) }}%</p>
+                                                    <p class="card-text">
+                                                        {% if total > 0 %}
+                                                            {{ ((articles_affectes / total) * 100) | round(1) }}%
+                                                        {% else %}
+                                                            0.0%
+                                                        {% endif %}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -141,7 +153,13 @@
                                                 <div class="card-body text-center">
                                                     <h5 class="card-title">Non affectés</h5>
                                                     <p class="card-text display-4">{{ articles_non_affectes | default(0) }}</p>
-                                                    <p class="card-text">{{ ((articles_non_affectes / (articles_affectes + articles_non_affectes)) * 100) | round(1) }}%</p>
+                                                    <p class="card-text">
+                                                        {% if total > 0 %}
+                                                            {{ ((articles_non_affectes / total) * 100) | round(1) }}%
+                                                        {% else %}
+                                                            0.0%
+                                                        {% endif %}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </div>
@@ -150,8 +168,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Type Chart & Table Section -->
                     <div class="col-xl-6">
                         <div class="card mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -163,14 +179,11 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <!-- Chart View (Bar) -->
                                 <div class="view-content type-views chart-view active">
                                     <div class="chart-container">
                                         <canvas id="typeChart"></canvas>
                                     </div>
                                 </div>
-
-                                <!-- Table View -->
                                 <div class="view-content type-views table-view d-none">
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
@@ -196,8 +209,6 @@
                                         </table>
                                     </div>
                                 </div>
-
-                                <!-- Pie Chart View -->
                                 <div class="view-content type-views pie-view d-none">
                                     <div class="chart-container">
                                         <canvas id="typePieChart"></canvas>
@@ -208,66 +219,6 @@
                     </div>
                 </div>
 
-                <!-- Services Section -->
-                <div class="row">
-                    <div class="col-xl-12">
-                        <div class="card mb-4">
-                            <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6>Répartition des matériels par service</h6>
-                                <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-sm btn-primary active" data-view="table" data-target="service-views">Tableau</button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="chart" data-target="service-views">Graphique</button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" data-view="pie" data-target="service-views">Camembert</button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <!-- Table View -->
-                                <div class="view-content service-views table-view active">
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Service</th>
-                                                    <th>Nombre de matériels</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for service in repartition_services %}
-                                                <tr>
-                                                    <td>{{ service.Service_Employe | default('N/A') }}</td>
-                                                    <td>{{ service[1] | default(0) }}</td>
-                                                </tr>
-                                                {% endfor %}
-                                                {% if not repartition_services %}
-                                                <tr>
-                                                    <td colspan="2" class="text-center">Aucun matériel affecté à un service</td>
-                                                </tr>
-                                                {% endif %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <!-- Chart View (Bar) -->
-                                <div class="view-content service-views chart-view d-none">
-                                    <div class="chart-container">
-                                        <canvas id="serviceBarChart"></canvas>
-                                    </div>
-                                </div>
-
-                                <!-- Pie Chart View -->
-                                <div class="view-content service-views pie-view d-none">
-                                    <div class="chart-container">
-                                        <canvas id="servicePieChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Employés Section -->
-                <div class="row">
                     <div class="col-xl-12">
                         <div class="card mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -279,7 +230,6 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <!-- Table View -->
                                 <div class="view-content employes-views table-view active">
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
@@ -307,15 +257,11 @@
                                         </table>
                                     </div>
                                 </div>
-
-                                <!-- Chart View (Grouped Bar) -->
                                 <div class="view-content employes-views chart-view d-none">
                                     <div class="chart-container">
                                         <canvas id="employesBarChart"></canvas>
                                     </div>
                                 </div>
-
-                                <!-- Tree View -->
                                 <div class="view-content employes-views tree-view d-none">
                                     <div id="employesTreeView" class="tree-container"></div>
                                 </div>
@@ -323,13 +269,11 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Matériels par direction/service Section -->
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card mb-4">
                             <div class="card-header d-flex justify-content-between align-items-center">
-                                <h6>Répartition des matériels affectés et non affectés par direction et service</h6>
+                                <h6>Répartition des matériels affectés</h6>
                                 <div class="btn-group" role="group">
                                     <button type="button" class="btn btn-sm btn-primary active" data-view="table" data-target="materiel-dir-views">Tableau</button>
                                     <button type="button" class="btn btn-sm btn-outline-primary" data-view="chart" data-target="materiel-dir-views">Graphique</button>
@@ -337,65 +281,96 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <!-- Table View -->
                                 <div class="view-content materiel-dir-views table-view active">
-                                    <div class="table-responsive">
+                                    <h6>Affectations dans Directions</h6>
+                                    <div class="table-responsive mb-4">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th>Direction</th>
-                                                    <th>Service</th>
                                                     <th>Matériels Affectés</th>
-                                                    <th>Matériels Non Affectés</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {% for materiel in repartition_materiel_direction_service %}
+                                                {% for materiel in repartition_materiel_direction_service if materiel.Direction_Employe != 'N/A' and materiel.Service_Employe == 'N/A' %}
                                                 <tr>
-                                                    <td>{{ materiel.Direction_Employe | default('N/A') }}</td>
-                                                    <td>{{ materiel.Service_Employe | default('N/A') }}</td>
+                                                    <td>{{ materiel.Direction_Employe }}</td>
                                                     <td>{{ materiel.Affectes | default(0) }}</td>
-                                                    <td>{{ materiel.Non_Affectes | default(0) }}</td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="2" class="text-center">Aucun matériel affecté à une direction</td>
                                                 </tr>
                                                 {% endfor %}
-                                                {% if not repartition_materiel_direction_service %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <h6>Affectations dans Services</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
                                                 <tr>
-                                                    <td colspan="4" class="text-center">Aucun matériel trouvé</td>
+                                                    <th>Service</th>
+                                                    <th>Matériels Affectés</th>
                                                 </tr>
-                                                {% endif %}
+                                            </thead>
+                                            <tbody>
+                                                {% for materiel in repartition_materiel_direction_service if materiel.Service_Employe != 'N/A' and materiel.Direction_Employe == 'N/A' %}
+                                                <tr>
+                                                    <td>{{ materiel.Service_Employe }}</td>
+                                                    <td>{{ materiel.Affectes | default(0) }}</td>
+                                                </tr>
+                                                {% else %}
+                                                <tr>
+                                                    <td colspan="2" class="text-center">Aucun matériel affecté à un service</td>
+                                                </tr>
+                                                {% endfor %}
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
-
-                                <!-- Chart View (Stacked Bar) -->
                                 <div class="view-content materiel-dir-views chart-view d-none">
                                     <div class="chart-container">
                                         <canvas id="materielDirectionBarChart"></canvas>
                                     </div>
                                 </div>
-
-                                <!-- Cards View -->
                                 <div class="view-content materiel-dir-views cards-view d-none">
-                                    <div class="row" id="materielDirCards">
-                                        {% for materiel in repartition_materiel_direction_service %}
+                                    <h6>Affectations dans Directions</h6>
+                                    <div class="row mb-4" id="materielDirCardsDirections">
+                                        {% for materiel in repartition_materiel_direction_service if materiel.Direction_Employe != 'N/A' and materiel.Service_Employe == 'N/A' %}
                                         <div class="col-lg-4 col-md-6 mb-4">
                                             <div class="card border-left-primary h-100">
                                                 <div class="card-header bg-light">
-                                                    <strong>{{ materiel.Direction_Employe | default('N/A') }}</strong> - {{ materiel.Service_Employe | default('N/A') }}
+                                                    <strong>{{ materiel.Direction_Employe }}</strong>
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row">
-                                                        <div class="col-6 border-right">
+                                                        <div class="col-12">
                                                             <div class="text-center">
                                                                 <div class="text-xs text-primary mb-1">Affectés</div>
                                                                 <div class="h4 mb-0 font-weight-bold">{{ materiel.Affectes | default(0) }}</div>
                                                             </div>
                                                         </div>
-                                                        <div class="col-6">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    <h6>Affectations dans Services</h6>
+                                    <div class="row" id="materielDirCardsServices">
+                                        {% for materiel in repartition_materiel_direction_service if materiel.Service_Employe != 'N/A' and materiel.Direction_Employe == 'N/A' %}
+                                        <div class="col-lg-4 col-md-6 mb-4">
+                                            <div class="card border-left-primary h-100">
+                                                <div class="card-header bg-light">
+                                                    <strong>{{ materiel.Service_Employe }}</strong>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-12">
                                                             <div class="text-center">
-                                                                <div class="text-xs text-warning mb-1">Non Affectés</div>
-                                                                <div class="h4 mb-0 font-weight-bold">{{ materiel.Non_Affectes | default(0) }}</div>
+                                                                <div class="text-xs text-primary mb-1">Affectés</div>
+                                                                <div class="h4 mb-0 font-weight-bold">{{ materiel.Affectes | default(0) }}</div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -422,31 +397,26 @@
         max-height: 400px;
         overflow-y: auto;
     }
-
     .tree-root {
         list-style: none;
         padding: 0;
         margin: 0;
     }
-
     .tree-node {
         padding: 8px;
         margin: 5px 0;
         border-radius: 4px;
     }
-
     .direction-node {
         background-color: #f8f9fa;
         font-weight: bold;
         display: flex;
         align-items: center;
     }
-
     .service-node {
         background-color: #ffffff;
         border: 1px solid #e9ecef;
     }
-
     .collapse-control {
         cursor: pointer;
         margin-right: 10px;
@@ -454,7 +424,6 @@
         width: 20px;
         text-align: center;
     }
-
     .count-badge {
         background-color: #4e73df;
         color: white;
@@ -463,59 +432,48 @@
         margin-left: 10px;
         font-size: 0.9em;
     }
-
     .service-count {
         background-color: #1cc88a;
     }
-
     .services-list {
         list-style: none;
         padding-left: 20px;
         margin-top: 5px;
     }
-
     .direction-label, .service-label {
         flex-grow: 1;
     }
 </style>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Toggle view buttons functionality
     document.querySelectorAll('[data-view]').forEach(button => {
         button.addEventListener('click', function() {
             const targetGroup = this.getAttribute('data-target');
             const viewType = this.getAttribute('data-view');
-
-            // Update button states
             document.querySelectorAll(`[data-target="${targetGroup}"]`).forEach(btn => {
                 btn.classList.remove('active', 'btn-primary');
                 btn.classList.add('btn-outline-primary');
             });
             this.classList.add('active', 'btn-primary');
             this.classList.remove('btn-outline-primary');
-
-            // Hide all views for this target group
             document.querySelectorAll(`.view-content.${targetGroup}`).forEach(view => {
                 view.classList.add('d-none');
                 view.classList.remove('active');
             });
-
-            // Show the selected view
             const selectedView = document.querySelector(`.view-content.${targetGroup}.${viewType}-view`);
             if (selectedView) {
                 selectedView.classList.remove('d-none');
                 selectedView.classList.add('active');
-                // Render tree view if selected
                 if (viewType === 'tree' && targetGroup === 'employes-views') {
                     createEmployeesTreeView();
+                }
+                if (viewType === 'chart' && targetGroup === 'materiel-dir-views') {
+                    initializeMaterielChart();
                 }
             }
         });
     });
-
-    // Initialize all charts
     initializeCharts();
 });
 
@@ -529,16 +487,12 @@ function createEmployeesTreeView() {
         },
         {% endfor %}
     ];
-
     const treeContainer = document.getElementById('employesTreeView');
-    treeContainer.innerHTML = ''; // Clear previous content
-
+    treeContainer.innerHTML = '';
     if (!employesData.length) {
         treeContainer.innerHTML = '<p class="text-center text-muted">Aucun employé trouvé</p>';
         return;
     }
-
-    // Group data by direction
     const groupedData = {};
     employesData.forEach(item => {
         if (!groupedData[item.direction]) {
@@ -549,20 +503,12 @@ function createEmployeesTreeView() {
             nombre: item.nombre
         });
     });
-
-    // Create root UL element
     const rootUl = document.createElement('ul');
     rootUl.className = 'tree-root';
-
-    // Add directions and services
     for (const direction in groupedData) {
         const dirLi = document.createElement('li');
-
-        // Create direction container
         const dirContainer = document.createElement('div');
         dirContainer.className = 'tree-node direction-node';
-
-        // Create collapsible control
         const collapseControl = document.createElement('span');
         collapseControl.className = 'collapse-control';
         collapseControl.innerHTML = '−';
@@ -576,58 +522,41 @@ function createEmployeesTreeView() {
                 this.innerHTML = '+';
             }
         };
-
-        // Direction label
         const dirLabel = document.createElement('span');
         dirLabel.className = 'direction-label';
         dirLabel.textContent = direction;
-
-        // Total count badge
         const totalCount = groupedData[direction].reduce((sum, item) => sum + item.nombre, 0);
         const countBadge = document.createElement('span');
         countBadge.className = 'count-badge';
         countBadge.textContent = totalCount;
-
-        // Add elements to direction container
         dirContainer.appendChild(collapseControl);
         dirContainer.appendChild(dirLabel);
         dirContainer.appendChild(countBadge);
         dirLi.appendChild(dirContainer);
-
-        // Create services list
         const servicesUl = document.createElement('ul');
         servicesUl.className = 'services-list';
-
-        // Add service items
         groupedData[direction].forEach(serviceItem => {
             const serviceLi = document.createElement('li');
-
             const serviceNode = document.createElement('div');
             serviceNode.className = 'tree-node service-node';
-
             const serviceLabel = document.createElement('span');
             serviceLabel.className = 'service-label';
             serviceLabel.textContent = serviceItem.service;
-
             const serviceCount = document.createElement('span');
             serviceCount.className = 'count-badge service-count';
             serviceCount.textContent = serviceItem.nombre;
-
             serviceNode.appendChild(serviceLabel);
             serviceNode.appendChild(serviceCount);
             serviceLi.appendChild(serviceNode);
             servicesUl.appendChild(serviceLi);
         });
-
         dirLi.appendChild(servicesUl);
         rootUl.appendChild(dirLi);
     }
-
     treeContainer.appendChild(rootUl);
 }
 
 function initializeCharts() {
-    // Statut Chart (Doughnut)
     const statutCtx = document.getElementById('statutChart').getContext('2d');
     new Chart(statutCtx, {
         type: 'doughnut',
@@ -660,14 +589,12 @@ function initializeCharts() {
         }
     });
 
-    // Type Chart (Bar)
     const typeCtx = document.getElementById('typeChart').getContext('2d');
     const typeData = [
         {% for type in repartition_types %}
         { type: "{{ type.Type_Article | default('N/A') }}", count: {{ type[1] | default(0) }} },
         {% endfor %}
     ];
-
     new Chart(typeCtx, {
         type: 'bar',
         data: {
@@ -706,7 +633,6 @@ function initializeCharts() {
         }
     });
 
-    // Type Pie Chart
     const typePieCtx = document.getElementById('typePieChart').getContext('2d');
     new Chart(typePieCtx, {
         type: 'pie',
@@ -735,13 +661,11 @@ function initializeCharts() {
         }
     });
 
-    // Service Bar Chart
     const serviceData = [
         {% for service in repartition_services %}
         { service: "{{ service.Service_Employe | default('N/A') }}", count: {{ service[1] | default(0) }} },
         {% endfor %}
     ];
-
     const serviceBarCtx = document.getElementById('serviceBarChart').getContext('2d');
     new Chart(serviceBarCtx, {
         type: 'bar',
@@ -775,7 +699,6 @@ function initializeCharts() {
         }
     });
 
-    // Service Pie Chart
     const servicePieCtx = document.getElementById('servicePieChart').getContext('2d');
     new Chart(servicePieCtx, {
         type: 'pie',
@@ -805,7 +728,6 @@ function initializeCharts() {
         }
     });
 
-    // Employés Bar Chart
     const employesData = [
         {% for employe in repartition_employes %}
         {
@@ -815,11 +737,8 @@ function initializeCharts() {
         },
         {% endfor %}
     ];
-
-    // Group by direction for grouped bar chart
     const employesByDirection = {};
     const allServices = new Set();
-
     employesData.forEach(item => {
         if (!employesByDirection[item.direction]) {
             employesByDirection[item.direction] = {};
@@ -827,10 +746,8 @@ function initializeCharts() {
         employesByDirection[item.direction][item.service] = item.nombre;
         allServices.add(item.service);
     });
-
     const directions = Object.keys(employesByDirection);
     const services = Array.from(allServices);
-
     const employesDatasets = services.map((service, index) => {
         return {
             label: service,
@@ -840,7 +757,6 @@ function initializeCharts() {
             borderWidth: 1
         };
     });
-
     const employesBarCtx = document.getElementById('employesBarChart').getContext('2d');
     new Chart(employesBarCtx, {
         type: 'bar',
@@ -861,7 +777,7 @@ function initializeCharts() {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Nombre d\'employés'
+                        text: "Nombre d'employés"
                     }
                 }
             },
@@ -873,39 +789,37 @@ function initializeCharts() {
         }
     });
 
-    // Matériel Direction Bar Chart (Stacked)
+    initializeMaterielChart();
+}
+
+function initializeMaterielChart() {
     const materielDirData = [
         {% for materiel in repartition_materiel_direction_service %}
         {
             direction: "{{ materiel.Direction_Employe | default('N/A') }}",
             service: "{{ materiel.Service_Employe | default('N/A') }}",
-            affectes: {{ materiel.Affectes | default(0) }},
-            nonAffectes: {{ materiel.Non_Affectes | default(0) }}
+            affectes: {{ materiel.Affectes | default(0) }}
         },
         {% endfor %}
     ];
-
-    // Create labels array (Direction - Service)
-    const materielLabels = materielDirData.map(item => `${item.direction} - ${item.service}`);
-
+    const directionData = materielDirData.filter(item => item.direction !== 'N/A' && item.service === 'N/A');
+    const serviceData = materielDirData.filter(item => item.service !== 'N/A' && item.direction === 'N/A');
+    const directionLabels = directionData.map(item => item.direction);
+    const serviceLabels = serviceData.map(item => item.service);
     const materielDirCtx = document.getElementById('materielDirectionBarChart').getContext('2d');
     new Chart(materielDirCtx, {
         type: 'bar',
         data: {
-            labels: materielLabels,
+            labels: [...directionLabels, ...serviceLabels],
             datasets: [
                 {
                     label: 'Matériels Affectés',
-                    data: materielDirData.map(item => item.affectes),
+                    data: [
+                        ...directionData.map(item => item.affectes),
+                        ...serviceData.map(item => item.affectes)
+                    ],
                     backgroundColor: '#4e73df',
                     borderColor: '#4e73df',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Matériels Non Affectés',
-                    data: materielDirData.map(item => item.nonAffectes),
-                    backgroundColor: '#f6c23e',
-                    borderColor: '#f6c23e',
                     borderWidth: 1
                 }
             ]
@@ -914,14 +828,12 @@ function initializeCharts() {
             maintainAspectRatio: false,
             scales: {
                 x: {
-                    stacked: true,
                     title: {
                         display: true,
-                        text: 'Direction - Service'
+                        text: 'Directions et Services'
                     }
                 },
                 y: {
-                    stacked: true,
                     beginAtZero: true,
                     title: {
                         display: true,
@@ -938,7 +850,6 @@ function initializeCharts() {
     });
 }
 
-// Helper functions for chart colors
 function getColor(index) {
     const colors = [
         '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',

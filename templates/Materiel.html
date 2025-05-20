@@ -64,7 +64,13 @@
                     <option value="">Toutes les affectations</option>
                     <option value="non-affecte">Non affecté</option>
                     {% for employe in employes_liste %}
-                    <option value="{{ employe.Code_Employe }}">{{ employe.Nom_Employe }} {{ employe.Prenom_Employe }}</option>
+                    <option value="{{ employe.Nom_Employe|lower }} {{ employe.Prenom_Employe|lower }}">{{ employe.Nom_Employe }} {{ employe.Prenom_Employe }} (Employé)</option>
+                    {% endfor %}
+                    {% for service in services %}
+                    <option value="{{ service|lower }}">{{ service }} (Service)</option>
+                    {% endfor %}
+                    {% for direction in directions %}
+                    <option value="{{ direction|lower }}">{{ direction }} (Direction)</option>
                     {% endfor %}
                 </select>
             </div>
@@ -88,50 +94,41 @@
                 <tbody>
                     {% for article in articles %}
                         <tr>
-                            <td>{{ article['Ref_Article'] }}</td>
-                            <td>{{ article['Libelle_Article'] }}</td>
-                            <td>{{ article['Type_Article'] }}</td>
-                            <td>{{ article['Marque_Article'] }}</td>
+                            <td>{{ article.Ref_Article }}</td>
+                            <td>{{ article.Libelle_Article }}</td>
+                            <td>{{ article.Type_Article }}</td>
+                            <td>{{ article.Marque_Article }}</td>
                             <td>
-                                <span class="badge {% if article['Etat_Article'] == 'Neuf' %}bg-success{% elif article['Etat_Article'] == 'Bon' %}bg-info{% elif article['Etat_Article'] == 'Moyen' %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ article['Etat_Article'] }}
+                                <span class="badge {% if article.Etat_Article == 'Neuf' %}bg-success{% elif article.Etat_Article == 'Bon' %}bg-info{% elif article.Etat_Article == 'Moyen' %}bg-warning{% else %}bg-danger{% endif %}">
+                                    {{ article.Etat_Article }}
                                 </span>
                             </td>
                             <td>
-                                <span class="badge {% if article['Statut_Article'] == 'En service' %}bg-success{% elif article['Statut_Article'] == 'En stock' %}bg-primary{% elif article['Statut_Article'] == 'En panne' %}bg-warning{% else %}bg-danger{% endif %}">
-                                    {{ article['Statut_Article'] }}
+                                <span class="badge {% if article.Statut_Article == 'AFFECTE' %}bg-success{% else %}bg-primary{% endif %}">
+                                    {{ article.Statut_Article }}
                                 </span>
                             </td>
+                            <td>{{ article.Affectation_Display }}</td>
                             <td>
-                                {% for employe in employes %}
-                                    {% if employe['Code_Employe'] == article['Affecter_au_Article'] %}
-                                        {{ employe['Nom_Employe'] }} {{ employe['Prenom_Employe'] }}
-                                    {% endif %}
-                                {% endfor %}
-                            </td>
-                            <td>
-                                {% if article['Image_Path'] and article['Image_Path']|length > 0 %}
-                                    <img src="{{ url_for('static', filename='images/' + article['Image_Path']) }}"
-                                         alt="{{ article['Libelle_Article'] }}"
+                                {% if article.Image_Path and article.Image_Path|length > 0 %}
+                                    <img src="{{ url_for('static', filename='images/' + article.Image_Path) }}"
+                                         alt="{{ article.Libelle_Article }}"
                                          class="img-thumbnail"
                                          style="max-width: 80px; height: auto;"
                                          data-bs-toggle="modal"
-                                         data-bs-target="#imageModal{{ article['ID_Article'] }}"
-                                         >
-
+                                         data-bs-target="#imageModal{{ article.ID_Article }}">
                                     <!-- Image Modal -->
-                                    <div class="modal fade" id="imageModal{{ article['ID_Article'] }}" tabindex="-1">
+                                    <div class="modal fade" id="imageModal{{ article.ID_Article }}" tabindex="-1">
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title">{{ article['Libelle_Article'] }}</h5>
+                                                    <h5 class="modal-title">{{ article.Libelle_Article }}</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body text-center">
-                                                    <img src="{{ url_for('static', filename='images/' + article['Image_Path']) }}"
-                                                         alt="{{ article['Libelle_Article'] }}"
-                                                         class="img-fluid"
-                                                         >
+                                                    <img src="{{ url_for('static', filename='images/' + article.Image_Path) }}"
+                                                         alt="{{ article.Libelle_Article }}"
+                                                         class="img-fluid">
                                                 </div>
                                             </div>
                                         </div>
@@ -142,19 +139,19 @@
                             </td>
                             <td>
                                 <div class="btn-group">
-                                    <a href="{{ url_for('editer_materiel', id=article['ID_Article']) }}" class="btn btn-sm btn-warning">
+                                    <a href="{{ url_for('editer_materiel', id=article.ID_Article) }}" class="btn btn-sm btn-warning">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ article['ID_Article'] }}">
+                                    <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailsModal{{ article.ID_Article }}">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ article['ID_Article'] }}">
+                                    <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ article.ID_Article }}">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
 
                                 <!-- Details Modal -->
-                                <div class="modal fade" id="detailsModal{{ article['ID_Article'] }}" tabindex="-1">
+                                <div class="modal fade" id="detailsModal{{ article.ID_Article }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -164,43 +161,36 @@
                                             <div class="modal-body">
                                                 <div class="row">
                                                     <div class="col-md-6">
-                                                        <p><strong>Référence:</strong> {{ article['Ref_Article'] }}</p>
-                                                        <p><strong>Libellé:</strong> {{ article['Libelle_Article'] }}</p>
-                                                        <p><strong>Type:</strong> {{ article['Type_Article'] }}</p>
-                                                        <p><strong>Marque:</strong> {{ article['Marque_Article'] }}</p>
+                                                        <p><strong>Référence:</strong> {{ article.Ref_Article }}</p>
+                                                        <p><strong>Libellé:</strong> {{ article.Libelle_Article }}</p>
+                                                        <p><strong>Type:</strong> {{ article.Type_Article }}</p>
+                                                        <p><strong>Marque:</strong> {{ article.Marque_Article }}</p>
                                                     </div>
                                                     <div class="col-md-6">
-                                                        <p><strong>État:</strong> {{ article['Etat_Article'] }}</p>
-                                                        <p><strong>Statut:</strong> {{ article['Statut_Article'] }}</p>
-                                                        <p><strong>Affecté à:</strong>
-                                                            {% for employe in employes %}
-                                                                {% if employe['Code_Employe'] == article['Affecter_au_Article'] %}
-                                                                    {{ employe['Nom_Employe'] }} {{ employe['Prenom_Employe'] }}
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        </p>
+                                                        <p><strong>État:</strong> {{ article.Etat_Article }}</p>
+                                                        <p><strong>Statut:</strong> {{ article.Statut_Article }}</p>
+                                                        <p><strong>Affecté à:</strong> {{ article.Affectation_Display }}</p>
                                                     </div>
                                                 </div>
-                                                {% if article['Image_Path'] and article['Image_Path']|length > 0 %}
+                                                {% if article.Image_Path and article.Image_Path|length > 0 %}
                                                     <div class="text-center mt-3">
-                                                        <img src="{{ url_for('static', filename='images/' + article['Image_Path']) }}"
-                                                             alt="{{ article['Libelle_Article'] }}"
+                                                        <img src="{{ url_for('static', filename='images/' + article.Image_Path) }}"
+                                                             alt="{{ article.Libelle_Article }}"
                                                              class="img-fluid"
-                                                             style="max-height: 200px;"
-                                                             >
+                                                             style="max-height: 200px;">
                                                     </div>
                                                 {% endif %}
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                                                <a href="{{ url_for('editer_materiel', id=article['ID_Article']) }}" class="btn btn-primary">Modifier</a>
+                                                <a href="{{ url_for('editer_materiel', id=article.ID_Article) }}" class="btn btn-primary">Modifier</a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
                                 <!-- Delete Modal -->
-                                <div class="modal fade" id="deleteModal{{ article['ID_Article'] }}" tabindex="-1">
+                                <div class="modal fade" id="deleteModal{{ article.ID_Article }}" tabindex="-1">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
@@ -208,11 +198,11 @@
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                             </div>
                                             <div class="modal-body">
-                                                Êtes-vous sûr de vouloir supprimer l'article "{{ article['Libelle_Article'] }}" ({{ article['Ref_Article'] }}) ?
+                                                Êtes-vous sûr de vouloir supprimer l'article "{{ article.Libelle_Article }}" ({{ article.Ref_Article }}) ?
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                                <form action="{{ url_for('supprimer_materiel', id=article['ID_Article']) }}" method="POST">
+                                                <form action="{{ url_for('supprimer_materiel', id=article.ID_Article) }}" method="POST">
                                                     <button type="submit" class="btn btn-danger">Supprimer</button>
                                                 </form>
                                             </div>
@@ -279,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Check if non-affected filter is selected
             const isNonAffecteSelected = affectationFilter === 'non-affecte';
-            const isRowNonAffecte = affecte.trim() === '';
+            const isRowNonAffecte = affecte.includes('non affecté');
 
             const matchesSearch = searchTerm === '' ||
                 reference.includes(searchTerm) ||
@@ -291,7 +281,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const matchesStatut = statutFilter === '' || statut.includes(statutFilter);
             const matchesAffectation = affectationFilter === '' ||
                                       (isNonAffecteSelected && isRowNonAffecte) ||
-                                      (!isNonAffecteSelected && row.cells[6].textContent.toLowerCase().includes(affectationFilter));
+                                      (!isNonAffecteSelected && affecte.includes(affectationFilter));
 
             if (matchesSearch && matchesType && matchesEtat && matchesMarque && matchesStatut && matchesAffectation) {
                 row.style.display = '';

@@ -5,9 +5,9 @@
 {% block content %}
 <div class="card mb-4">
     <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <h4><i class="bi bi-people"></i> Liste des Utilisateurs</h4>
+        <h4><i class="bi bi-people"></i> Liste des employés</h4>
         <a href="{{ url_for('ajouter_utilisateur') }}" class="btn btn-light">
-            <i class="bi bi-plus-circle"></i> Ajouter un utilisateur
+            <i class="bi bi-plus-circle"></i> Ajouter un employé
         </a>
     </div>
     <div class="card-body">
@@ -16,7 +16,7 @@
         <div class="row mb-3">
             <div class="col-md-6">
                 <div class="input-group">
-                    <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un utilisateur...">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un employé...">
                     <button class="btn btn-outline-secondary" type="button" id="searchButton">
                         <i class="bi bi-search"></i> Rechercher
                     </button>
@@ -88,7 +88,7 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            Êtes-vous sûr de vouloir supprimer l'utilisateur {{ employe['Nom_Employe'] }} {{ employe['Prenom_Employe'] }} ?
+                                            Êtes-vous sûr de vouloir supprimer l'employé {{ employe['Nom_Employe'] }} {{ employe['Prenom_Employe'] }} ?
                                         </div>
                                         <div class="modal-footer">
                                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>

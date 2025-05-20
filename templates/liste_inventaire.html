@@ -1,0 +1,614 @@
+{% extends "base.html" %}
+
+{% block title %}Liste Inventaire{% endblock %}
+
+{% block content %}
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 0.8rem 1.5rem rgba(0, 0, 0, 0.1);
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+    .card-header {
+        padding: 1.5rem;
+        border-bottom: 2px solid rgba(0,0,0,0.05);
+        background-color: #d7c5ec !important;
+    }
+    .inventory-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.4em 0.7em;
+        border-radius: 0.25rem;
+        transition: all 0.2s ease;
+        font-weight: 500;
+    }
+    .table-responsive {
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+    .table {
+        margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        padding: 1rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    .table td {
+        vertical-align: middle;
+        padding: 0.85rem 1rem;
+        border-top: 1px solid rgba(0,0,0,0.05);
+    }
+    .table tbody tr {
+        transition: all 0.2s ease;
+    }
+    .table tbody tr:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    .affectation-info {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.4;
+    }
+    .affectation-type {
+        font-size: 0.75rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+    .no-items {
+        text-align: center;
+        padding: 3rem;
+        color: #6c757d;
+    }
+    .export-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+    }
+    .search-filter {
+        max-width: 350px;
+        position: relative;
+    }
+    .search-filter .form-control {
+        padding-right: 40px;
+        border-radius: 0.5rem;
+    }
+    .clear-search-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        border: none;
+        background: transparent;
+        padding: 0 12px;
+        display: none;
+    }
+    .clear-search-btn.visible {
+        display: block;
+    }
+    .material-info {
+        display: flex;
+        flex-direction: column;
+    }
+    .material-category {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    .material-id {
+        font-size: 0.7rem;
+        color: #adb5bd;
+        margin-top: 0.2rem;
+    }
+    .filters-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    .filter-item {
+        flex: 0 0 auto;
+    }
+    .date-info {
+        font-size: 0.85rem;
+    }
+    .date-label {
+        font-weight: 500;
+        color: #495057;
+    }
+    .stats-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+    .stat-card {
+        flex: 1 1 150px;
+        background: #eaf3ff;
+        border-radius: 0.5rem;
+        padding: 1rem;
+        text-align: center;
+        height: 80px;
+        width: 150px;
+    }
+    .stat-number {
+        font-size: 1.20rem;
+        font-weight: 600;
+        color: #1e474d;
+    }
+    .stat-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    .material-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .material-actions button {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+    .highlighted {
+        background-color: rgba(255, 243, 205, 0.5);
+    }
+    @media (max-width: 768px) {
+        .inventory-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        .search-filter {
+            max-width: 100%;
+        }
+        .filters-row {
+            flex-direction: column;
+        }
+        .filter-item {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="mb-0"><i class="bi bi-box-seam me-2"></i>Inventaire des Matériels</h4>
+            </div>
+            <div class="badge bg-white text-primary fs-6">
+                <span id="itemCount">{{ inventaire|length }}</span> matériel(s)
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">{{ inventaire|length }}</div>
+                    <div class="stat-label">Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="affectedCount">{{ inventaire|selectattr('Statut_Article', 'equalto', 'AFFECTE')|list|length }}</div>
+                    <div class="stat-label">Affectés</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="nonAffectedCount">{{ inventaire|rejectattr('Statut_Article', 'equalto', 'AFFECTE')|list|length }}</div>
+                    <div class="stat-label">Non affectés</div>
+                </div>
+            </div>
+
+            <div class="inventory-actions">
+                <div class="search-filter">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" placeholder="Rechercher..." id="inventorySearch">
+                        <button class="btn btn-outline-secondary clear-search-btn" type="button" id="clearSearch">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-funnel me-1"></i> Filtres
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                            <li><a class="dropdown-item filter-status" href="#" data-status="all">Tous les statuts</a></li>
+                            <li><a class="dropdown-item filter-status" href="#" data-status="AFFECTE">Affectés uniquement</a></li>
+                            <li><a class="dropdown-item filter-status" href="#" data-status="NON AFFECTE">Non affectés uniquement</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="resetFilters">Réinitialiser les filtres</a></li>
+                        </ul>
+                    </div>
+
+                    <a href="{{ url_for('inventaire.export_inventaire') }}" class="btn btn-success export-btn">
+                        <i class="bi bi-file-earmark-excel"></i> Exporter Excel
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table" id="inventoryTable">
+                    <thead>
+                        <tr>
+                            <th data-sort="material">Matériel <i class="bi bi-arrow-down-up sort-icon ms-1"></i></th>
+                            <th data-sort="service">Service/Direction <i class="bi bi-arrow-down-up sort-icon ms-1"></i></th>
+                            <th data-sort="affectation">Affectation <i class="bi bi-arrow-down-up sort-icon ms-1"></i></th>
+                            <th data-sort="dates">Dates <i class="bi bi-arrow-down-up sort-icon ms-1"></i></th>
+                            <th data-sort="status">Statut <i class="bi bi-arrow-down-up sort-icon ms-1"></i></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if inventaire|length > 0 %}
+                            {% for item in inventaire %}
+                            <tr data-status="{{ item.Statut_Article | default('NON AFFECTE') }}">
+                                <td>
+                                    <div class="material-info">
+                                        <strong>{{ item.Libelle_Article }}</strong>
+                                        {% if item.Categorie_Article %}
+                                            <span class="material-category">{{ item.Categorie_Article }}</span>
+                                        {% endif %}
+                                        {% if item.ID_Article %}
+                                            <span class="material-id">ID: {{ item.ID_Article }}</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if item.Service_Employe_Article %}
+                                        {{ item.Service_Employe_Article }}
+                                        {% if item.Direction_Employe_Article %}
+                                            <br><small class="text-muted">{{ item.Direction_Employe_Article }}</small>
+                                        {% endif %}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="affectation-info">
+                                        {% if item.Affecter_au_Article %}
+                                            <span>{{ item.Nom_Employe }} {{ item.Prenom_Employe }}</span>
+                                            <span class="affectation-type">
+                                                <i class="bi bi-person-fill me-1"></i>Employé
+                                            </span>
+                                        {% elif item.Service_Employe_Article in directions_list %}
+                                            <span>{{ item.Service_Employe_Article }}</span>
+                                            <span class="affectation-type">
+                                                <i class="bi bi-building me-1"></i>Direction
+                                            </span>
+                                        {% else %}
+                                            <span>{{ item.Service_Employe_Article | default('N/A') }}</span>
+                                            <span class="affectation-type">
+                                                <i class="bi bi-diagram-3 me-1"></i>Service
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="affectation-info date-info">
+                                        <span><span class="date-label">Achat:</span> {{ item.Date_Achat_Article | default('-') }}</span>
+                                        <span><span class="date-label">Aff.:</span> {{ item.Date_Affectation | default('-') }}</span>
+                                        <span><span class="date-label">Rest.:</span> {{ item.Date_Restitution_Affectation | default('-') }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="status-badge badge"
+                                        style="{% if item.Statut_Article == 'AFFECTE' %}background-color: #9b59b6 !important;{% else %}background-color: #95a5a6 !important;{% endif %} color: white !important;">
+                                        <i class="bi {% if item.Statut_Article == 'AFFECTE' %}bi-check-square{% else %}bi-dash-square{% endif %} me-1"></i>
+                                        {{ item.Statut_Article | default('NON AFFECTE') }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr id="no-results-row" style="display: none;">
+                                <td colspan="5" class="no-items">
+                                    <i class="bi bi-search fs-1"></i>
+                                    <p class="mt-3">Aucun résultat trouvé pour votre recherche</p>
+                                </td>
+                            </tr>
+                            <tr id="no-items-row">
+                                <td colspan="5" class="no-items">
+                                    <i class="bi bi-inbox fs-1"></i>
+                                    <p class="mt-3">Aucun matériel trouvé dans l'inventaire</p>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elements
+        const searchInput = document.getElementById('inventorySearch');
+        const clearSearch = document.getElementById('clearSearch');
+        const tableRows = document.querySelectorAll('#inventoryTable tbody tr:not(#no-results-row):not(#no-items-row)');
+        const noResultsRow = document.getElementById('no-results-row');
+        const itemCountElement = document.getElementById('itemCount');
+        const statusFilters = document.querySelectorAll('.filter-status');
+        const resetFilters = document.getElementById('resetFilters');
+        const sortableHeaders = document.querySelectorAll('th[data-sort]');
+
+        // Variables to track filter state
+        let currentStatusFilter = 'all';
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc';
+        let visibleRowsCount = tableRows.length;
+
+        // Update Stats
+        function updateStats() {
+            // Update the visible count
+            itemCountElement.textContent = visibleRowsCount;
+
+            // You could also update other stats if needed
+            // For example, counting visible affected/non-affected items
+        }
+
+        // Search functionality with highlighting
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            clearSearch.classList.toggle('visible', searchTerm.length > 0);
+
+            let resultsFound = false;
+            visibleRowsCount = 0;
+
+            tableRows.forEach(row => {
+                // Skip if filtered by status
+                if (currentStatusFilter !== 'all' && row.getAttribute('data-status') !== currentStatusFilter) {
+                    row.style.display = 'none';
+                    return;
+                }
+
+                const rowText = row.textContent.toLowerCase();
+
+                // Check if row matches search term
+                if (searchTerm === '' || rowText.includes(searchTerm)) {
+                    row.style.display = '';
+                    resultsFound = true;
+                    visibleRowsCount++;
+
+                    // Remove previous highlighting
+                    row.querySelectorAll('.highlighted').forEach(el => {
+                        el.outerHTML = el.innerHTML;
+                    });
+
+                    // Add highlighting if there's a search term
+                    if (searchTerm !== '') {
+                        highlightSearchTerm(row, searchTerm);
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Show/hide no results message
+            if (noResultsRow) {
+                noResultsRow.style.display = !resultsFound && tableRows.length > 0 ? '' : 'none';
+            }
+
+            updateStats();
+        }
+
+        // Highlight search terms
+        function highlightSearchTerm(row, term) {
+            const textNodes = getTextNodes(row);
+
+            textNodes.forEach(node => {
+                const text = node.nodeValue;
+                const lowerText = text.toLowerCase();
+                let index = lowerText.indexOf(term);
+
+                if (index >= 0) {
+                    const span = document.createElement('span');
+                    span.className = 'highlighted';
+
+                    const before = document.createTextNode(text.substring(0, index));
+                    const match = document.createTextNode(text.substring(index, index + term.length));
+                    const after = document.createTextNode(text.substring(index + term.length));
+
+                    span.appendChild(match);
+
+                    const fragment = document.createDocumentFragment();
+                    fragment.appendChild(before);
+                    fragment.appendChild(span);
+                    fragment.appendChild(after);
+
+                    node.parentNode.replaceChild(fragment, node);
+                }
+            });
+        }
+
+        // Get all text nodes in an element
+        function getTextNodes(node) {
+            const textNodes = [];
+
+            function getNodes(node) {
+                if (node.nodeType === 3) { // Text node
+                    textNodes.push(node);
+                } else {
+                    for (let i = 0; i < node.childNodes.length; i++) {
+                        getNodes(node.childNodes[i]);
+                    }
+                }
+            }
+
+            getNodes(node);
+            return textNodes;
+        }
+
+        // Filter by status
+        function filterByStatus(status) {
+            currentStatusFilter = status;
+
+            tableRows.forEach(row => {
+                if (status === 'all' || row.getAttribute('data-status') === status) {
+                    // Still need to check search term
+                    const searchTerm = searchInput.value.toLowerCase().trim();
+                    if (searchTerm === '' || row.textContent.toLowerCase().includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Count visible rows
+            visibleRowsCount = Array.from(tableRows).filter(row => row.style.display !== 'none').length;
+
+            // Show/hide no results message
+            if (noResultsRow) {
+                const resultsFound = visibleRowsCount > 0;
+                noResultsRow.style.display = !resultsFound ? '' : 'none';
+            }
+
+            updateStats();
+        }
+
+        // Sort table
+        function sortTable(column) {
+            // Toggle direction if clicking the same column
+            if (currentSortColumn === column) {
+                currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortColumn = column;
+                currentSortDirection = 'asc';
+            }
+
+            // Get rows as array for sorting
+            const rows = Array.from(tableRows);
+
+            // Sort rows based on column content
+            rows.sort((a, b) => {
+                let aValue, bValue;
+
+                // Get column value based on column name
+                switch(column) {
+                    case 'material':
+                        aValue = a.querySelector('td:nth-child(1) strong').textContent;
+                        bValue = b.querySelector('td:nth-child(1) strong').textContent;
+                        break;
+                    case 'service':
+                        aValue = a.querySelector('td:nth-child(2)').textContent;
+                        bValue = b.querySelector('td:nth-child(2)').textContent;
+                        break;
+                    case 'affectation':
+                        aValue = a.querySelector('td:nth-child(3) .affectation-info span:first-child').textContent;
+                        bValue = b.querySelector('td:nth-child(3) .affectation-info span:first-child').textContent;
+                        break;
+                    case 'dates':
+                        // Sort by purchase date
+                        aValue = a.querySelector('td:nth-child(4) .affectation-info span:first-child').textContent;
+                        bValue = b.querySelector('td:nth-child(4) .affectation-info span:first-child').textContent;
+                        break;
+                    case 'status':
+                        aValue = a.getAttribute('data-status');
+                        bValue = b.getAttribute('data-status');
+                        break;
+                    default:
+                        aValue = '';
+                        bValue = '';
+                }
+
+                // Compare for sorting
+                if (aValue < bValue) return currentSortDirection === 'asc' ? -1 : 1;
+                if (aValue > bValue) return currentSortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Reorder in the DOM
+            const tbody = document.querySelector('#inventoryTable tbody');
+
+            // Save special rows
+            const noResultsRow = document.getElementById('no-results-row');
+            const noItemsRow = document.getElementById('no-items-row');
+
+            // Remove all rows
+            tableRows.forEach(row => row.remove());
+
+            // Append in sorted order
+            rows.forEach(row => tbody.appendChild(row));
+
+            // Re-append special rows if they exist
+            if (noResultsRow) tbody.appendChild(noResultsRow);
+            if (noItemsRow) tbody.appendChild(noItemsRow);
+
+            // Update UI to show sort direction
+            sortableHeaders.forEach(header => {
+                const icon = header.querySelector('.sort-icon');
+                if (header.getAttribute('data-sort') === column) {
+                    icon.className = currentSortDirection === 'asc'
+                        ? 'bi bi-arrow-down sort-icon ms-1'
+                        : 'bi bi-arrow-up sort-icon ms-1';
+                } else {
+                    icon.className = 'bi bi-arrow-down-up sort-icon ms-1';
+                }
+            });
+        }
+
+        // Event Listeners
+        searchInput.addEventListener('input', performSearch);
+
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            performSearch();
+            searchInput.focus();
+        });
+
+        // Status filter listeners
+        statusFilters.forEach(filter => {
+            filter.addEventListener('click', function(e) {
+                e.preventDefault();
+                const status = this.getAttribute('data-status');
+                filterByStatus(status);
+            });
+        });
+
+        // Reset filters
+        resetFilters.addEventListener('click', function(e) {
+            e.preventDefault();
+            searchInput.value = '';
+            currentStatusFilter = 'all';
+            performSearch();
+        });
+
+        // Sortable columns
+        sortableHeaders.forEach(header => {
+            header.addEventListener('click', function() {
+                const column = this.getAttribute('data-sort');
+                sortTable(column);
+            });
+        });
+
+        // Initialize with default sorting
+        sortTable('material');
+
+        // Make headers clickable
+        sortableHeaders.forEach(header => {
+            header.style.cursor = 'pointer';
+        });
+    });
+</script>
+{% endblock %}

@@ -1,32 +1,31 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, Response
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_file, Blueprint
 import pyodbc
 import os
 from werkzeug.utils import secure_filename
 import uuid
 import logging
-from datetime import datetime
+from datetime import datetime, date
 from flask_bcrypt import Bcrypt
 from functools import wraps
-import json
-import csv
+from io import BytesIO
 import pandas as pd
-
+from datetime import timedelta
 # App setup
 app = Flask(__name__, static_folder='static')
-app.secret_key = os.urandom(24).hex()  # Secure random key
+app.secret_key = os.urandom(24).hex()
 app.config['UPLOAD_FOLDER'] = os.path.join(app.static_folder, 'images')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-
-# Initialize Bcrypt
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=12)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 bcrypt = Bcrypt(app)
 
-# Configure logging
 logging.basicConfig(level=logging.DEBUG, filename='app.log', filemode='a',
                     format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
-# Helper functions
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -42,7 +41,6 @@ def get_db_connection():
 
 
 def get_server_timestamp():
-    """Fetch the current timestamp from SQL Server."""
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -52,7 +50,26 @@ def get_server_timestamp():
         return timestamp
     except pyodbc.Error as e:
         logger.error(f"Error fetching server timestamp: {str(e)}")
-        return datetime.now()  # Fallback to local time if DB fails
+        return datetime.now()
+
+
+def update_article_status(article_id, conn, cursor):
+    """Update Statut_Article based on active affectations."""
+    today = date.today().strftime('%Y-%m-%d')
+    cursor.execute("""
+                   SELECT COUNT(*)
+                   FROM Affectation
+                   WHERE ID_Article_Affectation = ?
+                     AND (Date_Restitution_Affectation IS NULL OR Date_Restitution_Affectation > ?)
+                   """, (article_id, today))
+    active_affectations = cursor.fetchone()[0]
+
+    new_status = 'AFFECTE' if active_affectations > 0 else 'NON AFFECTE'
+    cursor.execute("""
+                   UPDATE Article
+                   SET Statut_Article = ?
+                   WHERE ID_Article = ?
+                   """, (new_status, article_id))
 
 
 def login_required(f):
@@ -168,7 +185,6 @@ def admin_add_user():
             password_confirm = request.form.get('password_confirm')
             role = request.form.get('role')
 
-            # Validate inputs
             if not email or not password or not role:
                 flash('Email, mot de passe et rôle sont requis.', 'danger')
                 return redirect(request.url)
@@ -182,7 +198,6 @@ def admin_add_user():
                 flash('Rôle invalide.', 'danger')
                 return redirect(request.url)
 
-            # Check email uniqueness
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("SELECT COUNT(*) FROM [User] WHERE Email = ?", (email,))
@@ -191,10 +206,7 @@ def admin_add_user():
                 flash('Cet email est déjà utilisé.', 'danger')
                 return redirect(request.url)
 
-            # Hash password
             hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-
-            # Insert user
             cursor.execute("INSERT INTO [User] (Email, Password, Role) VALUES (?, ?, ?)",
                            (email, hashed_password, role))
             conn.commit()
@@ -235,7 +247,6 @@ def admin_edit_user(id):
             password_confirm = request.form.get('password_confirm')
             role = request.form.get('role')
 
-            # Validate inputs
             if not email or not role:
                 flash('Email et rôle sont requis.', 'danger')
                 return redirect(request.url)
@@ -249,14 +260,12 @@ def admin_edit_user(id):
                 flash('Rôle invalide.', 'danger')
                 return redirect(request.url)
 
-            # Check email uniqueness
             cursor.execute("SELECT COUNT(*) FROM [User] WHERE Email = ? AND ID_User != ?", (email, id))
             if cursor.fetchone()[0] > 0:
                 conn.close()
                 flash('Cet email est déjà utilisé.', 'danger')
                 return redirect(request.url)
 
-            # Update user
             if password:
                 hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
                 cursor.execute("UPDATE [User] SET Email = ?, Password = ?, Role = ? WHERE ID_User = ?",
@@ -320,7 +329,6 @@ def profile():
             new_password = request.form.get('new_password')
             password_confirm = request.form.get('password_confirm')
 
-            # Validate inputs
             if not current_password or not new_password:
                 flash('Mot de passe actuel et nouveau mot de passe requis.', 'danger')
                 return redirect(request.url)
@@ -331,7 +339,6 @@ def profile():
                 flash('Le nouveau mot de passe doit contenir au moins 8 caractères.', 'danger')
                 return redirect(request.url)
 
-            # Verify current password
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("SELECT Password FROM [User] WHERE ID_User = ?", (session['user_id'],))
@@ -341,7 +348,6 @@ def profile():
                 flash('Mot de passe actuel incorrect.', 'danger')
                 return redirect(request.url)
 
-            # Update password
             hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
             cursor.execute("UPDATE [User] SET Password = ? WHERE ID_User = ?",
                            (hashed_password, session['user_id']))
@@ -362,9 +368,11 @@ def profile():
 
 
 @app.route('/dashboard')
-@login_required
 def dashboard():
-    logger.debug("Accessed dashboard route")
+    if 'user_id' not in session:
+        flash('Veuillez vous connecter pour accéder au tableau de bord.', 'warning')
+        return redirect(url_for('login'))
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -372,325 +380,258 @@ def dashboard():
         # Total employees
         cursor.execute("SELECT COUNT(*) FROM Employe")
         total_employes = cursor.fetchone()[0]
-        logger.debug(f"Total employes: {total_employes}")
 
         # Total articles
         cursor.execute("SELECT COUNT(*) FROM Article")
         total_articles = cursor.fetchone()[0]
-        logger.debug(f"Total articles: {total_articles}")
 
-        # Articles affectés (Statut_Article = 'AFFECTE')
-        cursor.execute("SELECT COUNT(*) FROM Article WHERE Statut_Article = 'AFFECTE'")
+        # Affected articles
+        cursor.execute("""
+            SELECT COUNT(DISTINCT af.ID_Article_Affectation)
+            FROM Affectation af
+            WHERE (af.Date_Restitution_Affectation IS NULL OR af.Date_Restitution_Affectation > GETDATE())
+        """)
         articles_affectes = cursor.fetchone()[0]
-        logger.debug(f"Articles affectés: {articles_affectes}")
 
-        # Articles non affectés (Statut_Article = 'NON AFFECTE')
-        cursor.execute("SELECT COUNT(*) FROM Article WHERE Statut_Article = 'NON AFFECTE'")
+        # Non-affected articles
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM Article ar
+            LEFT JOIN Affectation af ON ar.ID_Article = af.ID_Article_Affectation
+            WHERE af.ID_Article_Affectation IS NULL
+            OR (af.Date_Restitution_Affectation IS NOT NULL AND af.Date_Restitution_Affectation <= GETDATE())
+        """)
         articles_non_affectes = cursor.fetchone()[0]
-        logger.debug(f"Articles non affectés: {articles_non_affectes}")
 
-        # Répartition des matériels par statut
+        # Articles by type
         cursor.execute("""
-                       SELECT Statut_Article, COUNT(*) as count
-                       FROM Article
-                       WHERE Statut_Article IS NOT NULL AND Statut_Article <> ''
-                       GROUP BY Statut_Article
-                       """)
-        repartition_statuts = cursor.fetchall()
-        logger.debug(f"Répartition statuts: {[(row[0], row[1]) for row in repartition_statuts]}")
-
-        # Répartition des matériels par type
-        cursor.execute("""
-                       SELECT Type_Article, COUNT(*) as count
-                       FROM Article
-                       WHERE Type_Article IS NOT NULL AND Type_Article <> ''
-                       GROUP BY Type_Article
-                       """)
+            SELECT Type_Article, COUNT(*) 
+            FROM Article 
+            GROUP BY Type_Article
+        """)
         repartition_types = cursor.fetchall()
-        logger.debug(f"Répartition types: {[(row[0], row[1]) for row in repartition_types]}")
 
-        # Répartition des matériels par service
+        # Articles by service
         cursor.execute("""
-                       SELECT e.Service_Employe, COUNT(a.ID_Article) as count
-                       FROM Employe e
-                           LEFT JOIN Article a
-                       ON e.Code_Employe = a.Affecter_au_Article
-                       WHERE e.Service_Employe IS NOT NULL AND e.Service_Employe <> ''
-                       GROUP BY e.Service_Employe
-                       """)
+            SELECT COALESCE(af.Service_Employe_Article, 'N/A'), COUNT(*) 
+            FROM Article ar
+            INNER JOIN Affectation af ON ar.ID_Article = af.ID_Article_Affectation
+            WHERE (af.Date_Restitution_Affectation IS NULL OR af.Date_Restitution_Affectation > GETDATE())
+            GROUP BY COALESCE(af.Service_Employe_Article, 'N/A')
+        """)
         repartition_services = cursor.fetchall()
-        logger.debug(f"Répartition services: {[(row[0], row[1]) for row in repartition_services]}")
 
-        # Répartition des employés par direction et service
+        # Employees by direction and service
         cursor.execute("""
-                       SELECT Direction_Employe, Service_Employe, COUNT(*) as Nombre_Employes
-                       FROM Employe
-                       WHERE Direction_Employe IS NOT NULL
-                         AND Service_Employe IS NOT NULL
-                       GROUP BY Direction_Employe, Service_Employe
-                       """)
+            SELECT COALESCE(Direction_Employe, 'N/A') AS Direction_Employe, 
+                   COALESCE(Service_Employe, 'N/A') AS Service_Employe, 
+                   COUNT(*) AS Nombre_Employes
+            FROM Employe
+            GROUP BY COALESCE(Direction_Employe, 'N/A'), COALESCE(Service_Employe, 'N/A')
+        """)
         repartition_employes = cursor.fetchall()
-        logger.debug(f"Répartition employés: {[(row[0], row[1], row[2]) for row in repartition_employes]}")
 
-        # Répartition des matériels affectés et non affectés par direction et service
+        # Materials by direction and service
         cursor.execute("""
-                       SELECT e.Direction_Employe,
-                              e.Service_Employe,
-                              SUM(CASE WHEN a.Statut_Article = 'AFFECTE' THEN 1 ELSE 0 END)     as Affectes,
-                              SUM(CASE WHEN a.Statut_Article = 'NON AFFECTE' THEN 1 ELSE 0 END) as Non_Affectes
-                       FROM Employe e
-                                LEFT JOIN Article a ON e.Code_Employe = a.Affecter_au_Article
-                       WHERE e.Direction_Employe IS NOT NULL
-                         AND e.Service_Employe IS NOT NULL
-                       GROUP BY e.Direction_Employe, e.Service_Employe
-                       """)
+            -- Directions
+            SELECT 
+                af.Service_Employe_Article AS Direction_Employe,
+                'N/A' AS Service_Employe,
+                COUNT(*) AS Affectes
+            FROM Article ar
+            INNER JOIN Affectation af ON ar.ID_Article = af.ID_Article_Affectation
+            INNER JOIN Employe e ON af.Service_Employe_Article = e.Direction_Employe
+            WHERE ar.Statut_Article = 'AFFECTE'
+            AND (af.Date_Restitution_Affectation IS NULL OR af.Date_Restitution_Affectation > GETDATE())
+            AND af.Service_Employe_Article IS NOT NULL
+            GROUP BY af.Service_Employe_Article
+            UNION ALL
+            -- Services
+            SELECT 
+                'N/A' AS Direction_Employe,
+                af.Service_Employe_Article AS Service_Employe,
+                COUNT(*) AS Affectes
+            FROM Article ar
+            INNER JOIN Affectation af ON ar.ID_Article = af.ID_Article_Affectation
+            INNER JOIN Employe e ON af.Service_Employe_Article = e.Service_Employe
+            WHERE ar.Statut_Article = 'AFFECTE'
+            AND (af.Date_Restitution_Affectation IS NULL OR af.Date_Restitution_Affectation > GETDATE())
+            AND af.Service_Employe_Article IS NOT NULL
+            GROUP BY af.Service_Employe_Article
+        """)
         repartition_materiel_direction_service = cursor.fetchall()
-        logger.debug(
-            f"Répartition matériel direction/service: {[(row[0], row[1], row[2], row[3]) for row in repartition_materiel_direction_service]}")
+
+        # Log data for debugging
+        logger.debug(f"Total employés: {total_employes}")
+        logger.debug(f"Total articles: {total_articles}")
+        logger.debug(f"Articles affectés: {articles_affectes}")
+        logger.debug(f"Articles non affectés: {articles_non_affectes}")
+        logger.debug(f"Répartition types: {[(row[0], row[1]) for row in repartition_types]}")
+        logger.debug(f"Répartition services: {[(row[0], row[1]) for row in repartition_services]}")
+        logger.debug(f"Répartition employés: {[(row[0], row[1], row[2]) for row in repartition_employes]}")
+        logger.debug(f"Répartition matériel direction/service: {[(row[0], row[1], row[2]) for row in repartition_materiel_direction_service]}")
 
         conn.close()
+
         return render_template('dashboard.html',
-                               total_employes=total_employes,
-                               total_articles=total_articles,
-                               articles_affectes=articles_affectes,
-                               articles_non_affectes=articles_non_affectes,
-                               repartition_statuts=repartition_statuts,
-                               repartition_types=repartition_types,
-                               repartition_services=repartition_services,
-                               repartition_employes=repartition_employes,
-                               repartition_materiel_direction_service=repartition_materiel_direction_service)
-    except pyodbc.Error as e:
-        logger.error(f"Database error in dashboard: {str(e)}")
-        flash(f'Erreur de base de données : {str(e)}', 'danger')
-        return render_template('dashboard.html',
-                               total_employes=0,
-                               total_articles=0,
-                               articles_affectes=0,
-                               articles_non_affectes=0,
-                               repartition_statuts=[],
-                               repartition_types=[],
-                               repartition_services=[],
-                               repartition_employes=[],
-                               repartition_materiel_direction_service=[])
+                              total_employes=total_employes,
+                              total_articles=total_articles,
+                              articles_affectes=articles_affectes,
+                              articles_non_affectes=articles_non_affectes,
+                              repartition_types=repartition_types,
+                              repartition_services=repartition_services,
+                              repartition_employes=repartition_employes,
+                              repartition_materiel_direction_service=repartition_materiel_direction_service)
+
     except Exception as e:
-        logger.error(f"Error in dashboard: {str(e)}")
-        flash(f'Erreur : {str(e)}', 'danger')
+        logger.error(f"Erreur dans le tableau de bord: {str(e)}")
+        flash('Une erreur est survenue lors du chargement du tableau de bord.', 'danger')
         return render_template('dashboard.html',
-                               total_employes=0,
-                               total_articles=0,
-                               articles_affectes=0,
-                               articles_non_affectes=0,
-                               repartition_statuts=[],
-                               repartition_types=[],
-                               repartition_services=[],
-                               repartition_employes=[],
-                               repartition_materiel_direction_service=[])
+                              total_employes=0,
+                              total_articles=0,
+                              articles_affectes=0,
+                              articles_non_affectes=0,
+                              repartition_types=[],
+                              repartition_services=[],
+                              repartition_employes=[],
+                              repartition_materiel_direction_service=[])
+inventaire_bp = Blueprint('inventaire', __name__)
 
 
-@app.route('/export_stats', methods=['POST'])
+@inventaire_bp.route('/liste_inventaire')
 @login_required
-def export_stats():
-    logger.debug("Accessed export_stats route")
+def liste_inventaire():
+    logger.debug("Accessed liste_inventaire route")
     try:
-        start_date = request.form.get('start_date')
-        end_date = request.form.get('end_date')
-        export_format = request.form.get('format')
-
-        if not start_date or not end_date or not export_format:
-            raise ValueError("Missing required fields")
-
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Collect data
-        cursor.execute("SELECT COUNT(*) FROM Employe")
-        total_employes = cursor.fetchone()[0]
-
-        cursor.execute("SELECT COUNT(*) FROM Article")
-        total_articles = cursor.fetchone()[0]
-
         cursor.execute("""
-                       SELECT COUNT(*)
+                       SELECT a.ID_Article,
+                              a.Libelle_Article,
+                              a.Statut_Article,
+                              a.Date_Achat_Article,
+                              af.Service_Employe_Article,
+                              e.Direction_Employe AS Direction_Employe_Article,
+                              af.Affecter_au_Article,
+                              af.Date_Affectation,
+                              af.Date_Restitution_Affectation,
+                              e.Nom_Employe,
+                              e.Prenom_Employe
                        FROM Article a
-                                JOIN Affectation af ON a.ID_Article = af.ID_Article_Affectation
-                       WHERE af.Date_Affectation BETWEEN ? AND ?
-                         AND (af.Date_Restitution_Affectation IS NULL OR af.Date_Restitution_Affectation > ?)
-                       """, (start_date, end_date, end_date))
-        articles_affectes = cursor.fetchone()[0]
-
-        cursor.execute("""
-                       SELECT COUNT(*)
-                       FROM Article
-                       WHERE ID_Article NOT IN (SELECT ID_Article_Affectation
-                                                FROM Affectation
-                                                WHERE Date_Affectation BETWEEN ? AND ?
-                                                  AND (Date_Restitution_Affectation IS NULL OR Date_Restitution_Affectation > ?))
-                       """, (start_date, end_date, end_date))
-        articles_non_affectes = cursor.fetchone()[0]
-
-        cursor.execute("SELECT Type_Article, COUNT(*) FROM Article GROUP BY Type_Article")
-        repartition_types = cursor.fetchall()
-
-        cursor.execute("""
-                       SELECT af.Service_Employe_Article, COUNT(*)
-                       FROM Affectation af
-                       WHERE af.Date_Affectation BETWEEN ? AND ?
-                         AND (af.Date_Restitution_Affectation IS NULL OR af.Date_Restitution_Affectation > ?)
-                       GROUP BY af.Service_Employe_Article
-                       """, (start_date, end_date, end_date))
-        repartition_services = cursor.fetchall()
-
-        cursor.execute("""
-                       SELECT Direction_Employe, Service_Employe, COUNT(*) as Nombre_Employes
-                       FROM Employe
-                       GROUP BY Direction_Employe, Service_Employe
+                                LEFT JOIN Affectation af ON a.ID_Article = af.ID_Article_Affectation
+                                LEFT JOIN Employe e ON af.Affecter_au_Article = e.Code_Employe
                        """)
-        repartition_employes = cursor.fetchall()
+        inventaire_raw = cursor.fetchall()
 
-        cursor.execute("""
-                       SELECT e.Direction_Employe,
-                              e.Service_Employe,
-                              SUM(CASE
-                                      WHEN a.Statut_Article = 'AFFECTE'
-                                          AND af.Date_Affectation BETWEEN ? AND ?
-                                          AND (af.Date_Restitution_Affectation IS NULL OR
-                                               af.Date_Restitution_Affectation > ?)
-                                          THEN 1
-                                      ELSE 0 END)                                               as Affectes,
-                              SUM(CASE WHEN a.Statut_Article = 'NON AFFECTE' THEN 1 ELSE 0 END) as Non_Affectes
-                       FROM Employe e
-                                LEFT JOIN Affectation af ON e.Service_Employe = af.Service_Employe_Article
-                                LEFT JOIN Article a ON af.ID_Article_Affectation = a.ID_Article
-                       GROUP BY e.Direction_Employe, e.Service_Employe
-                       """, (start_date, end_date, end_date))
-        repartition_materiel_direction_service = cursor.fetchall()
+        cursor.execute("SELECT DISTINCT Direction_Employe FROM Employe WHERE Direction_Employe IS NOT NULL")
+        directions_list = [row.Direction_Employe for row in cursor.fetchall()]
+
+        today = date.today().strftime('%Y-%m-%d')
+        inventaire = []
+        for item in inventaire_raw:
+            if item.Date_Restitution_Affectation and item.Date_Restitution_Affectation <= today:
+                status_display = 'Non affecté'
+                status_color = 'secondary'
+            else:
+                status_display = 'Active' if item.Statut_Article == 'AFFECTE' else 'Non affecté'
+                status_color = 'success' if item.Statut_Article == 'AFFECTE' else 'secondary'
+            inventaire.append({
+                'ID_Article': item.ID_Article,
+                'Libelle_Article': item.Libelle_Article,
+                'Statut_Article': item.Statut_Article,
+                'Date_Achat_Article': item.Date_Achat_Article,
+                'Service_Employe_Article': item.Service_Employe_Article,
+                'Direction_Employe_Article': item.Direction_Employe_Article,
+                'Affecter_au_Article': item.Affecter_au_Article,
+                'Date_Affectation': item.Date_Affectation,
+                'Date_Restitution_Affectation': item.Date_Restitution_Affectation,
+                'Nom_Employe': item.Nom_Employe,
+                'Prenom_Employe': item.Prenom_Employe,
+                'Status_Display': status_display,
+                'Status_Color': status_color
+            })
 
         conn.close()
+        return render_template('liste_inventaire.html',
+                               inventaire=inventaire,
+                               directions_list=directions_list)
+    except pyodbc.Error as e:
+        logger.error(f"Database error in liste_inventaire: {str(e)}")
+        flash(f'Erreur de base de données : {str(e)}', 'danger')
+        return render_template('liste_inventaire.html', inventaire=[], directions_list=[])
 
-        # Prepare data structure
-        data = {
-            'summary': {
-                'total_employes': total_employes,
-                'total_articles': total_articles,
-                'articles_affectes': articles_affectes,
-                'articles_non_affectes': articles_non_affectes,
-                'date_range': f'{start_date} to {end_date}'
-            },
-            'articles_by_status': [
-                {'status': 'Affectés', 'count': articles_affectes,
-                 'percentage': round((articles_affectes / (articles_affectes + articles_non_affectes)) * 100, 1) if (
-                                                                                                                                articles_affectes + articles_non_affectes) > 0 else 0},
-                {'status': 'Non affectés', 'count': articles_non_affectes,
-                 'percentage': round((articles_non_affectes / (articles_affectes + articles_non_affectes)) * 100,
-                                     1) if (articles_affectes + articles_non_affectes) > 0 else 0}
-            ],
-            'articles_by_type': [
-                {'type': row[0] or 'N/A', 'count': row[1]} for row in repartition_types
-            ],
-            'articles_by_service': [
-                {'service': row[0] or 'N/A', 'count': row[1]} for row in repartition_services
-            ],
-            'employees_by_direction_service': [
-                {'direction': row[0] or 'N/A', 'service': row[1] or 'N/A', 'count': row[2]} for row in
-                repartition_employes
-            ],
-            'articles_by_direction_service': [
-                {'direction': row[0] or 'N/A', 'service': row[1] or 'N/A', 'affectes': row[2], 'non_affectes': row[3]}
-                for row in repartition_materiel_direction_service
-            ]
-        }
 
-        if export_format == 'csv':
-            output = io.StringIO()
-            writer = csv.writer(output)
+@inventaire_bp.route('/export_inventaire')
+@login_required
+def export_inventaire():
+    logger.debug("Accessed export_inventaire route")
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-            writer.writerow(['Dashboard Statistics'])
-            writer.writerow([f'Date Range: {start_date} to {end_date}'])
-            writer.writerow([])
+        cursor.execute("""
+            SELECT 
+                a.Libelle_Article AS 'Libellé',
+                a.Statut_Article AS 'Statut',
+                a.Date_Achat_Article AS 'Date Achat',
+                CASE 
+                    WHEN af.Service_Employe_Article IN (
+                        SELECT DISTINCT Direction_Employe 
+                        FROM Employe 
+                        WHERE Direction_Employe IS NOT NULL
+                    ) THEN NULL 
+                    ELSE af.Service_Employe_Article 
+                END AS 'Service',
+                CASE 
+                    WHEN af.Service_Employe_Article IN (
+                        SELECT DISTINCT Direction_Employe 
+                        FROM Employe 
+                        WHERE Direction_Employe IS NOT NULL
+                    ) THEN af.Service_Employe_Article 
+                    ELSE NULL 
+                END AS 'Direction',
+                CASE 
+                    WHEN af.Affecter_au_Article IS NOT NULL THEN 
+                        CONCAT(e.Nom_Employe, ' ', e.Prenom_Employe, ' (Employé)')
+                    WHEN af.Service_Employe_Article IN (
+                        SELECT DISTINCT Direction_Employe 
+                        FROM Employe 
+                        WHERE Direction_Employe IS NOT NULL
+                    ) THEN CONCAT(af.Service_Employe_Article, ' (Direction)')
+                    ELSE COALESCE(af.Service_Employe_Article, 'N/A') + ' (Service)'
+                END AS 'Affecté à',
+                af.Date_Affectation AS 'Date Affectation',
+                af.Date_Restitution_Affectation AS 'Date Restitution'
+            FROM Article a
+            LEFT JOIN Affectation af ON a.ID_Article = af.ID_Article_Affectation
+                AND (af.Date_Restitution_Affectation IS NULL OR af.Date_Restitution_Affectation > ?)
+            LEFT JOIN Employe e ON af.Affecter_au_Article = e.Code_Employe
+        """, (date.today().strftime('%Y-%m-%d'),))
+        rows = cursor.fetchall()
 
-            writer.writerow(['Summary'])
-            writer.writerow(['Metric', 'Value'])
-            for key, value in data['summary'].items():
-                writer.writerow([key.replace('_', ' ').title(), value])
-            writer.writerow([])
+        columns = ['Libellé', 'Statut', 'Date Achat', 'Service', 'Direction', 'Affecté à', 'Date Affectation', 'Date Restitution']
+        df = pd.DataFrame([tuple(row) for row in rows], columns=columns)
+        df.fillna('-', inplace=True)
 
-            writer.writerow(['Articles by Status'])
-            writer.writerow(['Status', 'Count', 'Percentage'])
-            for item in data['articles_by_status']:
-                writer.writerow([item['status'], item['count'], f"{item['percentage']}%"])
-            writer.writerow([])
+        output = BytesIO()
+        with pd.ExcelWriter(output, engine='openpyxl') as writer:
+            df.to_excel(writer, index=False, sheet_name='Inventaire')
+        output.seek(0)
 
-            writer.writerow(['Articles by Type'])
-            writer.writerow(['Type', 'Count'])
-            for item in data['articles_by_type']:
-                writer.writerow([item['type'], item['count']])
-            writer.writerow([])
+        conn.close()
+        return send_file(
+            output,
+            download_name=f"inventaire_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xlsx",
+            as_attachment=True,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    except pyodbc.Error as e:
+        logger.error(f"Database error in export_inventaire: {str(e)}")
+        flash(f'Erreur de base de données : {str(e)}', 'danger')
+        return redirect(url_for('inventaire.liste_inventaire'))
 
-            writer.writerow(['Articles by Service'])
-            writer.writerow(['Service', 'Count'])
-            for item in data['articles_by_service']:
-                writer.writerow([item['service'], item['count']])
-            writer.writerow([])
-
-            writer.writerow(['Employees by Direction and Service'])
-            writer.writerow(['Direction', 'Service', 'Count'])
-            for item in data['employees_by_direction_service']:
-                writer.writerow([item['direction'], item['service'], item['count']])
-            writer.writerow([])
-
-            writer.writerow(['Articles by Direction and Service'])
-            writer.writerow(['Direction', 'Service', 'Affectes', 'Non Affectes'])
-            for item in data['articles_by_direction_service']:
-                writer.writerow([item['direction'], item['service'], item['affectes'], item['non_affectes']])
-
-            filename = f'dashboard_stats_{start_date}_to_{end_date}.csv'
-            return Response(
-                output.getvalue(),
-                mimetype='text/csv',
-                headers={'Content-Disposition': f'attachment;filename={filename}'}
-            )
-
-        elif export_format == 'json':
-            filename = f'dashboard_stats_{start_date}_to_{end_date}.json'
-            return Response(
-                json.dumps(data, indent=2, ensure_ascii=False),
-                mimetype='application/json',
-                headers={'Content-Disposition': f'attachment;filename={filename}'}
-            )
-
-        elif export_format == 'excel':
-            output = io.BytesIO()
-            with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                pd.DataFrame([
-                    {'Metric': key.replace('_', ' ').title(), 'Value': value}
-                    for key, value in data['summary'].items()
-                ]).to_excel(writer, sheet_name='Summary', index=False)
-                pd.DataFrame(data['articles_by_status']).to_excel(writer, sheet_name='Articles_by_Status', index=False)
-                pd.DataFrame(data['articles_by_type']).to_excel(writer, sheet_name='Articles_by_Type', index=False)
-                pd.DataFrame(data['articles_by_service']).to_excel(writer, sheet_name='Articles_by_Service',
-                                                                   index=False)
-                pd.DataFrame(data['employees_by_direction_service']).to_excel(writer,
-                                                                              sheet_name='Employees_by_Dir_Service',
-                                                                              index=False)
-                pd.DataFrame(data['articles_by_direction_service']).to_excel(writer,
-                                                                             sheet_name='Articles_by_Dir_Service',
-                                                                             index=False)
-
-            output.seek(0)
-            filename = f'dashboard_stats_{start_date}_to_{end_date}.xlsx'
-            return Response(
-                output,
-                mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                headers={'Content-Disposition': f'attachment;filename={filename}'}
-            )
-
-        else:
-            raise ValueError("Invalid export format")
-
-    except Exception as e:
-        logger.error(f"Error in export_stats: {str(e)}")
-        flash(f'Erreur lors de l\'exportation : {str(e)}', 'danger')
-        return redirect(url_for('dashboard'))
+app.register_blueprint(inventaire_bp)
 
 
 @app.route('/utilisateurs')
@@ -701,7 +642,6 @@ def utilisateurs():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Fetch all employees
         cursor.execute("""
                        SELECT ID_Employe,
                               Code_Employe,
@@ -718,7 +658,6 @@ def utilisateurs():
         employes_list = [dict(zip(columns, employe)) for employe in employes]
         logger.debug(f"Total employes fetched: {len(employes_list)}")
 
-        # Fetch distinct services (exclude NULL and empty)
         cursor.execute("""
                        SELECT DISTINCT Service_Employe
                        FROM Employe
@@ -729,7 +668,6 @@ def utilisateurs():
         services = [row.Service_Employe for row in cursor.fetchall()]
         logger.debug(f"Services fetched: {services}")
 
-        # Fetch distinct directions (exclude NULL and empty)
         cursor.execute("""
                        SELECT DISTINCT Direction_Employe
                        FROM Employe
@@ -812,7 +750,6 @@ def editer_utilisateur(id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Fetch current employee data
         cursor.execute("SELECT * FROM Employe WHERE ID_Employe = ?", (id,))
         employe = cursor.fetchone()
         if not employe:
@@ -829,7 +766,6 @@ def editer_utilisateur(id):
             update_fields = {}
             params = []
 
-            # Map form fields to database columns
             field_mapping = {
                 'code': 'Code_Employe',
                 'badge': 'Badge_Employe',
@@ -844,12 +780,10 @@ def editer_utilisateur(id):
                 'date_sortie': 'Date_Sortie_Employe'
             }
 
-            # Check unique constraints for changed fields
             for form_field, db_field in field_mapping.items():
                 if form_field in data and data[form_field] != '':
                     new_value = data[form_field] if data[form_field] else None
                     if new_value != employe_dict[db_field]:
-                        # Validate unique fields
                         if form_field in ['code', 'badge', 'cin']:
                             cursor.execute(f"SELECT COUNT(*) FROM Employe WHERE {db_field} = ? AND ID_Employe != ?",
                                            (new_value, id))
@@ -865,7 +799,6 @@ def editer_utilisateur(id):
                 flash('Aucune modification détectée.', 'info')
                 return redirect(url_for('utilisateurs'))
 
-            # Build dynamic UPDATE query
             set_clause = ', '.join(f"{field} = ?" for field in update_fields.keys())
             query = f"UPDATE Employe SET {set_clause} WHERE ID_Employe = ?"
             params.append(id)
@@ -927,6 +860,7 @@ def supprimer_utilisateur(id):
         return redirect(url_for('utilisateurs'))
 
 
+
 @app.route('/materiel')
 @login_required
 def materiel():
@@ -935,41 +869,52 @@ def materiel():
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # Fetch all articles
+        # Fetch articles with affectation details
         cursor.execute("""
-                       SELECT ID_Article,
-                              Ref_Article,
-                              Libelle_Article,
-                              Type_Article,
-                              Marque_Article,
-                              Etat_Article,
-                              Statut_Article,
-                              Affecter_au_Article,
-                              Image_Path
-                       FROM Article
-                       """)
+                       SELECT a.ID_Article,
+                              a.Ref_Article,
+                              a.Libelle_Article,
+                              a.Type_Article,
+                              a.Marque_Article,
+                              a.Etat_Article,
+                              a.Statut_Article,
+                              a.Affecter_au_Article,
+                              a.Image_Path,
+                              af.Service_Employe_Article,
+                              e.Nom_Employe,
+                              e.Prenom_Employe
+                       FROM Article a
+                                LEFT JOIN Affectation af ON a.ID_Article = af.ID_Article_Affectation
+                           AND (af.Date_Restitution_Affectation IS NULL OR af.Date_Restitution_Affectation > ?)
+                                LEFT JOIN Employe e ON a.Affecter_au_Article = e.Code_Employe
+                       """, (date.today().strftime('%Y-%m-%d'),))
         articles = cursor.fetchall()
         article_columns = [column[0] for column in cursor.description]
-        logger.debug(f"Article table columns: {article_columns}")
-        if 'Image_Path' not in article_columns:
-            logger.error("Image_Path column missing from Article table")
-        articles_list = [dict(zip(article_columns, article)) for article in articles]
-        logger.debug(f"Total articles fetched: {len(articles_list)}")
-        for article in articles_list:
-            logger.debug(
-                f"Article: Ref={article.get('Ref_Article', 'N/A')}, Image_Path={article.get('Image_Path', 'None')}")
+        articles_list = []
+        today = date.today().strftime('%Y-%m-%d')
+        for article in articles:
+            article_dict = dict(zip(article_columns, article))
+            # Determine affectation display
+            if article.Affecter_au_Article and article.Nom_Employe:
+                article_dict['Affectation_Display'] = f"{article.Nom_Employe} {article.Prenom_Employe} (Employé)"
+            elif article.Service_Employe_Article:
+                # Check if Service_Employe_Article is a direction
+                cursor.execute("SELECT COUNT(*) FROM Employe WHERE Direction_Employe = ?",
+                               (article.Service_Employe_Article,))
+                is_direction = cursor.fetchone()[0] > 0
+                article_dict['Affectation_Display'] = (f"{article.Service_Employe_Article} "
+                                                       f"({'Direction' if is_direction else 'Service'})")
+            else:
+                article_dict['Affectation_Display'] = "Non affecté"
+            articles_list.append(article_dict)
 
-        # Fetch all employees
-        cursor.execute("""
-                       SELECT Code_Employe, Nom_Employe, Prenom_Employe
-                       FROM Employe
-                       """)
+        # Fetch employees for filters and details
+        cursor.execute("SELECT Code_Employe, Nom_Employe, Prenom_Employe FROM Employe")
         employes = cursor.fetchall()
         employe_columns = [column[0] for column in cursor.description]
         employes_list = [dict(zip(employe_columns, employe)) for employe in employes]
-        logger.debug(f"Total employes fetched: {len(employes_list)}")
 
-        # Fetch distinct types
+        # Fetch types, states, brands, and statuses
         cursor.execute("""
                        SELECT DISTINCT Type_Article
                        FROM Article
@@ -978,9 +923,7 @@ def materiel():
                        ORDER BY Type_Article
                        """)
         types = [row.Type_Article for row in cursor.fetchall()]
-        logger.debug(f"Types fetched: {types}")
 
-        # Fetch distinct etats
         cursor.execute("""
                        SELECT DISTINCT Etat_Article
                        FROM Article
@@ -989,9 +932,7 @@ def materiel():
                        ORDER BY Etat_Article
                        """)
         etats = [row.Etat_Article for row in cursor.fetchall()]
-        logger.debug(f"Etats fetched: {etats}")
 
-        # Fetch distinct marques
         cursor.execute("""
                        SELECT DISTINCT Marque_Article
                        FROM Article
@@ -1000,9 +941,7 @@ def materiel():
                        ORDER BY Marque_Article
                        """)
         marques = [row.Marque_Article for row in cursor.fetchall()]
-        logger.debug(f"Marques fetched: {marques}")
 
-        # Fetch distinct statuts
         cursor.execute("""
                        SELECT DISTINCT Statut_Article
                        FROM Article
@@ -1011,7 +950,25 @@ def materiel():
                        ORDER BY Statut_Article
                        """)
         statuts = [row.Statut_Article for row in cursor.fetchall()]
-        logger.debug(f"Statuts fetched: {statuts}")
+
+        # Fetch services and directions for filter dropdown
+        cursor.execute("""
+                       SELECT DISTINCT Service_Employe
+                       FROM Employe
+                       WHERE Service_Employe IS NOT NULL
+                         AND Service_Employe <> ''
+                       ORDER BY Service_Employe
+                       """)
+        services = [row.Service_Employe for row in cursor.fetchall()]
+
+        cursor.execute("""
+                       SELECT DISTINCT Direction_Employe
+                       FROM Employe
+                       WHERE Direction_Employe IS NOT NULL
+                         AND Direction_Employe <> ''
+                       ORDER BY Direction_Employe
+                       """)
+        directions = [row.Direction_Employe for row in cursor.fetchall()]
 
         conn.close()
         return render_template('materiel.html',
@@ -1021,7 +978,9 @@ def materiel():
                                types=types,
                                etats=etats,
                                marques=marques,
-                               statuts=statuts)
+                               statuts=statuts,
+                               services=services,
+                               directions=directions)
     except pyodbc.Error as e:
         logger.error(f"Database error in materiel: {str(e)}")
         flash(f'Erreur de base de données : {str(e)}', 'danger')
@@ -1032,7 +991,9 @@ def materiel():
                                types=[],
                                etats=[],
                                marques=[],
-                               statuts=[])
+                               statuts=[],
+                               services=[],
+                               directions=[])
     except Exception as e:
         logger.error(f"Error in materiel: {str(e)}")
         flash(f'Erreur : {str(e)}', 'danger')
@@ -1043,8 +1004,9 @@ def materiel():
                                types=[],
                                etats=[],
                                marques=[],
-                               statuts=[])
-
+                               statuts=[],
+                               services=[],
+                               directions=[])
 
 @app.route('/ajouter_materiel', methods=['GET', 'POST'])
 @login_required
@@ -1066,7 +1028,8 @@ def ajouter_materiel():
             type_article = request.form['type']
             marque = request.form['marque']
             etat = request.form['etat']
-            affecte_a_id = request.form.get('affecte_a')
+            date_achat = request.form.get('date_achat') or None
+            affecte_a_id = request.form.get('affecter_au') or None
 
             image_path_db = None
             if 'image' in request.files:
@@ -1089,22 +1052,63 @@ def ajouter_materiel():
                     flash('Format d\'image non valide. Utilisez PNG, JPG ou JPEG.', 'danger')
                     return redirect(request.url)
 
-            statut = 'AFFECTE' if affecte_a_id else 'NON AFFECTE'
-
             cursor.execute("""
-                           INSERT INTO Article (Ref_Article, Libelle_Article, Type_Article, Marque_Article,
-                                                Etat_Article, Statut_Article, Affecter_au_Article, Image_Path)
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                           """, (ref, libelle, type_article, marque, etat, statut, affecte_a_id, image_path_db))
+                           INSERT INTO Article (Ref_Article,
+                                                Libelle_Article,
+                                                Type_Article,
+                                                Marque_Article,
+                                                Etat_Article,
+                                                Statut_Article,
+                                                Affecter_au_Article,
+                                                Image_Path,
+                                                Date_Achat_Article)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                           """, (
+                               ref,
+                               libelle,
+                               type_article,
+                               marque,
+                               etat,
+                               'NON AFFECTE',  # Initial status, updated by affectation if needed
+                               None,  # Affecter_au_Article set via affectation
+                               image_path_db,
+                               date_achat
+                           ))
+            article_id = cursor.execute("SELECT @@IDENTITY").fetchone()[0]
+
+            if affecte_a_id:
+                server_time = get_server_timestamp()
+                numero_affectation = f"AUTO_{server_time.strftime('%Y%m%d%H%M%S')}"
+                cursor.execute("""
+                               INSERT INTO Affectation (ID_Article_Affectation,
+                                                        Service_Employe_Article,
+                                                        Date_Affectation,
+                                                        Affecter_au_Article,
+                                                        Numero_Affectation)
+                               VALUES (?, ?, ?, ?, ?)
+                               """, (
+                                   article_id,
+                                   cursor.execute("SELECT Service_Employe FROM Employe WHERE Code_Employe = ?",
+                                                  (affecte_a_id,)).fetchone()[0] or "Inconnu",
+                                   date.today().strftime('%Y-%m-%d'),
+                                   affecte_a_id,
+                                   numero_affectation
+                               ))
+                update_article_status(article_id, conn, cursor)
+
             conn.commit()
             flash('Matériel ajouté avec succès', 'success')
-            logger.info(f"Added material: {ref}, Image_Path: {image_path_db}")
+            logger.info(f"Added material: {ref}, Image_Path: {image_path_db}, Date_Achat: {date_achat}")
             conn.close()
             return redirect(url_for('materiel'))
 
         conn.close()
-        return render_template('ajouter_materiel.html', types=types, etats=etats,
-                               categories=categories, locations=locations, employes=employes)
+        return render_template('ajouter_materiel.html',
+                               types=types,
+                               etats=etats,
+                               categories=categories,
+                               locations=locations,
+                               employes=employes)
     except pyodbc.DataError as e:
         conn.rollback()
         logger.error(f"Data error in ajouter_materiel: {str(e)}")
@@ -1153,7 +1157,7 @@ def editer_materiel(id):
             type_article = request.form['type']
             marque = request.form['marque']
             etat = request.form['etat']
-            affecte_a_id = request.form.get('affecte_a')
+            affecte_a_id = request.form.get('affecte_a') or None
 
             image_path_db = article_dict.get('Image_Path')
             remove_image = 'remove_image' in request.form
@@ -1180,8 +1184,6 @@ def editer_materiel(id):
                     flash('Format d\'image non valide. Utilisez PNG, JPG ou JPEG.', 'danger')
                     return redirect(request.url)
 
-            statut = 'AFFECTE' if affecte_a_id else 'NON AFFECTE'
-
             cursor.execute("""
                            UPDATE Article
                            SET Ref_Article         = ?,
@@ -1189,11 +1191,38 @@ def editer_materiel(id):
                                Type_Article        = ?,
                                Marque_Article      = ?,
                                Etat_Article        = ?,
-                               Statut_Article      = ?,
                                Affecter_au_Article = ?,
                                Image_Path          = ?
                            WHERE ID_Article = ?
-                           """, (ref, libelle, type_article, marque, etat, statut, affecte_a_id, image_path_db, id))
+                           """, (ref, libelle, type_article, marque, etat, affecte_a_id, image_path_db, id))
+
+            if affecte_a_id and article_dict.get('Affecter_au_Article') != affecte_a_id:
+                cursor.execute(
+                    "DELETE FROM Affectation WHERE ID_Article_Affectation = ? AND Date_Restitution_Affectation IS NULL",
+                    (id,))
+                server_time = get_server_timestamp()
+                numero_affectation = f"AUTO_{server_time.strftime('%Y%m%d%H%M%S')}"
+                cursor.execute("""
+                               INSERT INTO Affectation (ID_Article_Affectation,
+                                                        Service_Employe_Article,
+                                                        Date_Affectation,
+                                                        Affecter_au_Article,
+                                                        Numero_Affectation)
+                               VALUES (?, ?, ?, ?, ?)
+                               """, (
+                                   id,
+                                   cursor.execute("SELECT Service_Employe FROM Employe WHERE Code_Employe = ?",
+                                                  (affecte_a_id,)).fetchone()[0] or "Inconnu",
+                                   date.today().strftime('%Y-%m-%d'),
+                                   affecte_a_id,
+                                   numero_affectation
+                               ))
+            elif not affecte_a_id and article_dict.get('Affecter_au_Article'):
+                cursor.execute(
+                    "UPDATE Affectation SET Date_Restitution_Affectation = ? WHERE ID_Article_Affectation = ? AND Date_Restitution_Affectation IS NULL",
+                    (date.today().strftime('%Y-%m-%d'), id))
+
+            update_article_status(id, conn, cursor)
             conn.commit()
             flash('Matériel mis à jour', 'success')
             logger.info(f"Updated material ID: {id}, Image_Path: {image_path_db}")
@@ -1227,6 +1256,7 @@ def supprimer_materiel(id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        cursor.execute("DELETE FROM Affectation WHERE ID_Article_Affectation = ?", (id,))
         cursor.execute("DELETE FROM Article WHERE ID_Article = ?", (id,))
         conn.commit()
         flash('Matériel supprimé', 'success')
@@ -1236,7 +1266,7 @@ def supprimer_materiel(id):
     except pyodbc.IntegrityError as e:
         conn.rollback()
         logger.error(f"Integrity error in supprimer_materiel: {str(e)}")
-        flash('Erreur : Impossible de supprimer, matériel lié à des affectations.', 'danger')
+        flash('Erreur : Impossible de supprimer, matériel lié à des données.', 'danger')
         return redirect(url_for('materiel'))
     except pyodbc.Error as e:
         conn.rollback()
@@ -1265,7 +1295,30 @@ def affectations():
                                 LEFT JOIN Article ar ON a.ID_Article_Affectation = ar.ID_Article
                                 LEFT JOIN Employe e ON a.Affecter_au_Article = e.Code_Employe
                        """)
-        affectations = cursor.fetchall()
+        affectations_raw = cursor.fetchall()
+
+        today = date.today().strftime('%Y-%m-%d')
+        affectations = []
+        for aff in affectations_raw:
+            if aff.Date_Restitution_Affectation and aff.Date_Restitution_Affectation <= today:
+                status_display = 'Terminée'
+                status_color = 'secondary'
+            else:
+                status_display = 'Active'
+                status_color = 'success'
+            affectations.append({
+                'ID_Affectation': aff.ID_Affectation,
+                'Libelle_Article': aff.Libelle_Article,
+                'Nom_Employe': aff.Nom_Employe,
+                'Prenom_Employe': aff.Prenom_Employe,
+                'Date_Affectation': aff.Date_Affectation,
+                'Date_Restitution_Affectation': aff.Date_Restitution_Affectation,
+                'Service_Employe_Article': aff.Service_Employe_Article,
+                'Affecter_au_Article': aff.Affecter_au_Article,
+                'Status_Display': status_display,
+                'Status_Color': status_color
+            })
+
         cursor.execute("SELECT ID_Article, Libelle_Article FROM Article WHERE Statut_Article = 'NON AFFECTE'")
         articles = cursor.fetchall()
         cursor.execute("SELECT Code_Employe, Nom_Employe, Prenom_Employe FROM Employe")
@@ -1277,17 +1330,18 @@ def affectations():
             "SELECT DISTINCT Direction_Employe FROM Employe WHERE Direction_Employe IS NOT NULL AND Direction_Employe <> ''")
         directions = cursor.fetchall()
         directions_list = [d.Direction_Employe for d in directions]
+
         conn.close()
         return render_template('affectation.html', affectations=affectations,
                                articles=articles, employes=employes, services=services,
                                directions=directions, directions_list=directions_list,
-                               current_date=get_server_timestamp().strftime('%Y-%m-%d'))
+                               current_date=today)
     except pyodbc.Error as e:
         logger.error(f"Database error in affectations: {str(e)}")
         flash(f'Erreur de base de données : {str(e)}', 'danger')
         return render_template('affectation.html', affectations=[], articles=[], employes=[],
                                services=[], directions=[], directions_list=[],
-                               current_date=get_server_timestamp().strftime('%Y-%m-%d'))
+                               current_date=date.today().strftime('%Y-%m-%d'))
 
 
 @app.route('/affectation/ajouter', methods=['POST'])
@@ -1306,7 +1360,6 @@ def ajouter_affectation():
         direction = data.get('direction') if affectation_type == 'DIRECTION' else None
         date_affectation = data.get('date_affectation')
         date_restitution = data.get('date_restitution') or None
-        # Use server timestamp for numero_affectation
         server_time = get_server_timestamp()
         numero_affectation = data.get('numero_affectation') or f"AUTO_{server_time.strftime('%Y%m%d%H%M%S')}"
 
@@ -1340,23 +1393,33 @@ def ajouter_affectation():
             '%Y-%m-%d') if date_restitution else None
 
         cursor.execute("""
-                       INSERT INTO Affectation (ID_Article_Affectation, Service_Employe_Article, Date_Affectation,
-                                                Date_Restitution_Affectation, Affecter_au_Article, Numero_Affectation)
+                       INSERT INTO Affectation (ID_Article_Affectation,
+                                                Service_Employe_Article,
+                                                Date_Affectation,
+                                                Date_Restitution_Affectation,
+                                                Affecter_au_Article,
+                                                Numero_Affectation)
                        VALUES (?, ?, ?, ?, ?, ?)
-                       """, (article_id, service_employe_article, date_affectation_str, date_restitution_str,
-                             affecter_au_article, numero_affectation))
+                       """, (
+                           article_id,
+                           service_employe_article,
+                           date_affectation_str,
+                           date_restitution_str,
+                           affecter_au_article,
+                           numero_affectation
+                       ))
 
         cursor.execute("""
                        UPDATE Article
-                       SET Statut_Article           = 'AFFECTE',
-                           Affecter_au_Article      = ?,
-                           Service_Employe_Article  = ?,
-                           Date_Affectation_Article = ?,
-                           Date_Restitution_Article = ?,
-                           Numero_Affectation       = ?
+                       SET Statut_Article      = ?,
+                           Affecter_au_Article = ?
                        WHERE ID_Article = ?
-                       """, (affecter_au_article, service_employe_article, date_affectation_str, date_restitution_str,
-                             numero_affectation, article_id))
+                       """, (
+                           'AFFECTE' if not date_restitution_str or date_restitution_str > date.today().strftime(
+                               '%Y-%m-%d') else 'NON AFFECTE',
+                           affecter_au_article,
+                           article_id
+                       ))
 
         conn.commit()
         flash('Affectation ajoutée avec succès', 'success')
@@ -1371,74 +1434,60 @@ def ajouter_affectation():
     return redirect(url_for('affectations'))
 
 
-@app.route('/affectation/terminer/<int:id>', methods=['GET', 'POST'])
+@app.route('/affectation/terminer/<int:id>', methods=['POST'])
 @login_required
 def terminer_affectation(id):
-    logger.debug(f"Accessed terminer_affectation route for ID: {id}, method: {request.method}")
+    logger.debug(f"Accessed terminer_affectation route for ID: {id}")
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("""
-                       SELECT a.ID_Affectation, ar.Libelle_Article
+                       SELECT a.ID_Affectation, ar.Libelle_Article, a.ID_Article_Affectation
                        FROM Affectation a
                                 LEFT JOIN Article ar ON a.ID_Article_Affectation = ar.ID_Article
                        WHERE a.ID_Affectation = ?
                        """, (id,))
         affectation = cursor.fetchone()
         if not affectation:
-            conn.close()
             raise ValueError("Affectation non trouvée.")
 
-        affectation_dict = {'ID_Affectation': affectation[0], 'Libelle_Article': affectation[1]}
-
-        if request.method == 'POST':
-            date_restitution = request.form.get('date_restitution')
-            if not date_restitution:
-                conn.close()
-                flash('Date de restitution requise.', 'danger')
-                return redirect(request.url)
-
-            # Validate date format
-            try:
-                date_restitution_str = datetime.strptime(date_restitution, '%Y-%m-%d').strftime('%Y-%m-%d')
-            except ValueError:
-                conn.close()
-                flash('Format de date invalide.', 'danger')
-                return redirect(request.url)
-
-            cursor.execute("SELECT ID_Article_Affectation FROM Affectation WHERE ID_Affectation = ?", (id,))
-            id_article = cursor.fetchone()[0]
-
-            cursor.execute("""
-                           UPDATE Affectation
-                           SET Date_Restitution_Affectation = ?
-                           WHERE ID_Affectation = ?
-                           """, (date_restitution_str, id))
-            cursor.execute("""
-                           UPDATE Article
-                           SET Statut_Article           = 'NON AFFECTE',
-                               Affecter_au_Article      = NULL,
-                               Service_Employe_Article  = NULL,
-                               Date_Restitution_Article = ?,
-                               Numero_Affectation       = NULL
-                           WHERE ID_Article = ?
-                           """, (date_restitution_str, id_article))
-            conn.commit()
-            flash('Affectation terminée avec succès', 'success')
-            logger.info(f"Terminated affectation ID: {id} with restitution date: {date_restitution_str}")
-            conn.close()
+        date_restitution = request.form.get('date_restitution')
+        if not date_restitution:
+            flash('Date de restitution requise.', 'danger')
             return redirect(url_for('affectations'))
 
-        conn.close()
-        return render_template('terminer_affectation.html', affectation=affectation_dict,
-                               current_date=get_server_timestamp().strftime('%Y-%m-%d'))
+        try:
+            date_restitution_str = datetime.strptime(date_restitution, '%Y-%m-%d').strftime('%Y-%m-%d')
+        except ValueError:
+            flash('Format de date invalide.', 'danger')
+            return redirect(url_for('affectations'))
+
+        cursor.execute("""
+                       UPDATE Affectation
+                       SET Date_Restitution_Affectation = ?
+                       WHERE ID_Affectation = ?
+                       """, (date_restitution_str, id))
+
+        cursor.execute("""
+                       UPDATE Article
+                       SET Statut_Article      = ?,
+                           Affecter_au_Article = NULL
+                       WHERE ID_Article = ?
+                       """, (
+                           'NON AFFECTE' if date_restitution_str <= date.today().strftime('%Y-%m-%d') else 'AFFECTE',
+                           affectation.ID_Article_Affectation
+                       ))
+
+        conn.commit()
+        flash('Affectation terminée avec succès', 'success')
+        logger.info(f"Terminated affectation ID: {id} with restitution date: {date_restitution_str}")
     except Exception as e:
-        if 'conn' in locals():
-            conn.rollback()
-            conn.close()
+        conn.rollback()
         logger.error(f"Error in terminer_affectation: {str(e)}")
         flash(f'Erreur: {str(e)}', 'danger')
-        return redirect(url_for('affectations'))
+    finally:
+        conn.close()
+    return redirect(url_for('affectations'))
 
 
 @app.route('/affectation/supprimer/<int:id>', methods=['POST'])
@@ -1449,22 +1498,13 @@ def supprimer_affectation(id):
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT ID_Article_Affectation FROM Affectation WHERE ID_Affectation = ?", (id,))
-        id_article = cursor.fetchone()
-        if not id_article:
+        result = cursor.fetchone()
+        if not result:
             raise ValueError("Affectation non trouvée.")
-        id_article = id_article[0]
 
+        article_id = result[0]
         cursor.execute("DELETE FROM Affectation WHERE ID_Affectation = ?", (id,))
-        cursor.execute("""
-                       UPDATE Article
-                       SET Statut_Article           = 'NON AFFECTE',
-                           Affecter_au_Article      = NULL,
-                           Service_Employe_Article  = NULL,
-                           Date_Affectation_Article = NULL,
-                           Date_Restitution_Article = NULL,
-                           Numero_Affectation       = NULL
-                       WHERE ID_Article = ?
-                       """, (id_article,))
+        update_article_status(article_id, conn, cursor)
         conn.commit()
         flash('Affectation supprimée avec succès', 'success')
         logger.info(f"Deleted affectation ID: {id}")

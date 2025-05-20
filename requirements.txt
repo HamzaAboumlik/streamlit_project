@@ -1,6 +1,8 @@
 flask
 flask-bcrypt
-wfastcgi
 pyodbc
-python-dotenv
-gunicorn
+wfastcgi
+pandas
+openpyxl
+weasyprint
+werkzeug
