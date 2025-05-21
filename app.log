@@ -17927,3 +17927,257 @@
 2025-05-20 09:17:35,619 - WARNING -  * Debugger is active!
 2025-05-20 09:17:35,627 - INFO -  * Debugger PIN: 547-924-811
 2025-05-20 09:17:45,810 - INFO - 127.0.0.1 - - [20/May/2025 09:17:45] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-20 14:24:27,211 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2025-05-20 14:24:27,211 - INFO - [33mPress CTRL+C to quit[0m
+2025-05-20 14:24:27,213 - INFO -  * Restarting with stat
+2025-05-20 14:24:28,120 - WARNING -  * Debugger is active!
+2025-05-20 14:24:28,126 - INFO -  * Debugger PIN: 547-924-811
+2025-05-20 14:24:30,227 - INFO - 127.0.0.1 - - [20/May/2025 14:24:30] "[32mGET /profile HTTP/1.1[0m" 302 -
+2025-05-20 14:24:30,231 - DEBUG - Accessed login route, method: GET
+2025-05-20 14:24:30,271 - INFO - 127.0.0.1 - - [20/May/2025 14:24:30] "GET /login?next=http://localhost:5000/profile HTTP/1.1" 200 -
+2025-05-20 14:24:30,588 - INFO - 127.0.0.1 - - [20/May/2025 14:24:30] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 14:24:30,955 - INFO - 127.0.0.1 - - [20/May/2025 14:24:30] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-20 14:25:38,308 - DEBUG - Accessed login route, method: POST
+2025-05-20 14:25:38,679 - WARNING - Failed login attempt for admin@example.com
+2025-05-20 14:25:38,680 - INFO - 127.0.0.1 - - [20/May/2025 14:25:38] "POST /login HTTP/1.1" 200 -
+2025-05-20 14:25:38,702 - INFO - 127.0.0.1 - - [20/May/2025 14:25:38] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 15:19:45,419 - DEBUG - Accessed login route, method: POST
+2025-05-20 15:19:45,511 - INFO - 127.0.0.1 - - [20/May/2025 15:19:45] "[35m[1mPOST /login HTTP/1.1[0m" 500 -
+2025-05-20 15:19:45,557 - INFO - 127.0.0.1 - - [20/May/2025 15:19:45] "GET /login?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+2025-05-20 15:19:45,706 - INFO - 127.0.0.1 - - [20/May/2025 15:19:45] "GET /login?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+2025-05-20 15:19:46,056 - INFO - 127.0.0.1 - - [20/May/2025 15:19:46] "GET /login?__debugger__=yes&cmd=resource&f=console.png&s=ucZuZyJo276kY0AEa7Op HTTP/1.1" 200 -
+2025-05-20 15:19:46,318 - INFO - 127.0.0.1 - - [20/May/2025 15:19:46] "GET /login?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+2025-05-20 15:28:32,034 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\projet_stage\\flask_app.py', reloading
+2025-05-20 15:28:32,341 - INFO -  * Restarting with stat
+2025-05-20 15:28:34,417 - WARNING -  * Debugger is active!
+2025-05-20 15:28:34,428 - INFO -  * Debugger PIN: 547-924-811
+2025-05-20 15:28:34,525 - DEBUG - Accessed login route, method: POST
+2025-05-20 15:28:34,627 - ERROR - Invalid password format for user hamza@gmail.com: Invalid salt
+2025-05-20 15:28:34,636 - INFO - 127.0.0.1 - - [20/May/2025 15:28:34] "POST /login HTTP/1.1" 200 -
+2025-05-20 15:28:34,777 - INFO - 127.0.0.1 - - [20/May/2025 15:28:34] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 15:28:34,799 - INFO - 127.0.0.1 - - [20/May/2025 15:28:34] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-20 15:28:48,958 - DEBUG - Accessed login route, method: POST
+2025-05-20 15:28:48,966 - ERROR - Invalid password format for user hamza@gmail.com: Invalid salt
+2025-05-20 15:28:48,967 - INFO - 127.0.0.1 - - [20/May/2025 15:28:48] "POST /login HTTP/1.1" 200 -
+2025-05-20 15:28:48,993 - INFO - 127.0.0.1 - - [20/May/2025 15:28:48] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 15:29:28,252 - DEBUG - Accessed login route, method: POST
+2025-05-20 15:29:28,256 - ERROR - Invalid password format for user hamza@gmail.com: Invalid salt
+2025-05-20 15:29:28,257 - INFO - 127.0.0.1 - - [20/May/2025 15:29:28] "POST /login HTTP/1.1" 200 -
+2025-05-20 15:29:28,566 - INFO - 127.0.0.1 - - [20/May/2025 15:29:28] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 16:14:46,998 - DEBUG - Accessed login route, method: POST
+2025-05-20 16:14:47,252 - WARNING - Failed login attempt for admin@example.com
+2025-05-20 16:14:47,253 - INFO - 127.0.0.1 - - [20/May/2025 16:14:47] "POST /login HTTP/1.1" 200 -
+2025-05-20 16:14:47,273 - INFO - 127.0.0.1 - - [20/May/2025 16:14:47] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 16:14:56,889 - DEBUG - Accessed login route, method: POST
+2025-05-20 16:14:56,893 - ERROR - Invalid password format for user hamza@gmail.com: Invalid salt
+2025-05-20 16:14:56,893 - INFO - 127.0.0.1 - - [20/May/2025 16:14:56] "POST /login HTTP/1.1" 200 -
+2025-05-20 16:14:57,203 - INFO - 127.0.0.1 - - [20/May/2025 16:14:57] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 16:15:11,868 - DEBUG - Accessed login route, method: POST
+2025-05-20 16:15:12,120 - INFO - User hamzaaboumlik37@gmail.com logged in successfully
+2025-05-20 16:15:12,121 - INFO - 127.0.0.1 - - [20/May/2025 16:15:12] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-05-20 16:15:12,131 - DEBUG - Accessed index route
+2025-05-20 16:15:12,254 - INFO - 127.0.0.1 - - [20/May/2025 16:15:12] "[35m[1mGET / HTTP/1.1[0m" 500 -
+2025-05-20 16:15:12,277 - INFO - 127.0.0.1 - - [20/May/2025 16:15:12] "[36mGET /?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 304 -
+2025-05-20 16:15:12,590 - INFO - 127.0.0.1 - - [20/May/2025 16:15:12] "[36mGET /?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 304 -
+2025-05-20 16:15:12,932 - INFO - 127.0.0.1 - - [20/May/2025 16:15:12] "GET /?__debugger__=yes&cmd=resource&f=console.png&s=ghrzutaOZvGwzcNpuOfR HTTP/1.1" 200 -
+2025-05-20 16:15:13,179 - INFO - 127.0.0.1 - - [20/May/2025 16:15:13] "[36mGET /?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 304 -
+2025-05-20 16:15:32,264 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\projet_stage\\flask_app.py', reloading
+2025-05-20 16:15:32,457 - INFO -  * Restarting with stat
+2025-05-20 16:15:36,304 - WARNING -  * Debugger is active!
+2025-05-20 16:15:36,310 - INFO -  * Debugger PIN: 547-924-811
+2025-05-20 16:15:49,297 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\projet_stage\\flask_app.py', reloading
+2025-05-20 16:15:49,453 - INFO -  * Restarting with stat
+2025-05-20 16:15:52,441 - WARNING -  * Debugger is active!
+2025-05-20 16:15:52,447 - INFO -  * Debugger PIN: 547-924-811
+2025-05-20 16:15:52,497 - DEBUG - Accessed index route
+2025-05-20 16:15:52,515 - INFO - 127.0.0.1 - - [20/May/2025 16:15:52] "GET / HTTP/1.1" 200 -
+2025-05-20 16:15:52,668 - INFO - 127.0.0.1 - - [20/May/2025 16:15:52] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:15:52,669 - INFO - 127.0.0.1 - - [20/May/2025 16:15:52] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:15:53,066 - INFO - 127.0.0.1 - - [20/May/2025 16:15:53] "[32mGET /api/stats HTTP/1.1[0m" 302 -
+2025-05-20 16:15:53,357 - DEBUG - Accessed login route, method: GET
+2025-05-20 16:15:53,360 - INFO - 127.0.0.1 - - [20/May/2025 16:15:53] "GET /login?next=http://localhost:5000/api/stats HTTP/1.1" 200 -
+2025-05-20 16:15:58,531 - DEBUG - Accessed login route, method: GET
+2025-05-20 16:15:58,532 - INFO - 127.0.0.1 - - [20/May/2025 16:15:58] "GET /login HTTP/1.1" 200 -
+2025-05-20 16:15:58,835 - INFO - 127.0.0.1 - - [20/May/2025 16:15:58] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 16:16:04,586 - DEBUG - Accessed login route, method: POST
+2025-05-20 16:16:04,940 - INFO - User hamzaaboumlik37@gmail.com logged in successfully
+2025-05-20 16:16:04,941 - INFO - 127.0.0.1 - - [20/May/2025 16:16:04] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-05-20 16:16:04,945 - DEBUG - Accessed index route
+2025-05-20 16:16:04,945 - INFO - 127.0.0.1 - - [20/May/2025 16:16:04] "GET / HTTP/1.1" 200 -
+2025-05-20 16:16:04,974 - INFO - 127.0.0.1 - - [20/May/2025 16:16:04] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:16:05,280 - DEBUG - Accessed api_stats route
+2025-05-20 16:16:05,292 - INFO - 127.0.0.1 - - [20/May/2025 16:16:05] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 16:16:05,328 - INFO - 127.0.0.1 - - [20/May/2025 16:16:05] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:16:07,096 - DEBUG - Accessed liste_inventaire route
+2025-05-20 16:16:07,163 - INFO - 127.0.0.1 - - [20/May/2025 16:16:07] "GET /liste_inventaire HTTP/1.1" 200 -
+2025-05-20 16:16:07,224 - INFO - 127.0.0.1 - - [20/May/2025 16:16:07] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:16:07,362 - INFO - 127.0.0.1 - - [20/May/2025 16:16:07] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:16:10,038 - DEBUG - Accessed index route
+2025-05-20 16:16:10,039 - INFO - 127.0.0.1 - - [20/May/2025 16:16:10] "GET / HTTP/1.1" 200 -
+2025-05-20 16:16:10,346 - INFO - 127.0.0.1 - - [20/May/2025 16:16:10] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:16:10,365 - INFO - 127.0.0.1 - - [20/May/2025 16:16:10] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:16:10,673 - DEBUG - Accessed api_stats route
+2025-05-20 16:16:10,676 - INFO - 127.0.0.1 - - [20/May/2025 16:16:10] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 16:22:07,325 - DEBUG - Accessed utilisateurs route
+2025-05-20 16:22:07,346 - DEBUG - Total employes fetched: 3
+2025-05-20 16:22:07,355 - DEBUG - Services fetched: ['Comptabilité', 'IT Support']
+2025-05-20 16:22:07,356 - DEBUG - Directions fetched: ['IT Department']
+2025-05-20 16:22:07,394 - INFO - 127.0.0.1 - - [20/May/2025 16:22:07] "GET /utilisateurs HTTP/1.1" 200 -
+2025-05-20 16:22:07,466 - INFO - 127.0.0.1 - - [20/May/2025 16:22:07] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:22:07,594 - INFO - 127.0.0.1 - - [20/May/2025 16:22:07] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:22:35,991 - DEBUG - Accessed editer_utilisateur route for ID: 3, method: GET
+2025-05-20 16:22:36,034 - INFO - 127.0.0.1 - - [20/May/2025 16:22:36] "GET /utilisateur/editer/3 HTTP/1.1" 200 -
+2025-05-20 16:22:36,304 - INFO - 127.0.0.1 - - [20/May/2025 16:22:36] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:22:36,364 - INFO - 127.0.0.1 - - [20/May/2025 16:22:36] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:22:40,341 - DEBUG - Accessed index route
+2025-05-20 16:22:40,342 - INFO - 127.0.0.1 - - [20/May/2025 16:22:40] "GET / HTTP/1.1" 200 -
+2025-05-20 16:22:40,481 - INFO - 127.0.0.1 - - [20/May/2025 16:22:40] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:22:40,601 - DEBUG - Accessed api_stats route
+2025-05-20 16:22:40,606 - INFO - 127.0.0.1 - - [20/May/2025 16:22:40] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 16:22:40,679 - INFO - 127.0.0.1 - - [20/May/2025 16:22:40] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:22:42,815 - DEBUG - Accessed utilisateurs route
+2025-05-20 16:22:42,817 - DEBUG - Total employes fetched: 3
+2025-05-20 16:22:42,818 - DEBUG - Services fetched: ['Comptabilité', 'IT Support']
+2025-05-20 16:22:42,819 - DEBUG - Directions fetched: ['IT Department']
+2025-05-20 16:22:42,821 - INFO - 127.0.0.1 - - [20/May/2025 16:22:42] "GET /utilisateurs HTTP/1.1" 200 -
+2025-05-20 16:22:43,129 - INFO - 127.0.0.1 - - [20/May/2025 16:22:43] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:22:43,157 - INFO - 127.0.0.1 - - [20/May/2025 16:22:43] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:22:46,998 - DEBUG - Accessed index route
+2025-05-20 16:22:46,999 - INFO - 127.0.0.1 - - [20/May/2025 16:22:46] "GET / HTTP/1.1" 200 -
+2025-05-20 16:22:47,313 - INFO - 127.0.0.1 - - [20/May/2025 16:22:47] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:22:47,341 - DEBUG - Accessed api_stats route
+2025-05-20 16:22:47,348 - INFO - 127.0.0.1 - - [20/May/2025 16:22:47] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 16:22:47,648 - INFO - 127.0.0.1 - - [20/May/2025 16:22:47] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:22:55,730 - DEBUG - Accessed liste_inventaire route
+2025-05-20 16:22:55,737 - INFO - 127.0.0.1 - - [20/May/2025 16:22:55] "GET /liste_inventaire HTTP/1.1" 200 -
+2025-05-20 16:22:55,870 - INFO - 127.0.0.1 - - [20/May/2025 16:22:55] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:22:55,993 - INFO - 127.0.0.1 - - [20/May/2025 16:22:55] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:22:59,669 - DEBUG - Accessed index route
+2025-05-20 16:22:59,671 - INFO - 127.0.0.1 - - [20/May/2025 16:22:59] "GET / HTTP/1.1" 200 -
+2025-05-20 16:22:59,978 - INFO - 127.0.0.1 - - [20/May/2025 16:22:59] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:23:00,013 - INFO - 127.0.0.1 - - [20/May/2025 16:23:00] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:23:00,322 - DEBUG - Accessed api_stats route
+2025-05-20 16:23:00,324 - INFO - 127.0.0.1 - - [20/May/2025 16:23:00] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 16:23:03,427 - DEBUG - Accessed profile route, method: GET
+2025-05-20 16:23:03,472 - INFO - 127.0.0.1 - - [20/May/2025 16:23:03] "GET /profile HTTP/1.1" 200 -
+2025-05-20 16:23:03,569 - INFO - 127.0.0.1 - - [20/May/2025 16:23:03] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:23:03,695 - INFO - 127.0.0.1 - - [20/May/2025 16:23:03] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:46:10,847 - DEBUG - Accessed utilisateurs route
+2025-05-20 16:46:10,869 - DEBUG - Total employes fetched: 3
+2025-05-20 16:46:10,871 - DEBUG - Services fetched: ['Comptabilité', 'IT Support']
+2025-05-20 16:46:10,873 - DEBUG - Directions fetched: ['IT Department']
+2025-05-20 16:46:10,876 - INFO - 127.0.0.1 - - [20/May/2025 16:46:10] "GET /utilisateurs HTTP/1.1" 200 -
+2025-05-20 16:46:10,988 - INFO - 127.0.0.1 - - [20/May/2025 16:46:10] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 16:46:11,113 - INFO - 127.0.0.1 - - [20/May/2025 16:46:11] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 16:46:11,222 - INFO - 127.0.0.1 - - [20/May/2025 16:46:11] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-20 17:04:40,421 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\projet_stage\\flask_app.py', reloading
+2025-05-20 17:04:41,719 - INFO -  * Restarting with stat
+2025-05-20 17:04:45,702 - WARNING -  * Debugger is active!
+2025-05-20 17:04:45,711 - INFO -  * Debugger PIN: 547-924-811
+2025-05-20 17:46:18,464 - INFO -  * Detected change in 'C:\\Users\\hp\\PycharmProjects\\projet_stage\\flask_app.py', reloading
+2025-05-20 17:46:18,573 - INFO -  * Restarting with stat
+2025-05-20 17:46:19,659 - WARNING -  * Debugger is active!
+2025-05-20 17:46:19,666 - INFO -  * Debugger PIN: 547-924-811
+2025-05-20 17:46:22,622 - INFO - 127.0.0.1 - - [20/May/2025 17:46:22] "[32mGET /utilisateurs HTTP/1.1[0m" 302 -
+2025-05-20 17:46:22,794 - DEBUG - Accessed login route, method: GET
+2025-05-20 17:46:22,799 - INFO - 127.0.0.1 - - [20/May/2025 17:46:22] "GET /login?next=http://localhost:5000/utilisateurs HTTP/1.1" 200 -
+2025-05-20 17:46:22,988 - INFO - 127.0.0.1 - - [20/May/2025 17:46:22] "[36mGET /static/images/background.jpg HTTP/1.1[0m" 304 -
+2025-05-20 17:46:23,136 - INFO - 127.0.0.1 - - [20/May/2025 17:46:23] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2025-05-20 17:46:31,468 - DEBUG - Accessed login route, method: POST
+2025-05-20 17:46:31,769 - INFO - User admin@example.com logged in successfully
+2025-05-20 17:46:31,769 - INFO - 127.0.0.1 - - [20/May/2025 17:46:31] "[32mPOST /login HTTP/1.1[0m" 302 -
+2025-05-20 17:46:31,773 - DEBUG - Accessed index route
+2025-05-20 17:46:31,786 - INFO - 127.0.0.1 - - [20/May/2025 17:46:31] "GET / HTTP/1.1" 200 -
+2025-05-20 17:46:32,127 - INFO - 127.0.0.1 - - [20/May/2025 17:46:32] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:46:32,128 - INFO - 127.0.0.1 - - [20/May/2025 17:46:32] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:46:32,372 - DEBUG - Accessed api_stats route
+2025-05-20 17:46:32,375 - INFO - 127.0.0.1 - - [20/May/2025 17:46:32] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 17:46:36,232 - DEBUG - Total employés: 3
+2025-05-20 17:46:36,232 - DEBUG - Total articles: 4
+2025-05-20 17:46:36,233 - DEBUG - Articles affectés: 3
+2025-05-20 17:46:36,233 - DEBUG - Articles non affectés: 1
+2025-05-20 17:46:36,233 - DEBUG - Répartition types: [('autre', 2), ('imprimante', 1), ('ordinateur', 1)]
+2025-05-20 17:46:36,233 - DEBUG - Répartition services: [('Comptabilité', 1), ('IT Department', 1), ('IT Support', 1)]
+2025-05-20 17:46:36,233 - DEBUG - Répartition employés: [('IT Department', 'Comptabilité', 1), ('IT Department', 'IT Support', 2)]
+2025-05-20 17:46:36,233 - DEBUG - Répartition matériel direction/service: [('IT Department', 'N/A', 3), ('N/A', 'Comptabilité', 1), ('N/A', 'IT Support', 2)]
+2025-05-20 17:46:36,299 - INFO - 127.0.0.1 - - [20/May/2025 17:46:36] "GET /dashboard HTTP/1.1" 200 -
+2025-05-20 17:46:36,527 - INFO - 127.0.0.1 - - [20/May/2025 17:46:36] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:46:36,636 - INFO - 127.0.0.1 - - [20/May/2025 17:46:36] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:46:37,415 - DEBUG - Accessed affectations route
+2025-05-20 17:46:37,481 - INFO - 127.0.0.1 - - [20/May/2025 17:46:37] "GET /affectations HTTP/1.1" 200 -
+2025-05-20 17:46:37,514 - INFO - 127.0.0.1 - - [20/May/2025 17:46:37] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:46:37,664 - INFO - 127.0.0.1 - - [20/May/2025 17:46:37] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:46:38,266 - DEBUG - Accessed materiel route
+2025-05-20 17:46:38,349 - INFO - 127.0.0.1 - - [20/May/2025 17:46:38] "GET /materiel HTTP/1.1" 200 -
+2025-05-20 17:46:38,371 - INFO - 127.0.0.1 - - [20/May/2025 17:46:38] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:46:38,527 - INFO - 127.0.0.1 - - [20/May/2025 17:46:38] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:46:38,688 - INFO - 127.0.0.1 - - [20/May/2025 17:46:38] "[36mGET /static/images/33881258d07e4165b7ad5c0b7583c2b0_imprimante.jpeg HTTP/1.1[0m" 304 -
+2025-05-20 17:46:38,690 - INFO - 127.0.0.1 - - [20/May/2025 17:46:38] "[36mGET /static/images/8708440c296843beacf9814a6e0adc2c_0a5cc46d5ba54cdf9055c05198d10369_pc.jpeg HTTP/1.1[0m" 304 -
+2025-05-20 17:46:38,691 - INFO - 127.0.0.1 - - [20/May/2025 17:46:38] "[36mGET /static/images/9e405382ed67484abf681addf07713fc_9da24c35241c4df3bb249819ee50eb53_telecharger_2.jpeg HTTP/1.1[0m" 304 -
+2025-05-20 17:46:38,693 - INFO - 127.0.0.1 - - [20/May/2025 17:46:38] "[36mGET /static/images/ba1d0deb533f4b08af527825e487f464_0f00bbba0602413e9d1f40e8a6bd1bb3_projecteur.png HTTP/1.1[0m" 304 -
+2025-05-20 17:46:39,276 - DEBUG - Accessed utilisateurs route
+2025-05-20 17:46:39,278 - DEBUG - Total employes fetched: 3
+2025-05-20 17:46:39,278 - DEBUG - Services fetched: ['Comptabilité', 'IT Support']
+2025-05-20 17:46:39,278 - DEBUG - Directions fetched: ['IT Department']
+2025-05-20 17:46:39,286 - INFO - 127.0.0.1 - - [20/May/2025 17:46:39] "GET /utilisateurs HTTP/1.1" 200 -
+2025-05-20 17:46:39,342 - INFO - 127.0.0.1 - - [20/May/2025 17:46:39] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:46:39,526 - INFO - 127.0.0.1 - - [20/May/2025 17:46:39] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:46:40,071 - DEBUG - Accessed admin_users route
+2025-05-20 17:46:40,108 - INFO - 127.0.0.1 - - [20/May/2025 17:46:40] "GET /admin/users HTTP/1.1" 200 -
+2025-05-20 17:46:40,380 - INFO - 127.0.0.1 - - [20/May/2025 17:46:40] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:46:40,441 - INFO - 127.0.0.1 - - [20/May/2025 17:46:40] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:46:41,152 - DEBUG - Accessed index route
+2025-05-20 17:46:41,152 - INFO - 127.0.0.1 - - [20/May/2025 17:46:41] "GET / HTTP/1.1" 200 -
+2025-05-20 17:46:41,278 - INFO - 127.0.0.1 - - [20/May/2025 17:46:41] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:46:41,416 - DEBUG - Accessed api_stats route
+2025-05-20 17:46:41,417 - INFO - 127.0.0.1 - - [20/May/2025 17:46:41] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 17:46:41,478 - INFO - 127.0.0.1 - - [20/May/2025 17:46:41] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:46:54,434 - INFO - 127.0.0.1 - - [20/May/2025 17:46:54] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:47:16,238 - DEBUG - Accessed liste_inventaire route
+2025-05-20 17:47:16,262 - INFO - 127.0.0.1 - - [20/May/2025 17:47:16] "GET /liste_inventaire HTTP/1.1" 200 -
+2025-05-20 17:47:16,546 - INFO - 127.0.0.1 - - [20/May/2025 17:47:16] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:47:16,625 - INFO - 127.0.0.1 - - [20/May/2025 17:47:16] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:47:25,718 - DEBUG - Accessed index route
+2025-05-20 17:47:25,719 - INFO - 127.0.0.1 - - [20/May/2025 17:47:25] "GET / HTTP/1.1" 200 -
+2025-05-20 17:47:25,767 - INFO - 127.0.0.1 - - [20/May/2025 17:47:25] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:47:25,971 - DEBUG - Accessed api_stats route
+2025-05-20 17:47:25,974 - INFO - 127.0.0.1 - - [20/May/2025 17:47:25] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 17:47:26,194 - INFO - 127.0.0.1 - - [20/May/2025 17:47:26] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:47:34,771 - DEBUG - Accessed utilisateurs route
+2025-05-20 17:47:34,773 - DEBUG - Total employes fetched: 3
+2025-05-20 17:47:34,774 - DEBUG - Services fetched: ['Comptabilité', 'IT Support']
+2025-05-20 17:47:34,775 - DEBUG - Directions fetched: ['IT Department']
+2025-05-20 17:47:34,777 - INFO - 127.0.0.1 - - [20/May/2025 17:47:34] "GET /utilisateurs HTTP/1.1" 200 -
+2025-05-20 17:47:34,907 - INFO - 127.0.0.1 - - [20/May/2025 17:47:34] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:47:35,031 - INFO - 127.0.0.1 - - [20/May/2025 17:47:35] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:47:44,327 - DEBUG - Accessed index route
+2025-05-20 17:47:44,328 - INFO - 127.0.0.1 - - [20/May/2025 17:47:44] "GET / HTTP/1.1" 200 -
+2025-05-20 17:47:44,644 - INFO - 127.0.0.1 - - [20/May/2025 17:47:44] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:47:44,679 - INFO - 127.0.0.1 - - [20/May/2025 17:47:44] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:47:44,981 - DEBUG - Accessed api_stats route
+2025-05-20 17:47:44,984 - INFO - 127.0.0.1 - - [20/May/2025 17:47:44] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 17:47:49,197 - DEBUG - Accessed liste_inventaire route
+2025-05-20 17:47:49,201 - INFO - 127.0.0.1 - - [20/May/2025 17:47:49] "GET /liste_inventaire HTTP/1.1" 200 -
+2025-05-20 17:47:49,282 - INFO - 127.0.0.1 - - [20/May/2025 17:47:49] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:47:49,460 - INFO - 127.0.0.1 - - [20/May/2025 17:47:49] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:48:23,247 - DEBUG - Accessed admin_users route
+2025-05-20 17:48:23,250 - INFO - 127.0.0.1 - - [20/May/2025 17:48:23] "GET /admin/users HTTP/1.1" 200 -
+2025-05-20 17:48:23,562 - INFO - 127.0.0.1 - - [20/May/2025 17:48:23] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:48:23,606 - INFO - 127.0.0.1 - - [20/May/2025 17:48:23] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:51:57,619 - DEBUG - Accessed index route
+2025-05-20 17:51:57,620 - INFO - 127.0.0.1 - - [20/May/2025 17:51:57] "GET / HTTP/1.1" 200 -
+2025-05-20 17:51:57,771 - INFO - 127.0.0.1 - - [20/May/2025 17:51:57] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:51:57,878 - DEBUG - Accessed api_stats route
+2025-05-20 17:51:57,894 - INFO - 127.0.0.1 - - [20/May/2025 17:51:57] "GET /api/stats HTTP/1.1" 200 -
+2025-05-20 17:51:57,972 - INFO - 127.0.0.1 - - [20/May/2025 17:51:57] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:52:59,380 - DEBUG - Accessed liste_inventaire route
+2025-05-20 17:52:59,403 - INFO - 127.0.0.1 - - [20/May/2025 17:52:59] "GET /liste_inventaire HTTP/1.1" 200 -
+2025-05-20 17:52:59,522 - INFO - 127.0.0.1 - - [20/May/2025 17:52:59] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:52:59,644 - INFO - 127.0.0.1 - - [20/May/2025 17:52:59] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:53:08,588 - DEBUG - Accessed index route
+2025-05-20 17:53:08,590 - INFO - 127.0.0.1 - - [20/May/2025 17:53:08] "GET / HTTP/1.1" 200 -
+2025-05-20 17:53:08,904 - INFO - 127.0.0.1 - - [20/May/2025 17:53:08] "[36mGET /static/css/styles.css HTTP/1.1[0m" 304 -
+2025-05-20 17:53:08,919 - INFO - 127.0.0.1 - - [20/May/2025 17:53:08] "[36mGET /static/images/logo.png HTTP/1.1[0m" 304 -
+2025-05-20 17:53:09,232 - DEBUG - Accessed api_stats route
+2025-05-20 17:53:09,236 - INFO - 127.0.0.1 - - [20/May/2025 17:53:09] "GET /api/stats HTTP/1.1" 200 -

@@ -124,13 +124,25 @@ def login():
             user = cursor.fetchone()
             conn.close()
 
-            if user and bcrypt.check_password_hash(user.Password, password):
-                session['user_id'] = user.ID_User
-                session['email'] = user.Email
-                session['role'] = user.Role
-                logger.info(f"User {email} logged in successfully")
-                next_page = request.args.get('next')
-                return redirect(next_page or url_for('index'))
+            if user:
+                try:
+                    password_matches = bcrypt.check_password_hash(user.Password, password)
+                except ValueError as e:
+                    logger.error(f"Invalid password format for user {email}: {str(e)}")
+                    flash('Email ou mot de passe incorrect.', 'danger')
+                    return render_template('login.html')
+
+                if password_matches:
+                    session['user_id'] = user.ID_User
+                    session['email'] = user.Email
+                    session['role'] = user.Role
+                    logger.info(f"User {email} logged in successfully")
+                    next_page = request.args.get('next')
+                    return redirect(next_page or url_for('index'))
+                else:
+                    flash('Email ou mot de passe incorrect.', 'danger')
+                    logger.warning(f"Failed login attempt for {email}")
+                    return render_template('login.html')
             else:
                 flash('Email ou mot de passe incorrect.', 'danger')
                 logger.warning(f"Failed login attempt for {email}")

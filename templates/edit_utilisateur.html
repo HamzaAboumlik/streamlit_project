@@ -95,13 +95,12 @@
 {% block scripts %}
 <script>
     document.getElementById('utilisateurForm').addEventListener('submit', function(event) {
-        // Clear unchanged fields to avoid sending them
         const inputs = document.querySelectorAll('input, select');
         inputs.forEach(input => {
             const original = input.getAttribute('data-original') || '';
             const current = input.value || '';
             if (current === original) {
-                input.name = ''; // Remove name to exclude from form data
+                input.name = '';
             }
         });
     });
